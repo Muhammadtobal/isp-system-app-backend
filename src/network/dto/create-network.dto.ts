@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateNetworkDto {
   @ApiProperty({ example: 'Main Network' })
@@ -11,4 +11,9 @@ export class CreateNetworkDto {
   @IsNotEmpty()
   @IsString()
   location: string;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

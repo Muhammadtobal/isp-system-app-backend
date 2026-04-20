@@ -12,7 +12,7 @@ import { Plan } from 'src/plan/entities/plan.entity';
 import { Network } from 'src/network/entities/network.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { BaseEntity } from 'src/shared/base.entity';
-
+import { Point } from 'src/point/entities/point.entity';
 @Entity()
 export class Subscription extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -23,6 +23,9 @@ export class Subscription extends BaseEntity {
 
   @Column('bigint')
   customer_id: number;
+
+  @Column('bigint')
+  point_id: number;
 
   @Column({ type: 'date' })
   start_date: string;
@@ -40,6 +43,10 @@ export class Subscription extends BaseEntity {
   @ManyToOne(() => Customer, (customer) => customer.subscriptions)
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
+
+  @ManyToOne(() => Point, (point) => point.subscriptions)
+  @JoinColumn({ name: 'point_id' })
+  point?: Point;
 
   @OneToMany(() => Payment, (payment) => payment.subscription)
   payments: Payment[];

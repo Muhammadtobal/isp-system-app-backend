@@ -3,10 +3,10 @@ import { Column, CreateDateColumn, Entity, UpdateDateColumn } from 'typeorm';
 @Entity()
 export abstract class BaseEntity {
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @Column({ type: 'boolean', default: true })
   active: boolean;

@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsInt, IsString, IsDateString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsInt,
+  IsString,
+  IsDateString,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateSubscriptionDto {
   @ApiProperty({ example: 1 })
@@ -11,6 +18,11 @@ export class CreateSubscriptionDto {
   @IsNotEmpty()
   @IsInt()
   customer_id: number;
+
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  point_id: number;
 
   @ApiProperty({ example: '2024-01-01' })
   @IsNotEmpty()
@@ -26,4 +38,9 @@ export class CreateSubscriptionDto {
   @IsNotEmpty()
   @IsString()
   status: string;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

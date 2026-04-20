@@ -15,6 +15,9 @@ import { PermissionModule } from './permission/permission.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
+import { ExpenseModule } from './expense/expense.module';
+import { ExpenseTypeModule } from './expense_type/expense_type.module';
+import { PointModule } from './point/point.module';
 
 @Module({
   imports: [
@@ -44,6 +47,9 @@ import { AdminModule } from './admin/admin.module';
     PermissionModule,
     AuthModule,
     AdminModule,
+    ExpenseModule,
+    ExpenseTypeModule,
+    PointModule,
   ],
   controllers: [AppController],
   providers: [AppService],

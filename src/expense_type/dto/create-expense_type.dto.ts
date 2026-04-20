@@ -1,0 +1,15 @@
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateExpenseTypeDto {
+  @ApiProperty({
+    example: 'Utilities',
+  })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
+}

@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsInt, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreatePlanDto {
@@ -23,4 +30,9 @@ export class CreatePlanDto {
   @IsNotEmpty()
   @IsInt()
   network_id: number;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

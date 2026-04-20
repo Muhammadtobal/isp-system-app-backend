@@ -1,5 +1,6 @@
 import { Customer } from 'src/customer/entities/customer.entity';
 import { Plan } from 'src/plan/entities/plan.entity';
+import { Point } from 'src/point/entities/point.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -19,4 +20,7 @@ export class Network extends BaseEntity {
 
   @OneToMany(() => Plan, (plan) => plan.network)
   plans: Plan[];
+
+  @OneToMany(() => Point, (point) => point.network)
+  points: Point[];
 }

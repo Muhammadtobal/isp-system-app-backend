@@ -1,5 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsInt } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateCustomerDto {
   @ApiProperty({ example: 'Ahmed Ali' })
@@ -16,4 +22,9 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   @IsInt()
   network_id: number;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

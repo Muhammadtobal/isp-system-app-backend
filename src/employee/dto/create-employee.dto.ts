@@ -1,10 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
   IsEmail,
   MinLength,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateEmployeeDto {
@@ -29,4 +30,9 @@ export class CreateEmployeeDto {
   @IsOptional()
   @IsString()
   refresh_token?: string;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

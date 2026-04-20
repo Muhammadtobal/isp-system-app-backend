@@ -8,13 +8,11 @@ export class CreatePermissionDto {
   name: string;
 
   @ApiProperty({ example: 'Allows creating users', required: false })
-  @IsNotEmpty()
   @IsOptional()
   @IsString()
   description?: string;
 
   @ApiProperty({ example: true, required: false })
-  @IsNotEmpty()
   @IsOptional()
   @IsBoolean()
   active?: boolean;
