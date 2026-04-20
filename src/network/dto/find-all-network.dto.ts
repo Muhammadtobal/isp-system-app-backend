@@ -20,8 +20,8 @@ export class FindAllNetworkDto {
   @ApiPropertyOptional({
     description: 'Sort options',
     example: {
-      field: 'id',
-      order: 'DESC',
+      by: 'id',
+      type: 'DESC',
     },
   })
   @IsOptional()

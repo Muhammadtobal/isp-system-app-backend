@@ -5,11 +5,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PaginationInput, SortInput } from 'src/shared/dto';
 
 export class FindAllEmployeeDto {
-  @ApiProperty({
-    description: 'Pagination object',
+  @ApiPropertyOptional({
+    description: 'Sort options',
     example: {
-      page: 1,
-      limit: 10,
+      by: 'id',
+      type: 'DESC',
     },
   })
   @IsNotEmpty()

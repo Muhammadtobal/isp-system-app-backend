@@ -1,12 +1,12 @@
-import { Type } from "class-transformer";
-import { IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { PaginationInput, SortInput } from "src/shared/dto";
+import { PaginationInput, SortInput } from 'src/shared/dto';
 
 export class FindAllAdminDto {
   @ApiProperty({
-    description: "Pagination object",
+    description: 'Pagination object',
     example: {
       page: 1,
       limit: 10,
@@ -18,10 +18,10 @@ export class FindAllAdminDto {
   pagination: PaginationInput;
 
   @ApiPropertyOptional({
-    description: "Sort options",
+    description: 'Sort options',
     example: {
-      field: "id",
-      order: "DESC",
+      by: 'id',
+      type: 'DESC',
     },
   })
   @IsOptional()
