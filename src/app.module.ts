@@ -14,6 +14,7 @@ import { EmployeePermissionModule } from './employee_permission/employee_permiss
 import { PermissionModule } from './permission/permission.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AuthModule } from './auth/auth.module';
     EmployeePermissionModule,
     PermissionModule,
     AuthModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
