@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Network } from 'src/network/entities/network.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
@@ -23,10 +24,11 @@ export class Plan extends BaseEntity {
   @Column({ type: 'decimal' })
   price: number;
 
-  @ManyToOne(() => Network, (network) => network.id, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
+  @Column('bigint')
+  network_id: number;
+
+  @ManyToOne(() => Network, (network) => network.plans)
+  @JoinColumn({ name: 'network_id' })
   network?: Network;
 
   @OneToMany(() => Subscription, (subscription) => subscription.plan)

@@ -16,12 +16,14 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { decodeJwtToken, verifyJwtToken } from 'src/shared/jwt-verify-token';
 import { UserService } from 'src/user/user.service';
+import { EmployeeService } from 'src/employee/employee.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly employeeService: EmployeeService,
     // private readonly adminService: AdminService,
   ) {}
 
@@ -49,6 +51,41 @@ export class AuthController {
 
     return {
       user: safeUser,
+      access_token: accessToken,
+      expires_in: 15 * 60,
+    };
+  }
+
+  @Post('employee-login')
+  async employeeLogin(@Body() loginEmployeeDto: LoginUserDto) {
+    const employee = await this.employeeService.findOne(
+      {
+        email: loginEmployeeDto.email,
+      },
+      {
+        relations: { employee_permissions: { permission: true } },
+      },
+    );
+
+    if (!employee) {
+      throw new HttpException('Employee not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (!(await bcrypt.compare(loginEmployeeDto.password, employee.password))) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    }
+
+    const accessToken = await this.authService.generateJwtToken(
+      {
+        empId: employee.id,
+      },
+      process.env.EMPLOYEE_JWT_KEY as string,
+    );
+
+    const { password, refresh_token, ...safeEmployee } = employee;
+
+    return {
+      employee: safeEmployee,
       access_token: accessToken,
       expires_in: 15 * 60,
     };
@@ -165,6 +202,51 @@ export class AuthController {
     const accessToken = await this.authService.generateJwtToken(
       { userId: user.id },
       process.env.USER_JWT_KEY as string,
+    );
+
+    return {
+      access_token: accessToken,
+      expires_in: 15 * 60,
+    };
+  }
+
+  @Post('employee-refresh-token')
+  async refreshEmployeeToken(
+    @Body() dto: RefreshTokenDto,
+    @Request() req: any,
+  ) {
+    if (!req.headers.authorization) {
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    }
+
+    const token = req.headers.authorization.split(' ')[1];
+
+    let jwtData: any;
+
+    try {
+      jwtData = verifyJwtToken(token, process.env.EMPLOYEE_JWT_KEY!);
+    } catch (err: any) {
+      if (err.message === 'TOKEN_EXPIRED') {
+        decodeJwtToken(token);
+
+        jwtData = verifyJwtToken(token, process.env.EMPLOYEE_JWT_KEY!, true);
+      } else {
+        throw err;
+      }
+    }
+
+    const employee = await this.employeeService.findOne({
+      id: jwtData.empId,
+      refresh_token: dto.refresh_token,
+    });
+
+    if (!employee) {
+      throw new HttpException('EMPLOYEE_NOT_FOUND', HttpStatus.NOT_FOUND);
+    }
+
+    const accessToken = await this.authService.generateJwtToken(
+      { empId: employee.id },
+      process.env.EMPLOYEE_JWT_KEY as string,
     );
 
     return {

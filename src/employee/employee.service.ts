@@ -18,12 +18,17 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
+import { AssignPermissionDto } from './dto/assign-permission.dto';
+import { EmployeePermissionService } from 'src/employee_permission/employee_permission.service';
+import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class EmployeeService {
   constructor(
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
+    private readonly employeePermissionService: EmployeePermissionService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   public create(createEmployeeDto: CreateEmployeeDto) {
@@ -67,5 +72,46 @@ export class EmployeeService {
 
   public remove(id: number) {
     this.employeeRepository.delete(id);
+  }
+
+  public async assignPermission(assignPermissionDto: AssignPermissionDto) {
+    const id = assignPermissionDto.permission_id;
+    await this.permissionService.findOne({ id });
+
+    const employee = await this.findOne({
+      id: assignPermissionDto.employee_id,
+    });
+
+    if (employee) {
+      await this.employeePermissionService.create({
+        employee_id: assignPermissionDto.employee_id,
+        permission_id: assignPermissionDto.permission_id,
+      });
+
+      return true;
+    }
+
+    return false;
+  }
+
+  public async unassignPermission(unassignPermissionDto: AssignPermissionDto) {
+    await this.permissionService.findOne({
+      id: unassignPermissionDto.permission_id,
+    });
+
+    const employee = await this.findOne({
+      id: unassignPermissionDto.employee_id,
+    });
+
+    if (employee) {
+      // await this.employeePermissionService.remove({
+      //   employee_id: unassignPermissionDto.employee_id,
+      //   permission_id: unassignPermissionDto.permission_id,
+      // });
+
+      return true;
+    }
+
+    return false;
   }
 }
