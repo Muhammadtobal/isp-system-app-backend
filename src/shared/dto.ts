@@ -1,13 +1,16 @@
-import { Type } from "class-transformer";
+import { Type } from 'class-transformer';
 import {
+  ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
-} from "class-validator";
+} from 'class-validator';
 
 export class MatchInput {
   @IsNotEmpty()
@@ -16,7 +19,7 @@ export class MatchInput {
 
   @IsNotEmpty()
   @IsString()
-  op: "full" | "partial";
+  op: 'full' | 'partial';
 }
 
 export class SingleDateInput {
@@ -77,14 +80,16 @@ export class RangeNumberInput {
 
 export class SingleIdInput {
   @IsNotEmpty()
-  @IsNumberString()
-  value: string;
+  @IsInt()
+  value: number;
 }
 
 export class ListOfIdsInput {
   @IsNotEmpty()
   @IsArray()
-  ids: string[];
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  ids: number[];
 }
 
 export class PaginationInput {
@@ -106,5 +111,5 @@ export class SortInput {
 
   @IsNotEmpty()
   @IsString()
-  type: "ASC" | "DESC";
+  type: 'ASC' | 'DESC';
 }

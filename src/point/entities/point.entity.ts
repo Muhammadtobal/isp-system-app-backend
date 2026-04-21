@@ -20,8 +20,17 @@ export class Point extends BaseEntity {
   @Column('bigint')
   network_id: number;
 
-  @Column({ type: 'text', nullable: true })
-  notes?: string;
+  @Column({ type: 'int' })
+  point_value: number;
+
+  @Column({ type: 'int' })
+  max_subscription: number;
+
+  @Column({ type: 'int', default: 0 })
+  count_subscription: number;
+
+  @Column({ type: 'text' })
+  location: string;
 
   @ManyToOne(() => Network, (network) => network.points)
   @JoinColumn({ name: 'network_id' })

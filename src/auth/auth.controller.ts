@@ -10,13 +10,11 @@ import {
 import * as bcrypt from 'bcryptjs';
 
 import { AuthService } from './auth.service';
-import { LoginUserDto } from './dto/login-user.dto';
-import { LoginAdminDto } from './dto/login-admin.dto';
+import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { decodeJwtToken, verifyJwtToken } from 'src/shared/jwt-verify-token';
 import { UserService } from 'src/user/user.service';
 import { EmployeeService } from 'src/employee/employee.service';
-import { AdminService } from 'src/admin/admin.service';
 
 @Controller('auth')
 export class AuthController {
@@ -24,11 +22,10 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly employeeService: EmployeeService,
-    private readonly adminService: AdminService,
   ) {}
 
   @Post('user-login')
-  async userLogin(@Body() loginUserDto: LoginUserDto) {
+  async userLogin(@Body() loginUserDto: LoginDto) {
     const user = await this.userService.findOne({
       email: loginUserDto.email,
     });
@@ -57,7 +54,7 @@ export class AuthController {
   }
 
   @Post('employee-login')
-  async employeeLogin(@Body() loginEmployeeDto: LoginUserDto) {
+  async employeeLogin(@Body() loginEmployeeDto: LoginDto) {
     const employee = await this.employeeService.findOne(
       {
         email: loginEmployeeDto.email,
@@ -86,83 +83,6 @@ export class AuthController {
 
     return {
       employee: safeEmployee,
-      access_token: accessToken,
-      expires_in: 15 * 60,
-    };
-  }
-
-  @Post('admin-login')
-  async adminLogin(@Body() loginAdminDto: LoginAdminDto) {
-    const admin = await this.adminService.findOne({
-      email: loginAdminDto.email,
-    });
-
-    if (!admin) {
-      throw new HttpException('Admin not found', HttpStatus.NOT_FOUND);
-    }
-
-    const isMatch = await bcrypt.compare(
-      loginAdminDto.password,
-      admin.password,
-    );
-
-    if (!isMatch) {
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
-    }
-
-    const accessToken = await this.authService.generateJwtToken(
-      {
-        adminId: admin.id,
-      },
-      process.env.ADMIN_JWT_KEY as string,
-    );
-
-    const { password, ...safeAdmin } = admin;
-
-    return {
-      admin: safeAdmin,
-      access_token: accessToken,
-      expires_in: 15 * 60,
-    };
-  }
-
-  @Post('admin-refresh-token')
-  async refreshAdminToken(@Body() dto: RefreshTokenDto, @Request() req: any) {
-    if (!req.headers.authorization) {
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
-    }
-
-    const token = req.headers.authorization.split(' ')[1];
-
-    let jwtData: any;
-
-    try {
-      jwtData = verifyJwtToken(token, process.env.ADMIN_JWT_KEY!);
-    } catch (err: any) {
-      if (err.message === 'TOKEN_EXPIRED') {
-        decodeJwtToken(token);
-
-        jwtData = verifyJwtToken(token, process.env.ADMIN_JWT_KEY!, true);
-      } else {
-        throw err;
-      }
-    }
-
-    const admin = await this.adminService.findOne({
-      id: jwtData.adminId,
-      refresh_token: dto.refresh_token,
-    });
-
-    if (!admin) {
-      throw new HttpException('ADMIN_NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-
-    const accessToken = await this.authService.generateJwtToken(
-      { adminId: admin.id },
-      process.env.ADMIN_JWT_KEY as string,
-    );
-
-    return {
       access_token: accessToken,
       expires_in: 15 * 60,
     };

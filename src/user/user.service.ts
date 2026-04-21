@@ -60,6 +60,7 @@ export class UserService {
 
   public async update(id: number, updateUserDto: UpdateUserDto) {
     await this.userRepository.update(id, updateUserDto);
+
     return this.findOne({ id });
   }
 

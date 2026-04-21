@@ -10,6 +10,7 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
@@ -21,6 +22,7 @@ import { AssignPermissionDto } from './dto/assign-permission.dto';
 import { ResetMyPasswordDto } from './dto/reset-my-password.dto';
 import { ErrorMessages } from 'src/shared/error-messages.object';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 
 @Controller('employee')
 export class EmployeeController {
@@ -30,6 +32,7 @@ export class EmployeeController {
   ) {}
 
   @Post('create')
+  @UseGuards(JwtAuthUserGuard)
   public async createEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
     createEmployeeDto.password = await bcrypt.hash(
       createEmployeeDto.password,
@@ -46,16 +49,19 @@ export class EmployeeController {
     return this.employeeService.findOne({ id: employee.id });
   }
   @Post('get-all')
+  @UseGuards(JwtAuthUserGuard)
   findAll(@Body() filter: FindAllEmployeeDto) {
     return this.employeeService.findAll(filter);
   }
 
   @Get('get-one/:id')
+  @UseGuards(JwtAuthUserGuard)
   findOne(@Param('id') id: number) {
     return this.employeeService.findOne({ id });
   }
 
   @Patch('update/:id')
+  @UseGuards(JwtAuthUserGuard)
   update(
     @Param('id') id: number,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
@@ -64,6 +70,7 @@ export class EmployeeController {
   }
 
   @Delete('remove/:id')
+  @UseGuards(JwtAuthUserGuard)
   remove(@Param('id') id: number) {
     this.employeeService.remove(id);
     return {
@@ -72,6 +79,7 @@ export class EmployeeController {
   }
 
   @Post('assign-permission')
+  @UseGuards(JwtAuthUserGuard)
   public async assignPermission(
     @Body() assignPermissionDto: AssignPermissionDto,
   ) {
@@ -82,6 +90,7 @@ export class EmployeeController {
   }
 
   @Post('unassign-permission')
+  @UseGuards(JwtAuthUserGuard)
   public async unassignPermission(
     @Body() unassignPermissionDto: AssignPermissionDto,
   ) {
@@ -93,6 +102,7 @@ export class EmployeeController {
   }
 
   @Post('reset-my-password')
+  @UseGuards(JwtAuthUserGuard)
   public async resetMyPassword(
     @Body() resetMyPasswordDto: ResetMyPasswordDto,
     @Req() req: any,

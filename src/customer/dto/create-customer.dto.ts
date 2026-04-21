@@ -13,6 +13,16 @@ export class CreateCustomerDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  plan_id: number;
+
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  point_id: number;
+
   @ApiProperty({ example: '0501234567' })
   @IsNotEmpty()
   @IsString()

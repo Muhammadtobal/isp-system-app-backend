@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -15,6 +16,25 @@ export class CreatePointDto {
   @IsNumber()
   network_id: number;
 
+  @ApiProperty({
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsInt()
+  point_value: number;
+
+  @ApiProperty({
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsInt()
+  max_subscription: number;
+
+  @ApiProperty({ example: 'Dubai - UAE' })
+  @IsNotEmpty()
+  @IsString()
+  location: string;
+
   @ApiPropertyOptional({
     example: 'Some notes',
   })
@@ -26,4 +46,12 @@ export class CreatePointDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  count_subscription?: number;
 }

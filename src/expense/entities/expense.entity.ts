@@ -1,5 +1,6 @@
 import { Employee } from 'src/employee/entities/employee.entity';
 import { ExpenseType } from 'src/expense_type/entities/expense_type.entity';
+import { Network } from 'src/network/entities/network.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import {
   Entity,
@@ -21,6 +22,9 @@ export class Expense extends BaseEntity {
   @Column('bigint')
   expense_type_id: number;
 
+  @Column('bigint')
+  network_id: number;
+
   @Column('bigint', { nullable: true })
   employee_id?: number;
 
@@ -30,6 +34,10 @@ export class Expense extends BaseEntity {
   @ManyToOne(() => ExpenseType, (expense_type) => expense_type.expenses)
   @JoinColumn({ name: 'expense_type_id' })
   expense_type?: ExpenseType;
+
+  @ManyToOne(() => Network, (network) => network.expenses)
+  @JoinColumn({ name: 'network_id' })
+  network?: Network;
 
   @ManyToOne(() => Employee, (employee) => employee.expenses)
   @JoinColumn({ name: 'employee_id' })

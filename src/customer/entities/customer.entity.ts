@@ -28,6 +28,8 @@ export class Customer extends BaseEntity {
   @JoinColumn({ name: 'network_id' })
   network?: Network;
 
-  @OneToMany(() => Subscription, (subscription) => subscription.customer)
+  @OneToMany(() => Subscription, (subscription) => subscription.customer, {
+    cascade: true,
+  })
   subscriptions: Subscription[];
 }

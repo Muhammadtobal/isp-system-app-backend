@@ -15,14 +15,13 @@ export class CreatePlanDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 100 })
+  @ApiProperty({ example: 100.5 })
   @IsNotEmpty()
-  @IsInt()
+  @IsNumber()
   speed: number;
 
   @ApiProperty({ example: 49.99 })
   @IsNotEmpty()
-  @Type(() => Number)
   @IsNumber()
   price: number;
 

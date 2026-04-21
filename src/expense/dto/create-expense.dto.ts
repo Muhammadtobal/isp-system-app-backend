@@ -1,18 +1,33 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateExpenseDto {
   @ApiProperty({
     example: 100.5,
   })
+  @IsNotEmpty()
   @IsNumber()
   value: number;
 
   @ApiProperty({
     example: 1,
   })
+  @IsNotEmpty()
   @IsNumber()
   expense_type_id: number;
+
+  @ApiProperty({
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  network_id: number;
 
   @ApiPropertyOptional({
     example: 1,

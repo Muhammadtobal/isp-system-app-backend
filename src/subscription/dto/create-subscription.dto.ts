@@ -24,23 +24,18 @@ export class CreateSubscriptionDto {
   @IsInt()
   point_id: number;
 
-  @ApiProperty({ example: '2024-01-01' })
-  @IsNotEmpty()
-  @IsDateString()
-  start_date: string;
-
-  @ApiProperty({ example: '2024-12-31' })
-  @IsNotEmpty()
-  @IsDateString()
-  end_date: string;
-
-  @ApiProperty({ example: 'active' })
-  @IsNotEmpty()
-  @IsString()
-  status: string;
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  status?: boolean;
 
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({ example: '2024-12-31', required: false })
+  @IsOptional()
+  @IsDateString()
+  end_date?: string;
 }

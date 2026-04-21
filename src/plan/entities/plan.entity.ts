@@ -18,10 +18,10 @@ export class Plan extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'double' })
   speed: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'double' })
   price: number;
 
   @Column('bigint')

@@ -18,16 +18,27 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
+import { SubscriptionService } from 'src/subscription/subscription.service';
 
 @Injectable()
 export class PaymentService {
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepository: Repository<Payment>,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
-  public create(createPaymentDto: CreatePaymentDto) {
+  public async create(createPaymentDto: CreatePaymentDto) {
     const payment = this.paymentRepository.create(createPaymentDto);
+    const subscription = await this.subscriptionService.findOne(
+      { id: createPaymentDto.subscription_id },
+      { relations: { plan: true } },
+    );
+
+    if (!subscription?.plan?.price) {
+      throw new Error('Plan price not found');
+    }
+    payment.amount = subscription?.plan?.price;
     return this.paymentRepository.save(payment);
   }
 

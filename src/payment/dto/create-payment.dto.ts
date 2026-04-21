@@ -13,10 +13,10 @@ export class CreatePaymentDto {
   @IsInt()
   subscription_id: number;
 
-  @ApiProperty({ example: 100.5 })
-  @IsNotEmpty()
-  @IsNumber()
-  amount: number;
+  // @ApiProperty({ example: 49.99 })
+  // @IsOptional()
+  // @IsNumber()
+  // amount?: number;
 
   @ApiProperty({ example: true, required: false })
   @IsOptional()

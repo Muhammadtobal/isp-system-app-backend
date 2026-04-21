@@ -14,7 +14,6 @@ import { EmployeePermissionModule } from './employee_permission/employee_permiss
 import { PermissionModule } from './permission/permission.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { AdminModule } from './admin/admin.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ExpenseTypeModule } from './expense_type/expense_type.module';
 import { PointModule } from './point/point.module';
@@ -46,7 +45,6 @@ import { PointModule } from './point/point.module';
     EmployeePermissionModule,
     PermissionModule,
     AuthModule,
-    AdminModule,
     ExpenseModule,
     ExpenseTypeModule,
     PointModule,

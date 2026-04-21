@@ -13,6 +13,7 @@ import { Network } from 'src/network/entities/network.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Point } from 'src/point/entities/point.entity';
+import { Exclude } from 'class-transformer';
 @Entity()
 export class Subscription extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -27,14 +28,11 @@ export class Subscription extends BaseEntity {
   @Column('bigint')
   point_id: number;
 
-  @Column({ type: 'date' })
-  start_date: string;
+  @Column({ type: 'date', nullable: true })
+  end_date?: string;
 
-  @Column({ type: 'date' })
-  end_date: string;
-
-  @Column({ type: 'varchar', length: 50 })
-  status: string;
+  @Column({ type: 'boolean', default: true })
+  status: boolean;
 
   @ManyToOne(() => Plan, (plan) => plan.subscriptions)
   @JoinColumn({ name: 'plan_id' })

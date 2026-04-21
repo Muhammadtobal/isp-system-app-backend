@@ -1,5 +1,12 @@
+import { Network } from 'src/network/entities/network.entity';
 import { BaseEntity } from 'src/shared/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class User extends BaseEntity {
@@ -26,4 +33,7 @@ export class User extends BaseEntity {
 
   @Column({ type: 'text' })
   address: string;
+
+  @OneToMany(() => Network, (network) => network.user)
+  networks: Network[];
 }

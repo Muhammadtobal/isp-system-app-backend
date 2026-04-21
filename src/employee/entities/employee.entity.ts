@@ -1,8 +1,16 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { EmployeePermission } from 'src/employee_permission/entities/employee_permission.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
+import { Network } from 'src/network/entities/network.entity';
 
 @Entity()
 export class Employee extends BaseEntity {
@@ -14,6 +22,9 @@ export class Employee extends BaseEntity {
 
   @Column('varchar', { length: 255 })
   full_name: string;
+
+  @Column('bigint')
+  network_id: number;
 
   @Column('varchar', { length: 255 })
   password: string;
@@ -29,4 +40,8 @@ export class Employee extends BaseEntity {
 
   @OneToMany(() => Expense, (expense) => expense.employee)
   expenses: Expense[];
+
+  @ManyToOne(() => Network, (network) => network.employees)
+  @JoinColumn({ name: 'network_id' })
+  network?: Network;
 }

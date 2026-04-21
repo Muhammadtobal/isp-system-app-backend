@@ -20,7 +20,7 @@ export class Payment extends BaseEntity {
   @Column('bigint')
   subscription_id: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'double' })
   amount: number;
 
   @ManyToOne(() => Subscription, (subscription) => subscription.payments)

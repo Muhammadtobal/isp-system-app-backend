@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
@@ -14,6 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FindAllUserDto } from './dto/find-all-user.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 
 @Controller('user')
 export class UserController {
@@ -37,21 +39,25 @@ export class UserController {
   }
 
   @Post('get-all')
+  @UseGuards(JwtAuthUserGuard)
   public findAll(@Body() filter: FindAllUserDto) {
     return this.userService.findAll(filter);
   }
 
   @Get('get-one/:id')
+  @UseGuards(JwtAuthUserGuard)
   public findOne(@Param('id') id: number) {
     return this.userService.findOne({ id });
   }
 
   @Patch('update/:id')
+  @UseGuards(JwtAuthUserGuard)
   public update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
   @Delete('remove/:id')
+  @UseGuards(JwtAuthUserGuard)
   public remove(@Param('id') id: number) {
     this.userService.remove(id);
     return {
