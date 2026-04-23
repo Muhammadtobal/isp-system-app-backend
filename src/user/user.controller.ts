@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
@@ -16,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindAllUserDto } from './dto/find-all-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { getUser } from 'src/shared/helpers';
 
 @Controller('user')
 export class UserController {
@@ -63,5 +65,47 @@ export class UserController {
     return {
       done: true,
     };
+  }
+
+  @Get('my-profile')
+  @UseGuards(JwtAuthUserGuard)
+  public async myProfile(@Request() req: any) {
+    const user = getUser(req.user);
+
+    if (user === '0') return;
+
+    const data = await this.userService.findOne({
+      id: user.userId,
+    });
+
+    if (!data) return;
+
+    const { password, refresh_token, active, role, ...safeUser } = data;
+
+    return safeUser;
+  }
+
+  @Patch('my-update')
+  @UseGuards(JwtAuthUserGuard)
+  public async myUpdate(
+    @Request() req: any,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = getUser(req.user);
+
+    if (user === '0') return;
+
+    const updatedUser = await this.userService.update(
+      user.userId,
+      updateUserDto,
+    );
+
+    if (!updatedUser) {
+      return { message: 'User not found' };
+    }
+
+    const { password, refresh_token, active, role, ...safeUser } = updatedUser;
+
+    return safeUser;
   }
 }

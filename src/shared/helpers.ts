@@ -272,3 +272,11 @@ export async function customPaginate<
     meta: metaTransformer(metaData),
   };
 }
+
+export function getUser(user: any) {
+  if (!user?.userId || !user?.role) {
+    return '0';
+  }
+
+  return user;
+}
