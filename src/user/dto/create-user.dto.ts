@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsBoolean,
 } from 'class-validator';
+import { Role } from 'src/shared/enums/role.enum';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -44,6 +45,15 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   phone: string;
+
+  @ApiProperty({
+    example: Role.USER,
+    enum: Role,
+    description: 'User role (user or admin)',
+  })
+  @IsNotEmpty()
+  @IsString()
+  role: Role;
 
   @ApiProperty({
     example: 'Dubai, UAE',

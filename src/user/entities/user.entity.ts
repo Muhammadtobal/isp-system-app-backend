@@ -1,5 +1,6 @@
 import { Network } from 'src/network/entities/network.entity';
 import { BaseEntity } from 'src/shared/base.entity';
+import { Role } from 'src/shared/enums/role.enum';
 import {
   Column,
   Entity,
@@ -33,6 +34,12 @@ export class User extends BaseEntity {
 
   @Column({ type: 'text' })
   address: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+  })
+  role: Role;
 
   @OneToMany(() => Network, (network) => network.user)
   networks: Network[];

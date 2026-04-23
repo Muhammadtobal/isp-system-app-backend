@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { nanoid } from "nanoid";
+import { Injectable } from '@nestjs/common';
+import { nanoid } from 'nanoid';
 
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
   public generateJwtToken(payload: any, secret: string) {
     return this.jwtService.signAsync(payload, {
       secret,
-      expiresIn: "15m",
+      expiresIn: '1y',
     });
   }
   public generateActivationCode() {

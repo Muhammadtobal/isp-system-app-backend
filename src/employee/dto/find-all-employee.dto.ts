@@ -43,9 +43,10 @@ export class FindAllEmployeeDto {
   @ApiProperty({
     description: 'Network id (single or list)',
     example: { id: 1 },
+    required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsObject()
   @IsSingleIdOrList()
-  network_id: SingleIdInput | ListOfIdsInput;
+  network_id?: SingleIdInput | ListOfIdsInput;
 }

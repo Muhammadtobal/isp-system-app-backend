@@ -43,9 +43,10 @@ export class FindAllNetworkDto {
   @ApiProperty({
     description: 'User id (single or list)',
     example: { id: 1 },
+    required: true,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsObject()
   @IsSingleIdOrList()
-  user_id: SingleIdInput | ListOfIdsInput;
+  user_id?: SingleIdInput | ListOfIdsInput;
 }

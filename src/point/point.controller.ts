@@ -13,7 +13,7 @@ import {
 import { PointService } from './point.service';
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
-import { FindAllPointDto } from './dto/find-all-point-type.dto';
+import { FindAllPointDto } from './dto/find-all-poin.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 
 @Controller('point')

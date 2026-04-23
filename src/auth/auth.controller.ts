@@ -40,6 +40,7 @@ export class AuthController {
     const accessToken = await this.authService.generateJwtToken(
       {
         userId: user.id,
+        role: user.role,
       },
       process.env.USER_JWT_KEY as string,
     );
@@ -49,7 +50,6 @@ export class AuthController {
     return {
       user: safeUser,
       access_token: accessToken,
-      expires_in: 15 * 60,
     };
   }
 
