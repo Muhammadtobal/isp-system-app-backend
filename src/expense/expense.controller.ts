@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 
 import { ExpenseService } from './expense.service';
@@ -15,6 +16,7 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { FindAllExpenseDto } from './dto/find-all-expense.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { getUser } from 'src/shared/helpers';
 
 @Controller('expense')
 export class ExpenseController {
@@ -22,7 +24,11 @@ export class ExpenseController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
-  create(@Body() createExpenseDto: CreateExpenseDto) {
+  create(@Body() createExpenseDto: CreateExpenseDto, @Request() req: any) {
+    const user = getUser(req.user);
+    if (user.role !== 'admin') {
+      createExpenseDto.user_id = user.userId;
+    }
     return this.expenseService.create(createExpenseDto);
   }
 

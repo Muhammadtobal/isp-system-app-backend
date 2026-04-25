@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { FindAllPlanDto } from './dto/find-all-plan.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { getUser } from 'src/shared/helpers';
 
 @Controller('plan')
 export class PlanController {
@@ -20,7 +22,11 @@ export class PlanController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
-  public create(@Body() createPlanDto: CreatePlanDto) {
+  public create(@Body() createPlanDto: CreatePlanDto, @Request() req: any) {
+    const user = getUser(req.user);
+    if (user.role !== 'admin') {
+      createPlanDto.user_id = user.userId;
+    }
     return this.planService.create(createPlanDto);
   }
 

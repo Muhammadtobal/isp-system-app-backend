@@ -2,6 +2,7 @@ import { Employee } from 'src/employee/entities/employee.entity';
 import { ExpenseType } from 'src/expense_type/entities/expense_type.entity';
 import { Network } from 'src/network/entities/network.entity';
 import { BaseEntity } from 'src/shared/base.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -30,6 +31,13 @@ export class Expense extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   notes?: string;
+
+  @Column('bigint', { nullable: true })
+  user_id?: number;
+
+  @ManyToOne(() => User, (user) => user.expenses)
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 
   @ManyToOne(() => ExpenseType, (expense_type) => expense_type.expenses)
   @JoinColumn({ name: 'expense_type_id' })

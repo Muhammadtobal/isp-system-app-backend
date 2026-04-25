@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ExpenseTypeModule } from './expense_type/expense_type.module';
 import { PointModule } from './point/point.module';
+import { EmployeeNetworkModule } from './employee-network/employee-network.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { PointModule } from './point/point.module';
     ExpenseModule,
     ExpenseTypeModule,
     PointModule,
+    EmployeeNetworkModule,
   ],
   controllers: [AppController],
   providers: [AppService],

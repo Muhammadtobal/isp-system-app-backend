@@ -10,7 +10,7 @@ import {
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
 import { Point } from './entities/point.entity';
-import { FindAllPointDto } from './dto/find-all-poin.dto';
+import { FindAllPointDto } from './dto/find-all-point.dto';
 
 import {
   generateQueryConditions,

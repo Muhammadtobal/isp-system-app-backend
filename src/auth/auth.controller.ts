@@ -79,7 +79,7 @@ export class AuthController {
       process.env.EMPLOYEE_JWT_KEY as string,
     );
 
-    const { password, refresh_token, ...safeEmployee } = employee;
+    const { password, ...safeEmployee } = employee;
 
     return {
       employee: safeEmployee,
@@ -88,90 +88,90 @@ export class AuthController {
     };
   }
 
-  @Post('user-refresh-token')
-  async refreshUserToken(@Body() dto: RefreshTokenDto, @Request() req: any) {
-    if (!req.headers.authorization) {
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
-    }
+  // // @Post('user-refresh-token')
+  // async refreshUserToken(@Body() dto: RefreshTokenDto, @Request() req: any) {
+  //   if (!req.headers.authorization) {
+  //     throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+  //   }
 
-    const token = req.headers.authorization.split(' ')[1];
+  //   const token = req.headers.authorization.split(' ')[1];
 
-    let jwtData: any;
+  //   let jwtData: any;
 
-    try {
-      jwtData = verifyJwtToken(token, process.env.USER_JWT_KEY!);
-    } catch (err: any) {
-      if (err.message === 'TOKEN_EXPIRED') {
-        decodeJwtToken(token);
+  //   try {
+  //     jwtData = verifyJwtToken(token, process.env.USER_JWT_KEY!);
+  //   } catch (err: any) {
+  //     if (err.message === 'TOKEN_EXPIRED') {
+  //       decodeJwtToken(token);
 
-        jwtData = verifyJwtToken(token, process.env.USER_JWT_KEY!, true);
-      } else {
-        throw err;
-      }
-    }
+  //       jwtData = verifyJwtToken(token, process.env.USER_JWT_KEY!, true);
+  //     } else {
+  //       throw err;
+  //     }
+  //   }
 
-    const user = await this.userService.findOne({
-      id: jwtData.userId,
-      refresh_token: dto.refresh_token,
-    });
+  //   const user = await this.userService.findOne({
+  //     id: jwtData.userId,
+  //     refresh_token: dto.refresh_token,
+  //   });
 
-    if (!user) {
-      throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
+  //   if (!user) {
+  //     throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+  //   }
 
-    const accessToken = await this.authService.generateJwtToken(
-      { userId: user.id },
-      process.env.USER_JWT_KEY as string,
-    );
+  //   const accessToken = await this.authService.generateJwtToken(
+  //     { userId: user.id },
+  //     process.env.USER_JWT_KEY as string,
+  //   );
 
-    return {
-      access_token: accessToken,
-      expires_in: 15 * 60,
-    };
-  }
+  //   return {
+  //     access_token: accessToken,
+  //     expires_in: 15 * 60,
+  //   };
+  // }
 
-  @Post('employee-refresh-token')
-  async refreshEmployeeToken(
-    @Body() dto: RefreshTokenDto,
-    @Request() req: any,
-  ) {
-    if (!req.headers.authorization) {
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
-    }
+  // @Post('employee-refresh-token')
+  // async refreshEmployeeToken(
+  //   @Body() dto: RefreshTokenDto,
+  //   @Request() req: any,
+  // ) {
+  //   if (!req.headers.authorization) {
+  //     throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+  //   }
 
-    const token = req.headers.authorization.split(' ')[1];
+  //   const token = req.headers.authorization.split(' ')[1];
 
-    let jwtData: any;
+  //   let jwtData: any;
 
-    try {
-      jwtData = verifyJwtToken(token, process.env.EMPLOYEE_JWT_KEY!);
-    } catch (err: any) {
-      if (err.message === 'TOKEN_EXPIRED') {
-        decodeJwtToken(token);
+  //   try {
+  //     jwtData = verifyJwtToken(token, process.env.EMPLOYEE_JWT_KEY!);
+  //   } catch (err: any) {
+  //     if (err.message === 'TOKEN_EXPIRED') {
+  //       decodeJwtToken(token);
 
-        jwtData = verifyJwtToken(token, process.env.EMPLOYEE_JWT_KEY!, true);
-      } else {
-        throw err;
-      }
-    }
+  //       jwtData = verifyJwtToken(token, process.env.EMPLOYEE_JWT_KEY!, true);
+  //     } else {
+  //       throw err;
+  //     }
+  //   }
 
-    const employee = await this.employeeService.findOne({
-      id: jwtData.empId,
-      refresh_token: dto.refresh_token,
-    });
+  //   const employee = await this.employeeService.findOne({
+  //     id: jwtData.empId,
+  //     refresh_token: dto.refresh_token,
+  //   });
 
-    if (!employee) {
-      throw new HttpException('EMPLOYEE_NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
+  //   if (!employee) {
+  //     throw new HttpException('EMPLOYEE_NOT_FOUND', HttpStatus.NOT_FOUND);
+  //   }
 
-    const accessToken = await this.authService.generateJwtToken(
-      { empId: employee.id },
-      process.env.EMPLOYEE_JWT_KEY as string,
-    );
+  //   const accessToken = await this.authService.generateJwtToken(
+  //     { empId: employee.id },
+  //     process.env.EMPLOYEE_JWT_KEY as string,
+  //   );
 
-    return {
-      access_token: accessToken,
-      expires_in: 15 * 60,
-    };
-  }
+  //   return {
+  //     access_token: accessToken,
+  //     expires_in: 15 * 60,
+  //   };
+  // }
 }

@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { FindAllSubscriptionDto } from './dto/find-all-subscription.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { getUser } from 'src/shared/helpers';
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -20,7 +22,14 @@ export class SubscriptionController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
-  public create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
+  public create(
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
+    @Request() req: any,
+  ) {
+    const user = getUser(req.user);
+    if (user.role !== 'admin') {
+      createSubscriptionDto.user_id = user.userId;
+    }
     return this.subscriptionService.create(createSubscriptionDto);
   }
 

@@ -21,7 +21,7 @@ export class CreatePointDto {
   })
   @IsNotEmpty()
   @IsInt()
-  point_value: number;
+  name: number;
 
   @ApiProperty({
     example: 1,
@@ -54,4 +54,9 @@ export class CreatePointDto {
   @IsOptional()
   @IsInt()
   count_subscription?: number;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  user_id?: number;
 }

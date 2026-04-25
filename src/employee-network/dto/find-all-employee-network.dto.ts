@@ -15,12 +15,12 @@ import {
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
 
-export class FindAllPlanDto {
-  @ApiProperty({
-    description: 'Pagination object',
+export class FindAllEmployeeNetworkDto {
+  @ApiPropertyOptional({
+    description: 'Sort options',
     example: {
-      page: 1,
-      limit: 10,
+      by: 'id',
+      type: 'DESC',
     },
   })
   @IsNotEmpty()
@@ -31,8 +31,8 @@ export class FindAllPlanDto {
   @ApiPropertyOptional({
     description: 'Sort options',
     example: {
-      by: 'id',
-      type: 'DESC',
+      field: 'id',
+      order: 'DESC',
     },
   })
   @IsOptional()
@@ -51,12 +51,22 @@ export class FindAllPlanDto {
   network_id?: SingleIdInput | ListOfIdsInput;
 
   @ApiProperty({
-    description: 'user id (single or list)',
+    description: 'Network id (single or list)',
     example: { id: 1 },
     required: false,
   })
   @IsOptional()
   @IsObject()
   @IsSingleIdOrList()
-  user_id?: SingleIdInput | ListOfIdsInput;
+  employee_id?: SingleIdInput | ListOfIdsInput;
+
+  // @ApiProperty({
+  //   description: 'user id (single or list)',
+  //   example: { id: 1 },
+  //   required: false,
+  // })
+  // @IsOptional()
+  // @IsObject()
+  // @IsSingleIdOrList()
+  // user_id?: SingleIdInput | ListOfIdsInput;
 }

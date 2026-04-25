@@ -34,4 +34,9 @@ export class CreatePlanDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  user_id?: number;
 }

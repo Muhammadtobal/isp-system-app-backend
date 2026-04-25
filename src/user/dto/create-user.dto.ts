@@ -62,14 +62,6 @@ export class CreateUserDto {
   @IsString()
   address: string;
 
-  @ApiPropertyOptional({
-    example: 'refresh_token_example',
-    description: 'Used for JWT refresh',
-  })
-  @IsOptional()
-  @IsString()
-  refresh_token?: string;
-
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

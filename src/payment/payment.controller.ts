@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { FindAllPaymentDto } from './dto/find-all-payment.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { getUser } from 'src/shared/helpers';
 
 @Controller('payment')
 export class PaymentController {
@@ -20,7 +22,14 @@ export class PaymentController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
-  public create(@Body() createPaymentDto: CreatePaymentDto) {
+  public create(
+    @Body() createPaymentDto: CreatePaymentDto,
+    @Request() req: any,
+  ) {
+    const user = getUser(req.user);
+    if (user.role !== 'admin') {
+      createPaymentDto.user_id = user.userId;
+    }
     return this.paymentService.create(createPaymentDto);
   }
 

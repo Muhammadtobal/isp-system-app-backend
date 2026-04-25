@@ -38,4 +38,9 @@ export class CreateSubscriptionDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  user_id?: number;
 }

@@ -6,6 +6,7 @@ import {
   MinLength,
   IsOptional,
   IsBoolean,
+  IsInt,
 } from 'class-validator';
 
 export class CreateEmployeeDto {
@@ -35,4 +36,9 @@ export class CreateEmployeeDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  // @ApiProperty({ example: 1, required: false })
+  // @IsOptional()
+  // @IsInt()
+  // user_id?: number;
 }

@@ -1,6 +1,12 @@
+import { Customer } from 'src/customer/entities/customer.entity';
+import { Employee } from 'src/employee/entities/employee.entity';
+import { Expense } from 'src/expense/entities/expense.entity';
 import { Network } from 'src/network/entities/network.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
+import { Point } from 'src/point/entities/point.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Role } from 'src/shared/enums/role.enum';
+import { Subscription } from 'src/subscription/entities/subscription.entity';
 import {
   Column,
   Entity,
@@ -29,9 +35,6 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   phone: string;
 
-  @Column('varchar', { length: 255, nullable: true })
-  refresh_token?: string;
-
   @Column({ type: 'text' })
   address: string;
 
@@ -43,4 +46,22 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Network, (network) => network.user)
   networks: Network[];
+
+  @OneToMany(() => Customer, (customer) => customer.user)
+  customers: Customer[];
+
+  // @OneToMany(() => Employee, (employee) => employee.user)
+  // employees: Employee[];
+
+  @OneToMany(() => Expense, (expense) => expense.user)
+  expenses: Expense[];
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
+
+  @OneToMany(() => Point, (point) => point.user)
+  points: Point[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
 }

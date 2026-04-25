@@ -30,11 +30,8 @@ export class UserController {
   public async create(@Body() createUserDto: CreateUserDto) {
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
 
-    const refreshToken = this.authService.generateRefreshToken();
-
     const user = await this.userService.create({
       ...createUserDto,
-      refresh_token: refreshToken,
     });
 
     return this.userService.findOne({ id: user.id });
@@ -80,7 +77,7 @@ export class UserController {
 
     if (!data) return;
 
-    const { password, refresh_token, active, role, ...safeUser } = data;
+    const { password, active, role, ...safeUser } = data;
 
     return safeUser;
   }
@@ -104,7 +101,7 @@ export class UserController {
       return { message: 'User not found' };
     }
 
-    const { password, refresh_token, active, role, ...safeUser } = updatedUser;
+    const { password, active, role, ...safeUser } = updatedUser;
 
     return safeUser;
   }

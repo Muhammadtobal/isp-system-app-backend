@@ -3,6 +3,7 @@ import { ExpenseType } from 'src/expense_type/entities/expense_type.entity';
 import { Network } from 'src/network/entities/network.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -21,7 +22,7 @@ export class Point extends BaseEntity {
   network_id: number;
 
   @Column({ type: 'int' })
-  point_value: number;
+  name: number;
 
   @Column({ type: 'int' })
   max_subscription: number;
@@ -31,6 +32,13 @@ export class Point extends BaseEntity {
 
   @Column({ type: 'text' })
   location: string;
+
+  @Column('bigint', { nullable: true })
+  user_id?: number;
+
+  @ManyToOne(() => User, (user) => user.expenses)
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 
   @ManyToOne(() => Network, (network) => network.points)
   @JoinColumn({ name: 'network_id' })

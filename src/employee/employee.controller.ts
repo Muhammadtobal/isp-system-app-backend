@@ -39,11 +39,8 @@ export class EmployeeController {
       10,
     );
 
-    const refreshToken = this.authService.generateRefreshToken();
-
     const employee = await this.employeeService.create({
       ...createEmployeeDto,
-      refresh_token: refreshToken,
     });
 
     return this.employeeService.findOne({ id: employee.id });
