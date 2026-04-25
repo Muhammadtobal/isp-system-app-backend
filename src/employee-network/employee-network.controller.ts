@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 
 import { EmployeeNetworkService } from './employee-network.service';
@@ -15,6 +16,7 @@ import { CreateEmployeeNetworkDto } from './dto/create-employee-network.dto';
 import { UpdateEmployeeNetworkDto } from './dto/update-employee-network.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 import { FindAllEmployeeNetworkDto } from './dto/find-all-employee-network.dto';
+import { getUser } from 'src/shared/helpers';
 
 @Controller('employee-network')
 export class EmployeeNetworkController {
@@ -24,8 +26,15 @@ export class EmployeeNetworkController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
-  create(@Body() createDto: CreateEmployeeNetworkDto) {
-    return this.employeeNetworkService.create(createDto);
+  create(
+    @Body() createEmployeeNetworkDto: CreateEmployeeNetworkDto,
+    @Request() req: any,
+  ) {
+    const user = getUser(req.user);
+    if (user.role !== 'admin') {
+      createEmployeeNetworkDto.user_id = user.userId;
+    }
+    return this.employeeNetworkService.create(createEmployeeNetworkDto);
   }
 
   @Post('get-all')

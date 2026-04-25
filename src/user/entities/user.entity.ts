@@ -1,4 +1,5 @@
 import { Customer } from 'src/customer/entities/customer.entity';
+import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
 import { Network } from 'src/network/entities/network.entity';
@@ -50,9 +51,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Customer, (customer) => customer.user)
   customers: Customer[];
 
-  // @OneToMany(() => Employee, (employee) => employee.user)
-  // employees: Employee[];
-
   @OneToMany(() => Expense, (expense) => expense.user)
   expenses: Expense[];
 
@@ -64,4 +62,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Subscription, (subscription) => subscription.user)
   subscriptions: Subscription[];
+
+  @OneToMany(() => EmployeeNetwork, (employee_network) => employee_network.user)
+  employee_networks: EmployeeNetwork[];
 }

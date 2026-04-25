@@ -28,13 +28,6 @@ export class Employee extends BaseEntity {
   @Column('varchar', { length: 255 })
   password: string;
 
-  // @Column('bigint', { nullable: true })
-  // user_id?: number;
-
-  // @ManyToOne(() => User, (user) => user.employees)
-  // @JoinColumn({ name: 'user_id' })
-  // user?: User;
-
   @OneToMany(
     () => EmployeePermission,
     (employee_permission) => employee_permission.employee,

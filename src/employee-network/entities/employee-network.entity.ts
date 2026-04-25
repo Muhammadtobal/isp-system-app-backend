@@ -25,6 +25,13 @@ export class EmployeeNetwork extends BaseEntity {
   @Column('bigint')
   employee_id: number;
 
+  @Column('bigint', { nullable: true })
+  user_id?: number;
+
+  @ManyToOne(() => User, (user) => user.employee_networks)
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
+
   @ManyToOne(() => Network, (network) => network.employee_networks)
   @JoinColumn({ name: 'network_id' })
   network?: Network;

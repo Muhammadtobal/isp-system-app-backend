@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsInt, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsInt, IsEmail, IsOptional } from 'class-validator';
 
 export class CreateEmployeeNetworkDto {
   @ApiProperty({ example: 1 })
@@ -13,4 +13,9 @@ export class CreateEmployeeNetworkDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  user_id?: number;
 }
