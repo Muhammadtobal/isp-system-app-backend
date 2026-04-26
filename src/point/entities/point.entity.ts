@@ -21,8 +21,8 @@ export class Point extends BaseEntity {
   @Column('bigint')
   network_id: number;
 
-  @Column({ type: 'int' })
-  name: number;
+  @Column({ type: 'varchar', length: 255 })
+  name: string;
 
   @Column({ type: 'int' })
   max_subscription: number;

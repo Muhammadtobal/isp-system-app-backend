@@ -17,11 +17,11 @@ export class CreatePointDto {
   network_id: number;
 
   @ApiProperty({
-    example: 1,
+    example: '1',
   })
   @IsNotEmpty()
-  @IsInt()
-  name: number;
+  @IsString()
+  name: string;
 
   @ApiProperty({
     example: 1,

@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
@@ -39,25 +41,80 @@ export class UserController {
 
   @Post('get-all')
   @UseGuards(JwtAuthUserGuard)
-  public findAll(@Body() filter: FindAllUserDto) {
-    return this.userService.findAll(filter);
+  public async findAll(@Body() filter: FindAllUserDto, @Request() req: any) {
+    const user = getUser(req.user);
+    if (user.role !== 'admin') {
+      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    }
+    const users = await this.userService.findAll(filter);
+
+    let activeCount = 0;
+    let inactiveCount = 0;
+
+    users.items.forEach((u) => {
+      if (u.active) {
+        activeCount++;
+      } else {
+        inactiveCount++;
+      }
+    });
+
+    return {
+      totalUsers: users.items.length,
+      activeUsers: activeCount,
+      inactiveUsers: inactiveCount,
+      data: users,
+    };
   }
 
   @Get('get-one/:id')
   @UseGuards(JwtAuthUserGuard)
-  public findOne(@Param('id') id: number) {
-    return this.userService.findOne({ id });
+  public async findOne(@Param('id') id: number, @Request() req: any) {
+    const userReq = getUser(req.user);
+    if (userReq.role !== 'admin') {
+      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    }
+    const user = await this.userService.findOne({ id });
+    if (!user) {
+      throw new HttpException('المستخدم غير موجود', HttpStatus.NOT_FOUND);
+    }
+    const { password, ...userSaved } = user;
+    return userSaved;
   }
 
   @Patch('update/:id')
   @UseGuards(JwtAuthUserGuard)
-  public update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  public async update(
+    @Param('id') id: number,
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() req: any,
+  ) {
+    const userReq = getUser(req.user);
+    if (userReq.role !== 'admin') {
+      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    }
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+    const data = await this.userService.update(id, updateUserDto);
+    if (!data) {
+      throw new HttpException('المستخدم غير موجود', HttpStatus.NOT_FOUND);
+    }
+
+    const { password, ...safeUser } = data;
+
+    return safeUser;
   }
 
   @Delete('remove/:id')
   @UseGuards(JwtAuthUserGuard)
-  public remove(@Param('id') id: number) {
+  public remove(@Param('id') id: number, @Request() req: any) {
+    const userReq = getUser(req.user);
+    if (userReq.role !== 'admin') {
+      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    }
+
     this.userService.remove(id);
     return {
       done: true,
@@ -91,7 +148,9 @@ export class UserController {
     const user = getUser(req.user);
 
     if (user === '0') return;
-
+    if (updateUserDto.password && updateUserDto.password.trim() !== '') {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
     const updatedUser = await this.userService.update(
       user.userId,
       updateUserDto,

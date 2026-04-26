@@ -34,8 +34,23 @@ export class PointController {
 
   @Post('get-all')
   @UseGuards(JwtAuthUserGuard)
-  findAll(@Body() filter: FindAllPointDto) {
-    return this.pointService.findAll(filter);
+  async findAll(@Body() filter: FindAllPointDto) {
+    const points = await this.pointService.findAll(filter);
+
+    let activeCount = 0;
+    let inactiveCount = 0;
+
+    points.items.forEach((p) => {
+      if (p.active) activeCount++;
+      else inactiveCount++;
+    });
+
+    return {
+      totalPoints: points.items.length,
+      activePoints: activeCount,
+      inactivePoints: inactiveCount,
+      data: points,
+    };
   }
 
   @Get('get-one/:id')
