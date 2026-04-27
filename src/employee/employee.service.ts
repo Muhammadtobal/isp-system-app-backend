@@ -75,43 +75,42 @@ export class EmployeeService {
   }
 
   public async assignPermission(assignPermissionDto: AssignPermissionDto) {
-    const id = assignPermissionDto.permission_id;
-    await this.permissionService.findOne({ id });
-
     const employee = await this.findOne({
       id: assignPermissionDto.employee_id,
     });
 
-    if (employee) {
-      await this.employeePermissionService.create({
-        employee_id: assignPermissionDto.employee_id,
-        permission_id: assignPermissionDto.permission_id,
+    if (!employee) return false;
+
+    for (const permission_id of assignPermissionDto.permission_ids) {
+      const permission = await this.permissionService.findOne({
+        id: permission_id,
       });
 
-      return true;
+      if (!permission) continue;
+
+      await this.employeePermissionService.create({
+        employee_id: assignPermissionDto.employee_id,
+        permission_id,
+      });
     }
 
-    return false;
+    return true;
   }
 
   public async unassignPermission(unassignPermissionDto: AssignPermissionDto) {
-    await this.permissionService.findOne({
-      id: unassignPermissionDto.permission_id,
-    });
-
     const employee = await this.findOne({
       id: unassignPermissionDto.employee_id,
     });
 
-    if (employee) {
-      // await this.employeePermissionService.remove({
-      //   employee_id: unassignPermissionDto.employee_id,
-      //   permission_id: unassignPermissionDto.permission_id,
-      // });
+    if (!employee) return false;
 
-      return true;
+    for (const permission_id of unassignPermissionDto.permission_ids) {
+      await this.employeePermissionService.removePermission({
+        employee_id: unassignPermissionDto.employee_id,
+        permission_id,
+      });
     }
 
-    return false;
+    return true;
   }
 }

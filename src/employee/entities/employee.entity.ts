@@ -19,7 +19,7 @@ export class Employee extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, unique: true })
   email: string;
 
   @Column('varchar', { length: 255 })
@@ -27,6 +27,13 @@ export class Employee extends BaseEntity {
 
   @Column('varchar', { length: 255 })
   password: string;
+
+  @Column('bigint', { nullable: true })
+  user_id?: number;
+
+  @ManyToOne(() => User, (user) => user.employees)
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 
   @OneToMany(
     () => EmployeePermission,

@@ -43,37 +43,44 @@ export class UserController {
   @UseGuards(JwtAuthUserGuard)
   public async findAll(@Body() filter: FindAllUserDto, @Request() req: any) {
     const user = getUser(req.user);
+
     if (user.role !== 'admin') {
       throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
     }
+
     const users = await this.userService.findAll(filter);
 
     let activeCount = 0;
     let inactiveCount = 0;
 
     users.items.forEach((u) => {
-      if (u.active) {
-        activeCount++;
-      } else {
-        inactiveCount++;
-      }
+      if (u.active) activeCount++;
+      else inactiveCount++;
+    });
+
+    const safeItems = users.items.map((u) => {
+      const { password, ...rest } = u;
+      return rest;
     });
 
     return {
       totalUsers: users.items.length,
       activeUsers: activeCount,
       inactiveUsers: inactiveCount,
-      data: users,
+      data: {
+        ...users,
+        items: safeItems,
+      },
     };
   }
 
   @Get('get-one/:id')
   @UseGuards(JwtAuthUserGuard)
   public async findOne(@Param('id') id: number, @Request() req: any) {
-    const userReq = getUser(req.user);
-    if (userReq.role !== 'admin') {
-      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
-    }
+    // const userReq = getUser(req.user);
+    // if (userReq.role !== 'admin') {
+    //   throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    // }
     const user = await this.userService.findOne({ id });
     if (!user) {
       throw new HttpException('المستخدم غير موجود', HttpStatus.NOT_FOUND);
@@ -89,10 +96,10 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
     @Request() req: any,
   ) {
-    const userReq = getUser(req.user);
-    if (userReq.role !== 'admin') {
-      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
-    }
+    // const userReq = getUser(req.user);
+    // if (userReq.role !== 'admin') {
+    //   throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    // }
 
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
@@ -121,47 +128,47 @@ export class UserController {
     };
   }
 
-  @Get('my-profile')
-  @UseGuards(JwtAuthUserGuard)
-  public async myProfile(@Request() req: any) {
-    const user = getUser(req.user);
+  // @Get('my-profile')
+  // @UseGuards(JwtAuthUserGuard)
+  // public async myProfile(@Request() req: any) {
+  //   const user = getUser(req.user);
 
-    if (user === '0') return;
+  //   if (user === '0') return;
 
-    const data = await this.userService.findOne({
-      id: user.userId,
-    });
+  //   const data = await this.userService.findOne({
+  //     id: user.userId,
+  //   });
 
-    if (!data) return;
+  //   if (!data) return;
 
-    const { password, active, role, ...safeUser } = data;
+  //   const { password, ...safeUser } = data;
 
-    return safeUser;
-  }
+  //   return safeUser;
+  // }
 
-  @Patch('my-update')
-  @UseGuards(JwtAuthUserGuard)
-  public async myUpdate(
-    @Request() req: any,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    const user = getUser(req.user);
+  // @Patch('my-update')
+  // @UseGuards(JwtAuthUserGuard)
+  // public async myUpdate(
+  //   @Request() req: any,
+  //   @Body() updateUserDto: UpdateUserDto,
+  // ) {
+  //   const user = getUser(req.user);
 
-    if (user === '0') return;
-    if (updateUserDto.password && updateUserDto.password.trim() !== '') {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
-    const updatedUser = await this.userService.update(
-      user.userId,
-      updateUserDto,
-    );
+  //   if (user === '0') return;
+  //   if (updateUserDto.password && updateUserDto.password.trim() !== '') {
+  //     updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+  //   }
+  //   const updatedUser = await this.userService.update(
+  //     user.userId,
+  //     updateUserDto,
+  //   );
 
-    if (!updatedUser) {
-      return { message: 'User not found' };
-    }
+  //   if (!updatedUser) {
+  //     return { message: 'User not found' };
+  //   }
 
-    const { password, active, role, ...safeUser } = updatedUser;
+  //   const { password, active, role, ...safeUser } = updatedUser;
 
-    return safeUser;
-  }
+  //   return safeUser;
+  // }
 }

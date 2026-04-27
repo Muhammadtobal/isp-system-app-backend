@@ -23,6 +23,41 @@ const PermissionsStore = {
   UPDATE_EXPENSE_TYPE: 'updateExpenseType',
   DELETE_EXPENSE_TYPE: 'deleteExpenseType',
   CREATE_EXPENSE_TYPE: 'createExpenseType',
+
+  GET_POINT: 'getPoint',
+  UPDATE_POINT: 'updatePoint',
+  DELETE_POINT: 'deletePoint',
+  CREATE_POINT: 'createPoint',
+
+  GET_PLAN: 'getPlan',
+  UPDATE_PLAN: 'updatePlan',
+  DELETE_PLAN: 'deletePlan',
+  CREATE_PLAN: 'createPlan',
+
+  GET_NETWORK: 'getNetwork',
+  UPDATE_NETWORK: 'updateNetwork',
+  DELETE_NETWORK: 'deleteNetwork',
+  CREATE_NETWORK: 'createNetwork',
+
+  GET_PAYMENT: 'getPayment',
+  UPDATE_PAYMENT: 'updatePayment',
+  DELETE_PAYMENT: 'deletePayment',
+  CREATE_PAYMENT: 'createPayment',
+
+  GET_CUSTOMER: 'getCustomer',
+  UPDATE_CUSTOMER: 'updateCustomer',
+  DELETE_CUSTOMER: 'deleteCustomer',
+  CREATE_CUSTOMER: 'createCustomer',
+
+  GET_SUBSCRIPTION: 'getSubscription',
+  UPDATE_SUBSCRIPTION: 'updateSubscription',
+  DELETE_SUBSCRIPTION: 'deleteSubscription',
+  CREATE_SUBSCRIPTION: 'createSubscription',
+
+  GET_USER: 'getUser',
+  UPDATE_USER: 'updateUser',
+  DELETE_USER: 'deleteUser',
+  CREATE_USER: 'createUser',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;

@@ -65,4 +65,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => EmployeeNetwork, (employee_network) => employee_network.user)
   employee_networks: EmployeeNetwork[];
+
+  @OneToMany(() => Employee, (employee) => employee.user)
+  employees: Employee[];
 }

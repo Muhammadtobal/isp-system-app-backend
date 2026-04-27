@@ -28,14 +28,14 @@ export class AuthController {
   async userLogin(@Body() loginUserDto: LoginDto) {
     const user = await this.userService.findOne({
       email: loginUserDto.email,
+      active: true,
     });
 
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (!(await bcrypt.compare(loginUserDto.password, user.password)))
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    if (!user || !(await bcrypt.compare(loginUserDto.password, user.password)))
+      throw new HttpException(
+        'الايميل او كلمة المرور خاطئة',
+        HttpStatus.UNAUTHORIZED,
+      );
 
     const accessToken = await this.authService.generateJwtToken(
       {

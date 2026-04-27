@@ -50,13 +50,13 @@ export class FindAllEmployeeDto {
   @IsSingleIdOrList()
   network_id?: SingleIdInput | ListOfIdsInput;
 
-  // @ApiProperty({
-  //   description: 'user id (single or list)',
-  //   example: { id: 1 },
-  //   required: false,
-  // })
-  // @IsOptional()
-  // @IsObject()
-  // @IsSingleIdOrList()
-  // user_id?: SingleIdInput | ListOfIdsInput;
+  @ApiProperty({
+    description: 'user id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  user_id?: SingleIdInput | ListOfIdsInput;
 }

@@ -82,7 +82,9 @@ export class EmployeePermissionService {
     return this.findOne({ id });
   }
 
-  public remove(id: number) {
-    this.employeePermissionRepository.delete(id);
+  public async removePermission(
+    employeePermissionOptions: FindOptionsWhere<EmployeePermission>,
+  ) {
+    await this.employeePermissionRepository.delete(employeePermissionOptions);
   }
 }

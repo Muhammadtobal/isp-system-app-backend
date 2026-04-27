@@ -52,13 +52,4 @@ export class EmployeePermissionController {
       updateEmployeePermissionDto,
     );
   }
-
-  @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
-  public remove(@Param('id') id: number) {
-    this.employeePermissionService.remove(id);
-    return {
-      done: true,
-    };
-  }
 }
