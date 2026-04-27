@@ -58,18 +58,21 @@ export class AuthController {
     const employee = await this.employeeService.findOne(
       {
         email: loginEmployeeDto.email,
+        active: true,
       },
       {
         relations: { employee_permissions: { permission: true } },
       },
     );
 
-    if (!employee) {
-      throw new HttpException('Employee not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (!(await bcrypt.compare(loginEmployeeDto.password, employee.password))) {
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+    if (
+      !employee ||
+      !(await bcrypt.compare(loginEmployeeDto.password, employee.password))
+    ) {
+      throw new HttpException(
+        'خطأ في كلمة السر او الايميل',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const accessToken = await this.authService.generateJwtToken(

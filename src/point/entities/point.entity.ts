@@ -24,6 +24,9 @@ export class Point extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
+
   @Column({ type: 'int' })
   max_subscription: number;
 

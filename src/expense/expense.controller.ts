@@ -17,6 +17,9 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { FindAllExpenseDto } from './dto/find-all-expense.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 import { getUser } from 'src/shared/helpers';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/opration..enum';
+import { Expense } from './entities/expense.entity';
 
 @Controller('expense')
 export class ExpenseController {
@@ -24,6 +27,7 @@ export class ExpenseController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.GET + Expense.name)
   create(@Body() createExpenseDto: CreateExpenseDto, @Request() req: any) {
     const user = getUser(req.user);
     if (user.role !== 'admin') {
