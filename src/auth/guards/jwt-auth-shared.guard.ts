@@ -7,7 +7,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
-export class JwtAuthEmployeeGuard extends AuthGuard('jwt-employee') {
+export class JwtAuthSharedGuard extends AuthGuard([
+  'jwt-employee',
+  'jwt-user',
+]) {
   constructor(private reflector: Reflector) {
     super();
   }
@@ -20,6 +23,13 @@ export class JwtAuthEmployeeGuard extends AuthGuard('jwt-employee') {
     const can = await super.canActivate(context);
     if (!can) return false;
 
+    const request = this.getRequest(context);
+    const user = request.user;
+
+    if (!user?.empId) {
+      return true;
+    }
+
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       'permissions',
       [context.getHandler(), context.getClass()],
@@ -29,10 +39,7 @@ export class JwtAuthEmployeeGuard extends AuthGuard('jwt-employee') {
       return true;
     }
 
-    const request = this.getRequest(context);
-    const user = request.user;
-
-    if (!user || !user.permissions) {
+    if (!user.permissions) {
       throw new ForbiddenException('No permissions found');
     }
 

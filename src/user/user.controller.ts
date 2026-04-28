@@ -19,7 +19,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindAllUserDto } from './dto/find-all-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
-import { getUser } from 'src/shared/helpers';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
+import { User } from './entities/user.entity';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation..enum';
 
 @Controller('user')
 export class UserController {
@@ -41,8 +45,12 @@ export class UserController {
 
   @Post('get-all')
   @UseGuards(JwtAuthUserGuard)
-  public async findAll(@Body() filter: FindAllUserDto, @Request() req: any) {
-    const user = getUser(req.user);
+  @Permissions(Operation.GET + User.name)
+  public async findAll(
+    @Body() filter: FindAllUserDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
 
     if (user.role !== 'admin') {
       throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
@@ -50,23 +58,12 @@ export class UserController {
 
     const users = await this.userService.findAll(filter);
 
-    let activeCount = 0;
-    let inactiveCount = 0;
-
-    users.items.forEach((u) => {
-      if (u.active) activeCount++;
-      else inactiveCount++;
-    });
-
     const safeItems = users.items.map((u) => {
       const { password, ...rest } = u;
       return rest;
     });
 
     return {
-      totalUsers: users.items.length,
-      activeUsers: activeCount,
-      inactiveUsers: inactiveCount,
       data: {
         ...users,
         items: safeItems,
@@ -75,6 +72,8 @@ export class UserController {
   }
 
   @Get('get-one/:id')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.GET + User.name)
   @UseGuards(JwtAuthUserGuard)
   public async findOne(@Param('id') id: number, @Request() req: any) {
     // const userReq = getUser(req.user);
@@ -90,6 +89,8 @@ export class UserController {
   }
 
   @Patch('update/:id')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.UPDATE + User.name)
   @UseGuards(JwtAuthUserGuard)
   public async update(
     @Param('id') id: number,
@@ -116,8 +117,9 @@ export class UserController {
 
   @Delete('remove/:id')
   @UseGuards(JwtAuthUserGuard)
-  public remove(@Param('id') id: number, @Request() req: any) {
-    const userReq = getUser(req.user);
+  @Permissions(Operation.DELETE + User.name)
+  public remove(@Param('id') id: number, @CurrentUser() req: AuthUser) {
+    const userReq = req;
     if (userReq.role !== 'admin') {
       throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
     }
@@ -171,4 +173,50 @@ export class UserController {
 
   //   return safeUser;
   // }
+
+  @Get('users-statistics')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.GET + User.name)
+  async usersStatistics(@CurrentUser() req: AuthUser) {
+    const user = req;
+
+    if (user.role !== 'admin') {
+      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+    }
+
+    let totalUsers = 0;
+    let activeUsers = 0;
+    let inactiveUsers = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.userService.findAll({
+        pagination: { page, limit },
+      });
+
+      if (!result.items.length) break;
+
+      for (const u of result.items) {
+        totalUsers++;
+
+        if (u.active) activeUsers++;
+        else inactiveUsers++;
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalUsers,
+      activeUsers,
+      inactiveUsers,
+    };
+  }
 }

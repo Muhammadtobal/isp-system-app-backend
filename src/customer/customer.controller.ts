@@ -15,7 +15,12 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { FindAllCustomerDto } from './dto/find-all-customer.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 import { PointService } from 'src/point/point.service';
-import { getUser } from 'src/shared/helpers';
+import { AuthUser } from 'src/shared/helpers';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation..enum';
+import { Customer } from './entities/customer.entity';
 
 @Controller('customer')
 export class CustomerController {
@@ -25,12 +30,13 @@ export class CustomerController {
   ) {}
 
   @Post('create')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + Customer.name)
   public async create(
     @Body() createCustomerDto: CreateCustomerDto,
-    @Request() req: any,
+    @CurrentUser() req: AuthUser,
   ) {
-    const user = getUser(req.user);
+    const user = req;
     if (user.role !== 'admin') {
       createCustomerDto.user_id = user.userId;
     }
@@ -38,19 +44,22 @@ export class CustomerController {
   }
 
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Customer.name)
   public findAll(@Body() filter: FindAllCustomerDto) {
     return this.customerService.findAll(filter);
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Customer.name)
   public findOne(@Param('id') id: number) {
     return this.customerService.findOne({ id });
   }
 
   @Patch('update/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + Customer.name)
   public update(
     @Param('id') id: number,
     @Body() updateCustomerDto: UpdateCustomerDto,
@@ -59,7 +68,8 @@ export class CustomerController {
   }
 
   @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.DELETE + Customer.name)
   public remove(@Param('id') id: number) {
     this.customerService.remove(id);
     return {

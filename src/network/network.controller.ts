@@ -14,6 +14,10 @@ import { CreateNetworkDto } from './dto/create-network.dto';
 import { UpdateNetworkDto } from './dto/update-network.dto';
 import { FindAllNetworkDto } from './dto/find-all-network.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation..enum';
+import { Network } from './entities/network.entity';
+import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 
 @Controller('network')
 export class NetworkController {
@@ -21,34 +25,36 @@ export class NetworkController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.CREATE + Network.name)
   create(@Body() createNetworkDto: CreateNetworkDto) {
     return this.networkService.create(createNetworkDto);
   }
 
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Network.name)
   findAll(@Body() filter: FindAllNetworkDto) {
     return this.networkService.findAll(filter);
   }
 
   @Get('get-one/:id')
   @UseGuards(JwtAuthUserGuard)
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @Permissions(Operation.GET + Network.name)
+  findOne(@Param('id') id: number) {
     return this.networkService.findOne({ id });
   }
 
   @Patch('update/:id')
   @UseGuards(JwtAuthUserGuard)
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateNetworkDto: UpdateNetworkDto,
-  ) {
+  @Permissions(Operation.UPDATE + Network.name)
+  update(@Param('id') id: number, @Body() updateNetworkDto: UpdateNetworkDto) {
     return this.networkService.update(id, updateNetworkDto);
   }
 
   @Delete('remove/:id')
   @UseGuards(JwtAuthUserGuard)
-  remove(@Param('id', ParseIntPipe) id: number) {
+  @Permissions(Operation.DELETE + Network.name)
+  remove(@Param('id') id: number) {
     this.networkService.remove(id);
     return {
       done: true,

@@ -273,10 +273,21 @@ export async function customPaginate<
   };
 }
 
-export function getUser(user: any) {
-  if (!user?.userId || !user?.role) {
-    return '0';
-  }
+// export function getUser(user: { role: string; userId: number }) {
+//   if (!user?.userId || !user?.role) {
+//     return null;
+//   }
 
-  return user;
+//   return user;
+// }
+
+// export function getEmp(user: { empId: number; userId: number }) {
+//   return user || null;
+// }
+
+export interface AuthUser {
+  userId: number;
+  role: string;
+  empId?: number;
+  permissions?: string[];
 }

@@ -24,7 +24,13 @@ import { ResetMyPasswordDto } from './dto/reset-my-password.dto';
 import { ErrorMessages } from 'src/shared/error-messages.object';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
-import { getUser } from 'src/shared/helpers';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation..enum';
+import { Employee } from './entities/employee.entity';
+import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 
 @Controller('employee')
 export class EmployeeController {
@@ -35,11 +41,12 @@ export class EmployeeController {
 
   @Post('create')
   @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.CREATE + Employee.name)
   public async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
-    @Request() req: any,
+    @CurrentUser() req: AuthUser,
   ) {
-    const user = getUser(req.user);
+    const user = req;
     if (user.role !== 'admin') {
       const exist = await this.employeeService.findOne({
         email: createEmployeeDto.email,
@@ -72,7 +79,8 @@ export class EmployeeController {
     return safeEmp;
   }
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Employee.name)
   async findAll(@Body() filter: FindAllEmployeeDto) {
     const employees = await this.employeeService.findAll(filter);
 
@@ -88,7 +96,8 @@ export class EmployeeController {
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Employee.name)
   public async findOne(@Param('id') id: number) {
     const employee = await this.employeeService.findOne({ id });
 
@@ -102,6 +111,8 @@ export class EmployeeController {
   }
 
   @Patch('update/:id')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.UPDATE + Employee.name)
   @UseGuards(JwtAuthUserGuard)
   public async update(
     @Param('id') id: number,
@@ -126,6 +137,8 @@ export class EmployeeController {
   }
 
   @Delete('remove/:id')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.DELETE + Employee.name)
   @UseGuards(JwtAuthUserGuard)
   remove(@Param('id') id: number) {
     this.employeeService.remove(id);

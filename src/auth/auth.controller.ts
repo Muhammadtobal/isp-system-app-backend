@@ -78,6 +78,7 @@ export class AuthController {
     const accessToken = await this.authService.generateJwtToken(
       {
         empId: employee.id,
+        userId: employee.user_id,
       },
       process.env.EMPLOYEE_JWT_KEY as string,
     );

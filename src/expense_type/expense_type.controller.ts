@@ -34,14 +34,14 @@ export class ExpenseTypeController {
 
   @Get('get-one/:id')
   @UseGuards(JwtAuthUserGuard)
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: number) {
     return this.expenseTypeService.findOne({ id });
   }
 
   @Patch('update/:id')
   @UseGuards(JwtAuthUserGuard)
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
     @Body() updateExpenseTypeDto: UpdateExpenseTypeDto,
   ) {
     return this.expenseTypeService.update(id, updateExpenseTypeDto);
@@ -49,7 +49,7 @@ export class ExpenseTypeController {
 
   @Delete('remove/:id')
   @UseGuards(JwtAuthUserGuard)
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: number) {
     this.expenseTypeService.remove(id);
     return {
       done: true,

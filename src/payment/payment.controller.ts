@@ -14,19 +14,25 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { FindAllPaymentDto } from './dto/find-all-payment.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
-import { getUser } from 'src/shared/helpers';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
+import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation..enum';
+import { Payment } from './entities/payment.entity';
 
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('create')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + Payment.name)
   public create(
     @Body() createPaymentDto: CreatePaymentDto,
-    @Request() req: any,
+    @CurrentUser() req: AuthUser,
   ) {
-    const user = getUser(req.user);
+    const user = req;
     if (user.role !== 'admin') {
       createPaymentDto.user_id = user.userId;
     }
@@ -34,19 +40,23 @@ export class PaymentController {
   }
 
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Payment.name)
   public findAll(@Body() filter: FindAllPaymentDto) {
     return this.paymentService.findAll(filter);
   }
 
   @Get('get-one/:id')
   @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Payment.name)
   public findOne(@Param('id') id: number) {
     return this.paymentService.findOne({ id });
   }
 
   @Patch('update/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + Payment.name)
   public update(
     @Param('id') id: number,
     @Body() updatePaymentDto: UpdatePaymentDto,
@@ -55,7 +65,8 @@ export class PaymentController {
   }
 
   @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.DELETE + Payment.name)
   public remove(@Param('id') id: number) {
     this.paymentService.remove(id);
     return {

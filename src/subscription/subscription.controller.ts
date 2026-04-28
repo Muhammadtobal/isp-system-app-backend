@@ -14,19 +14,25 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { FindAllSubscriptionDto } from './dto/find-all-subscription.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
-import { getUser } from 'src/shared/helpers';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
+import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation..enum';
+import { Subscription } from './entities/subscription.entity';
 
 @Controller('subscription')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
   @Post('create')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + Subscription.name)
   public create(
     @Body() createSubscriptionDto: CreateSubscriptionDto,
-    @Request() req: any,
+    @CurrentUser() req: AuthUser,
   ) {
-    const user = getUser(req.user);
+    const user = req;
     if (user.role !== 'admin') {
       createSubscriptionDto.user_id = user.userId;
     }
@@ -34,19 +40,22 @@ export class SubscriptionController {
   }
 
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Subscription.name)
   public findAll(@Body() filter: FindAllSubscriptionDto) {
     return this.subscriptionService.findAll(filter);
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Subscription.name)
   public findOne(@Param('id') id: number) {
     return this.subscriptionService.findOne({ id });
   }
 
   @Patch('update/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + Subscription.name)
   public update(
     @Param('id') id: number,
     @Body() updateSubscriptionDto: UpdateSubscriptionDto,
@@ -55,7 +64,8 @@ export class SubscriptionController {
   }
 
   @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.DELETE + Subscription.name)
   public remove(@Param('id') id: number) {
     this.subscriptionService.remove(id);
     return {
