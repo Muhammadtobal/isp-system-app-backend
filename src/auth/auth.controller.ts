@@ -31,7 +31,14 @@ export class AuthController {
       active: true,
     });
 
-    if (!user || !(await bcrypt.compare(loginUserDto.password, user.password)))
+    if (!user) {
+      throw new HttpException(
+        'لا يوجد حساب بهذه المعلومات',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (!(await bcrypt.compare(loginUserDto.password, user.password)))
       throw new HttpException(
         'الايميل او كلمة المرور خاطئة',
         HttpStatus.UNAUTHORIZED,
@@ -65,10 +72,13 @@ export class AuthController {
       },
     );
 
-    if (
-      !employee ||
-      !(await bcrypt.compare(loginEmployeeDto.password, employee.password))
-    ) {
+    if (!employee) {
+      throw new HttpException(
+        'لا يوجد حساب بهذه المعلومات',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    if (!(await bcrypt.compare(loginEmployeeDto.password, employee.password))) {
       throw new HttpException(
         'خطأ في كلمة السر او الايميل',
         HttpStatus.UNAUTHORIZED,
