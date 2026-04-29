@@ -59,6 +59,9 @@ export class SubscriptionService {
   public findAll(filter: FindAllSubscriptionDto) {
     const query = this.subscriptionRepository
       .createQueryBuilder('subscription')
+      .leftJoinAndSelect('subscription.plan', 'plan')
+      .leftJoinAndSelect('subscription.point', 'point')
+      .leftJoinAndSelect('subscription.customer', 'customer')
       .where('true');
 
     generateQuerySorts<Subscription>(
