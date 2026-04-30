@@ -203,4 +203,52 @@ export class EmployeeController {
 
     return { done: true };
   }
+
+  @Get('employees-statistics')
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Employee.name)
+  async employeesStatistics(@CurrentUser() req: AuthUser) {
+    const user = req;
+    let user_id;
+
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    let totalEmployees = 0;
+    let activeEmployees = 0;
+    let inactiveEmployees = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.employeeService.findAll({
+        pagination: { page, limit },
+        user_id: { value: user_id },
+      });
+
+      if (!result.items.length) break;
+
+      for (const e of result.items) {
+        totalEmployees++;
+
+        if (e.active) activeEmployees++;
+        else inactiveEmployees++;
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalEmployees,
+      activeEmployees,
+      inactiveEmployees,
+    };
+  }
 }
