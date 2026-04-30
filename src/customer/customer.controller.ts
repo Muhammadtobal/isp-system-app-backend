@@ -76,4 +76,52 @@ export class CustomerController {
       done: true,
     };
   }
+
+  @Get('customers-statistics')
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Customer.name)
+  public async customersStatistics(@CurrentUser() req: AuthUser) {
+    const user = req;
+    let user_id;
+
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    let totalCustomers = 0;
+    let activeCustomers = 0;
+    let inactiveCustomers = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.customerService.findAll({
+        pagination: { page, limit },
+        user_id: { value: user_id },
+      });
+
+      if (!result.items.length) break;
+
+      for (const c of result.items) {
+        totalCustomers++;
+
+        if (c.active) activeCustomers++;
+        else inactiveCustomers++;
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalCustomers,
+      activeCustomers,
+      inactiveCustomers,
+    };
+  }
 }

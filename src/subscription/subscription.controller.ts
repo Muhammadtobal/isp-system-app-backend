@@ -72,4 +72,52 @@ export class SubscriptionController {
       done: true,
     };
   }
+
+  @Get('subscriptions-statistics')
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Subscription.name)
+  async subscriptionsStatistics(@CurrentUser() req: AuthUser) {
+    const user = req;
+    let user_id;
+
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    let totalSubscriptions = 0;
+    let activeSubscriptions = 0;
+    let inactiveSubscriptions = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.subscriptionService.findAll({
+        pagination: { page, limit },
+        user_id: { value: user_id },
+      });
+
+      if (!result.items.length) break;
+
+      for (const s of result.items) {
+        totalSubscriptions++;
+
+        if (s.active) activeSubscriptions++;
+        else inactiveSubscriptions++;
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalSubscriptions,
+      activeSubscriptions,
+      inactiveSubscriptions,
+    };
+  }
 }

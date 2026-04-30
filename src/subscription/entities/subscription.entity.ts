@@ -46,7 +46,9 @@ export class Subscription extends BaseEntity {
   @JoinColumn({ name: 'plan_id' })
   plan?: Plan;
 
-  @ManyToOne(() => Customer, (customer) => customer.subscriptions)
+  @ManyToOne(() => Customer, (customer) => customer.subscriptions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
 
