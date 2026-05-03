@@ -151,7 +151,13 @@ export class EmployeeController {
   @UseGuards(JwtAuthUserGuard)
   public async assignPermission(
     @Body() assignPermissionDto: AssignPermissionDto,
+    @CurrentUser() req: AuthUser,
   ) {
+    const user = req;
+    if (user.role !== 'admin') {
+      assignPermissionDto.user_id = user.userId;
+    }
+
     const result =
       await this.employeeService.assignPermission(assignPermissionDto);
 

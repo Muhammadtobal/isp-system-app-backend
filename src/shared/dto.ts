@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
@@ -23,12 +24,14 @@ export class MatchInput {
 }
 
 export class SingleDateInput {
+  @ApiProperty({ example: '2026-04-25' })
   @IsNotEmpty()
   @IsString()
   value: string;
 }
 
 export class RangeDateInput {
+  @ApiProperty({ example: '2026-04-25' })
   @IsNotEmpty()
   @IsString()
   min: string;
@@ -39,12 +42,14 @@ export class RangeDateInput {
 }
 
 export class MinDateInput {
+  @ApiProperty({ example: '2026-04-25' })
   @IsNotEmpty()
   @IsString()
   min: string;
 }
 
 export class MaxDateInput {
+  @ApiProperty({ example: '2026-04-25' })
   @IsNotEmpty()
   @IsString()
   max: string;

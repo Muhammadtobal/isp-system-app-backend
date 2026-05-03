@@ -91,6 +91,7 @@ export class EmployeeService {
       await this.employeePermissionService.create({
         employee_id: assignPermissionDto.employee_id,
         permission_id,
+        user_id: assignPermissionDto.user_id,
       });
     }
 

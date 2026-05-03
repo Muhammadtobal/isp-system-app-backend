@@ -23,6 +23,7 @@ import { Expense } from './entities/expense.entity';
 import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { FindTotalExpenseDto } from './dto/find-total-expense.dto';
 
 @Controller('expense')
 export class ExpenseController {
@@ -71,6 +72,49 @@ export class ExpenseController {
     this.expenseService.remove(id);
     return {
       done: true,
+    };
+  }
+
+  @Post('expenses-total')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.GET + 'Expense')
+  public async expensesTotal(
+    @Body() filter: FindTotalExpenseDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+    let user_id;
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+    let totalExpenses = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.expenseService.findAll({
+        ...filter,
+        pagination: { page, limit },
+        user_id: { value: user_id },
+      });
+
+      if (!result.items.length) break;
+
+      for (const exp of result.items) {
+        totalExpenses += exp.value;
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalExpenses,
     };
   }
 }

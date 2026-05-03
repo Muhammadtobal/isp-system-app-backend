@@ -1,6 +1,7 @@
 import { Customer } from 'src/customer/entities/customer.entity';
 import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
+import { EmployeePermission } from 'src/employee_permission/entities/employee_permission.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
 import { Network } from 'src/network/entities/network.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
@@ -68,4 +69,10 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Employee, (employee) => employee.user)
   employees: Employee[];
+
+  @OneToMany(
+    () => EmployeePermission,
+    (employee_permission) => employee_permission.user,
+  )
+  employee_permissions: EmployeePermission[];
 }

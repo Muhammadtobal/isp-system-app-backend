@@ -21,14 +21,6 @@ export class EmployeePermissionController {
     private readonly employeePermissionService: EmployeePermissionService,
   ) {}
 
-  @Post('create')
-  @UseGuards(JwtAuthUserGuard)
-  public create(
-    @Body() createEmployeePermissionDto: CreateEmployeePermissionDto,
-  ) {
-    return this.employeePermissionService.create(createEmployeePermissionDto);
-  }
-
   @Post('get-all')
   @UseGuards(JwtAuthUserGuard)
   public findAll(@Body() filter: FindAllEmployeePermissionDto) {
@@ -39,17 +31,5 @@ export class EmployeePermissionController {
   @UseGuards(JwtAuthUserGuard)
   public findOne(@Param('id') id: number) {
     return this.employeePermissionService.findOne({ id });
-  }
-
-  @Patch('update/:id')
-  @UseGuards(JwtAuthUserGuard)
-  public update(
-    @Param('id') id: number,
-    @Body() updateEmployeePermissionDto: UpdateEmployeePermissionDto,
-  ) {
-    return this.employeePermissionService.update(
-      id,
-      updateEmployeePermissionDto,
-    );
   }
 }

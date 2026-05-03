@@ -20,6 +20,7 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { Payment } from './entities/payment.entity';
+import { FindTotalPaymentDto } from './dto/find-total-payment.dto';
 
 @Controller('payment')
 export class PaymentController {
@@ -71,6 +72,56 @@ export class PaymentController {
     this.paymentService.remove(id);
     return {
       done: true,
+    };
+  }
+
+  @Post('payments-total')
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.GET + 'Payment')
+  public async paymentsTotal(
+    @Body() filter: FindTotalPaymentDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+
+    let user_id;
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    let totalPayments = 0;
+    let subscriptionsCount = 0;
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.paymentService.findAll({
+        ...filter,
+        pagination: { page, limit },
+        user_id: { value: user_id },
+      });
+
+      if (!result.items.length) break;
+
+      for (const pay of result.items) {
+        totalPayments += pay.amount;
+
+        if (pay.subscription_id) {
+          subscriptionsCount++;
+        }
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalPayments,
+      subscriptionsCount,
     };
   }
 }

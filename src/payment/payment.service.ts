@@ -45,6 +45,25 @@ export class PaymentService {
   public findAll(filter: FindAllPaymentDto) {
     const query = this.paymentRepository
       .createQueryBuilder('payment')
+
+      .leftJoin('payment.subscription', 'subscription')
+      .leftJoin('subscription.plan', 'plan')
+      .leftJoin('subscription.customer', 'customer')
+      .leftJoin('subscription.point', 'point')
+
+      .select([
+        'payment',
+
+        'subscription.id',
+
+        'plan.name',
+        'plan.speed',
+        'plan.price',
+
+        'customer.name',
+
+        'point.name',
+      ])
       .where('true');
 
     generateQuerySorts<Payment>(query, filter, Payment, 'payment');

@@ -1,4 +1,10 @@
-import { ArrayNotEmpty, IsArray, IsInt, IsNotEmpty } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -21,4 +27,9 @@ export class AssignPermissionDto {
   @IsNotEmpty()
   @IsInt()
   employee_id: number;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  user_id?: number;
 }

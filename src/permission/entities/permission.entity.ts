@@ -1,8 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { EmployeePermission } from 'src/employee_permission/entities/employee_permission.entity';
+import { BaseEntity } from 'src/shared/base.entity';
 
 @Entity()
-export class Permission {
+export class Permission extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
@@ -11,15 +12,6 @@ export class Permission {
 
   @Column('text', { nullable: true })
   description?: string;
-
-  @Column('boolean', { default: true })
-  active: boolean;
-
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
-
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
 
   @OneToMany(
     () => EmployeePermission,
