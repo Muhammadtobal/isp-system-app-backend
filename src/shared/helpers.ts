@@ -226,6 +226,18 @@ export function generateQueryConditions<T>(
     }
   }
 }
+
+function buildDayRange(date: string) {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(date);
+  end.setHours(0, 0, 0, 0);
+  end.setDate(end.getDate() + 1);
+
+  return { start, end };
+}
+
 export function hasOnlySpecificProperties(obj, allowedKeys: string[]) {
   const objKeys = Object.keys(obj);
 
