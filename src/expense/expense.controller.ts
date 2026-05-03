@@ -87,6 +87,7 @@ export class ExpenseController {
     if (user.role !== 'admin') {
       user_id = user.userId;
     }
+    console.log('user', user);
     let totalExpenses = 0;
 
     const limit = 200;
@@ -99,6 +100,7 @@ export class ExpenseController {
         pagination: { page, limit },
         user_id: { value: user_id },
       });
+      console.log('result', result);
 
       if (!result.items.length) break;
 

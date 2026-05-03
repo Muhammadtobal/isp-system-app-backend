@@ -56,4 +56,14 @@ export class FindTotalExpenseDto {
   @IsObject()
   @IsSingleDateOrRange()
   created_at?: SingleDateInput | RangeDateInput | MaxDateInput | MinDateInput;
+
+  @ApiProperty({
+    description: 'user id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  network_id?: SingleIdInput | ListOfIdsInput;
 }

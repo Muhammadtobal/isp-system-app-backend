@@ -10,6 +10,7 @@ import {
   MinDateInput,
   MinNumberInput,
   SingleDateInput,
+  SingleIdInput,
   SingleNumberInput,
 } from 'src/shared/dto';
 import {
@@ -167,6 +168,15 @@ export function generateQueryConditions<T>(
       query.andWhere(`${entityName}.${key} IN(:...in_values)`, {
         in_values: filter[key]['in'],
       });
+
+    if (
+      SingleIdInputSchema.safeParse(filter[key]).success &&
+      hasOnlySpecificProperties(filter[key], ['value'])
+    ) {
+      query.andWhere(`${entityName}.${key} = :${key}`, {
+        [key]: (filter[key] as SingleIdInput).value,
+      });
+    }
 
     if (key === 'counts') {
       for (const countsKey in filter.counts) {

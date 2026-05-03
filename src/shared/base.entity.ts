@@ -17,19 +17,4 @@ export abstract class BaseEntity {
 
   @Column({ type: 'boolean', default: true })
   active: boolean;
-
-  @BeforeInsert()
-  setCreatedDate() {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    this.created_at = d;
-    this.updated_at = d;
-  }
-
-  @BeforeUpdate()
-  setUpdatedDate() {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    this.updated_at = d;
-  }
 }
