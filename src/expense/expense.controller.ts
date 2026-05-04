@@ -100,8 +100,6 @@ export class ExpenseController {
         pagination: { page, limit },
         user_id: { value: user_id },
       });
-      console.log('result', result);
-      console.log('filter', filter);
 
       if (!result.items.length) break;
 

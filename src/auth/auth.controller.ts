@@ -15,6 +15,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { decodeJwtToken, verifyJwtToken } from 'src/shared/jwt-verify-token';
 import { UserService } from 'src/user/user.service';
 import { EmployeeService } from 'src/employee/employee.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('auth')
 export class AuthController {
@@ -33,14 +34,14 @@ export class AuthController {
 
     if (!user) {
       throw new HttpException(
-        'لا يوجد حساب بهذه المعلومات',
+        ErrorMessages.UNAUTHORIZED,
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!(await bcrypt.compare(loginUserDto.password, user.password)))
       throw new HttpException(
-        'الايميل او كلمة المرور خاطئة',
+        ErrorMessages.DATA_CONFLICT,
         HttpStatus.UNAUTHORIZED,
       );
 
@@ -80,7 +81,7 @@ export class AuthController {
     }
     if (!(await bcrypt.compare(loginEmployeeDto.password, employee.password))) {
       throw new HttpException(
-        'خطأ في كلمة السر او الايميل',
+        ErrorMessages.DATA_CONFLICT,
         HttpStatus.UNAUTHORIZED,
       );
     }

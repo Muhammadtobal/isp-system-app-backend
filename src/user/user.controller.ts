@@ -24,6 +24,7 @@ import { AuthUser } from 'src/shared/helpers';
 import { User } from './entities/user.entity';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('user')
 export class UserController {
@@ -53,7 +54,10 @@ export class UserController {
     const user = req;
 
     if (user.role !== 'admin') {
-      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        ErrorMessages.NOT_ALLOWED,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const users = await this.userService.findAll(filter);
@@ -82,7 +86,10 @@ export class UserController {
     // }
     const user = await this.userService.findOne({ id });
     if (!user) {
-      throw new HttpException('المستخدم غير موجود', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_USER,
+        HttpStatus.NOT_FOUND,
+      );
     }
     const { password, ...userSaved } = user;
     return userSaved;
@@ -107,7 +114,10 @@ export class UserController {
     }
     const data = await this.userService.update(id, updateUserDto);
     if (!data) {
-      throw new HttpException('المستخدم غير موجود', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_USER,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const { password, ...safeUser } = data;
@@ -121,7 +131,10 @@ export class UserController {
   public remove(@Param('id') id: number, @CurrentUser() req: AuthUser) {
     const userReq = req;
     if (userReq.role !== 'admin') {
-      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        ErrorMessages.NOT_ALLOWED,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     this.userService.remove(id);
@@ -181,7 +194,10 @@ export class UserController {
     const user = req;
 
     if (user.role !== 'admin') {
-      throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        ErrorMessages.NOT_ALLOWED,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     let totalUsers = 0;

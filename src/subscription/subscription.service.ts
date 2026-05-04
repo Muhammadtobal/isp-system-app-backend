@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,6 +26,7 @@ import {
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { Point } from 'src/point/entities/point.entity';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Injectable()
 export class SubscriptionService {
@@ -40,7 +43,10 @@ export class SubscriptionService {
       });
 
       if (!point) {
-        throw new BadRequestException('Point not found');
+        throw new HttpException(
+          ErrorMessages.POINT_NOT_FOUND,
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       if (point.count_subscription >= point.max_subscription) {

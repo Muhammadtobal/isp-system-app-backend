@@ -55,7 +55,7 @@ export class EmployeeController {
 
       if (exist) {
         throw new HttpException(
-          '  المستخدم  موجود مسبقا',
+          ErrorMessages.USER_EXISTS_CONFLICT,
           HttpStatus.NOT_FOUND,
         );
       }
@@ -72,7 +72,10 @@ export class EmployeeController {
 
     const saveEmp = await this.employeeService.findOne({ id: employee.id });
     if (!saveEmp) {
-      throw new HttpException('المستخدم غير موجود', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_EMPLOYEE,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const { password, ...safeEmp } = saveEmp;
@@ -105,7 +108,10 @@ export class EmployeeController {
     );
 
     if (!employee) {
-      throw new HttpException('الموظف غير موجود', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_EMPLOYEE,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const { password, ...employeeSafe } = employee;
@@ -131,7 +137,10 @@ export class EmployeeController {
     const data = await this.employeeService.update(id, updateEmployeeDto);
 
     if (!data) {
-      throw new HttpException('الموظف غير موجود', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_EMPLOYEE,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const { password, ...safeEmployee } = data;
@@ -198,10 +207,7 @@ export class EmployeeController {
     if (
       !(await bcrypt.compare(resetMyPasswordDto.current_password, emp.password))
     )
-      throw new HttpException(
-        ErrorMessages.EMPLOYEE_DATA_CONFLICT,
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException(ErrorMessages.DATA_CONFLICT, HttpStatus.CONFLICT);
 
     const newHashedPassword = await bcrypt.hash(
       resetMyPasswordDto.new_password,
