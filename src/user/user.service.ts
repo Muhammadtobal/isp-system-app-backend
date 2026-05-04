@@ -32,7 +32,10 @@ export class UserService {
   }
 
   public findAll(filter: FindAllUserDto) {
-    const query = this.userRepository.createQueryBuilder('user').where('true');
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.networks', 'networks')
+      .where('true');
 
     generateQuerySorts<User>(query, filter, User, 'user');
 

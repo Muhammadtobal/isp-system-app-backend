@@ -84,7 +84,10 @@ export class UserController {
     // if (userReq.role !== 'admin') {
     //   throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
     // }
-    const user = await this.userService.findOne({ id });
+    const user = await this.userService.findOne(
+      { id },
+      { relations: { networks: true } },
+    );
     if (!user) {
       throw new HttpException(
         ErrorMessages.NOT_FOUND_USER,
