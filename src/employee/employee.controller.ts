@@ -104,7 +104,12 @@ export class EmployeeController {
   public async findOne(@Param('id') id: number) {
     const employee = await this.employeeService.findOne(
       { id },
-      { relations: { employee_permissions: { permission: true } } },
+      {
+        relations: {
+          employee_permissions: { permission: true },
+          employee_networks: { network: true },
+        },
+      },
     );
 
     if (!employee) {
