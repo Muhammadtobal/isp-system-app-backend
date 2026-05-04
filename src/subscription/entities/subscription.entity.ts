@@ -5,6 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  BeforeInsert,
 } from 'typeorm';
 
 import { Customer } from 'src/customer/entities/customer.entity';
@@ -29,14 +30,14 @@ export class Subscription extends BaseEntity {
   @Column('bigint')
   point_id: number;
 
-  @Column({ type: 'date', nullable: true })
-  end_date?: string;
-
   @Column({ type: 'boolean', default: true })
   status: boolean;
 
   @Column('bigint', { nullable: true })
   user_id?: number;
+
+  @Column({ unique: true })
+  subscription_code: string;
 
   @ManyToOne(() => User, (user) => user.expenses)
   @JoinColumn({ name: 'user_id' })
@@ -48,6 +49,7 @@ export class Subscription extends BaseEntity {
 
   @ManyToOne(() => Customer, (customer) => customer.subscriptions, {
     onDelete: 'CASCADE',
+    cascade: true,
   })
   @JoinColumn({ name: 'customer_id' })
   customer?: Customer;
@@ -58,4 +60,16 @@ export class Subscription extends BaseEntity {
 
   @OneToMany(() => Payment, (payment) => payment.subscription)
   payments: Payment[];
+
+  @BeforeInsert()
+  generateSubscriptionCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    this.subscription_code = `sub-${code}`;
+  }
 }

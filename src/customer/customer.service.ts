@@ -53,6 +53,7 @@ export class CustomerService {
         plan_id: createCustomerDto.plan_id,
         point_id: createCustomerDto.point_id,
         customer_id: customerSaved.id,
+        user_id: customerSaved.user_id,
       });
 
       await manager.save(subscription);

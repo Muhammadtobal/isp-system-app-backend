@@ -99,7 +99,10 @@ export class EmployeeController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Employee.name)
   public async findOne(@Param('id') id: number) {
-    const employee = await this.employeeService.findOne({ id });
+    const employee = await this.employeeService.findOne(
+      { id },
+      { relations: { employee_permissions: { permission: true } } },
+    );
 
     if (!employee) {
       throw new HttpException('الموظف غير موجود', HttpStatus.NOT_FOUND);

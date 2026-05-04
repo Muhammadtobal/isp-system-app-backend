@@ -5,13 +5,14 @@ import {
   IsNumber,
   IsOptional,
   IsBoolean,
+  IsString,
 } from 'class-validator';
 
 export class CreatePaymentDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 'sub-KZKVTL' })
   @IsNotEmpty()
-  @IsInt()
-  subscription_id: number;
+  @IsString()
+  subscription_code: string;
 
   @ApiProperty({ example: 49.99 })
   @IsOptional()

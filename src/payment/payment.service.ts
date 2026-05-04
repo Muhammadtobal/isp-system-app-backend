@@ -31,7 +31,7 @@ export class PaymentService {
   public async create(createPaymentDto: CreatePaymentDto) {
     const payment = this.paymentRepository.create(createPaymentDto);
     const subscription = await this.subscriptionService.findOne(
-      { id: createPaymentDto.subscription_id },
+      { subscription_code: createPaymentDto.subscription_code },
       { relations: { plan: true } },
     );
 
@@ -39,6 +39,7 @@ export class PaymentService {
       throw new Error('Plan price not found');
     }
     payment.amount = subscription?.plan?.price;
+    payment.subscription_id = subscription.id;
     return this.paymentRepository.save(payment);
   }
 

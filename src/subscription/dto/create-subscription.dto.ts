@@ -34,11 +34,6 @@ export class CreateSubscriptionDto {
   @IsBoolean()
   active?: boolean;
 
-  @ApiProperty({ example: '2024-12-31', required: false })
-  @IsOptional()
-  @IsDateString()
-  end_date?: string;
-
   @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsInt()

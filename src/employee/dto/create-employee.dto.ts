@@ -26,6 +26,11 @@ export class CreateEmployeeDto {
   @MinLength(6)
   password: string;
 
+  @ApiProperty({ example: 1, required: true })
+  @IsNotEmpty()
+  @IsInt()
+  network_id: number;
+
   @ApiProperty({ example: 'refresh_token_example', required: false })
   @IsNotEmpty()
   @IsOptional()

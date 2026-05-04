@@ -21,6 +21,7 @@ import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { AssignPermissionDto } from './dto/assign-permission.dto';
 import { EmployeePermissionService } from 'src/employee_permission/employee_permission.service';
 import { PermissionService } from 'src/permission/permission.service';
+import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
 
 @Injectable()
 export class EmployeeService {
@@ -30,10 +31,20 @@ export class EmployeeService {
     private readonly employeePermissionService: EmployeePermissionService,
     private readonly permissionService: PermissionService,
   ) {}
-
-  public create(createEmployeeDto: CreateEmployeeDto) {
+  public async create(createEmployeeDto: CreateEmployeeDto) {
     const employee = this.employeeRepository.create(createEmployeeDto);
-    return this.employeeRepository.save(employee);
+
+    employee.employee_networks = [];
+
+    const employeeNetwork = new EmployeeNetwork();
+    employeeNetwork.network_id = createEmployeeDto.network_id;
+    employeeNetwork.user_id = createEmployeeDto.user_id;
+
+    employeeNetwork.employee = employee;
+
+    employee.employee_networks.push(employeeNetwork);
+
+    return await this.employeeRepository.save(employee);
   }
 
   public findAll(filter: FindAllEmployeeDto) {

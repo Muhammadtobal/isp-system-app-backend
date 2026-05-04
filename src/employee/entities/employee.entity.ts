@@ -47,6 +47,7 @@ export class Employee extends BaseEntity {
   @OneToMany(
     () => EmployeeNetwork,
     (employee_network) => employee_network.employee,
+    { cascade: true },
   )
   employee_networks: EmployeeNetwork[];
 }
