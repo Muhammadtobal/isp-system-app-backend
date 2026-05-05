@@ -50,6 +50,16 @@ export class EmployeeService {
   public findAll(filter: FindAllEmployeeDto) {
     const query = this.employeeRepository
       .createQueryBuilder('employee')
+      .leftJoinAndSelect(
+        'employee.employee_permissions',
+        'employee_permissions',
+      )
+      .leftJoinAndSelect('employee_permissions.permission', 'permission')
+      .leftJoinAndSelect('employee.employee_networks', 'employee_networks')
+      .leftJoinAndSelect('employee_networks.network', 'network')
+      .leftJoinAndSelect('employee.expenses', 'expenses')
+      .leftJoinAndSelect('expenses.expense_type', 'expense_type')
+
       .where('true');
 
     generateQuerySorts<Employee>(query, filter, Employee, 'employee');

@@ -14,10 +14,10 @@ export class CreatePaymentDto {
   @IsString()
   subscription_code: string;
 
-  @ApiProperty({ example: 49.99 })
-  @IsOptional()
-  @IsNumber()
-  amount?: number;
+  // @ApiProperty({ example: 49.99 })
+  // @IsOptional()
+  // @IsNumber()
+  // amount?: number;
 
   @ApiProperty({ example: true, required: false })
   @IsOptional()
