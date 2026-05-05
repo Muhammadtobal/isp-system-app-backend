@@ -16,6 +16,7 @@ import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
+  AuthUser,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 
@@ -31,11 +32,15 @@ export class ExpenseService {
     return this.expenseRepository.save(expense);
   }
 
-  public findAll(filter: FindAllExpenseDto) {
+  public findAll(filter: FindAllExpenseDto, user?: AuthUser) {
     const query = this.expenseRepository
       .createQueryBuilder('expense')
       .where('true');
-
+    if (user && user.role !== 'admin') {
+      query.andWhere('expense.user_id = :userId', {
+        userId: user.userId,
+      });
+    }
     generateQuerySorts<Expense>(query, filter, Expense, 'expense');
     generateQueryConditions<Expense>(query, filter, 'expense');
 

@@ -84,11 +84,6 @@ export class PaymentController {
   ) {
     const user = req;
 
-    let user_id;
-    if (user.role !== 'admin') {
-      user_id = user.userId;
-    }
-
     let totalPayments = 0;
     let subscriptionsCount = 0;
     const limit = 200;
@@ -96,11 +91,13 @@ export class PaymentController {
     let lastPage = false;
 
     while (!lastPage) {
-      const result = await this.paymentService.findAll({
-        ...filter,
-        pagination: { page, limit },
-        user_id: { value: user_id },
-      });
+      const result = await this.paymentService.findAll(
+        {
+          ...filter,
+          pagination: { page, limit },
+        },
+        user,
+      );
 
       if (!result.items.length) break;
 

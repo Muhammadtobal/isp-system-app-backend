@@ -83,15 +83,23 @@ export function generateQueryConditions<T>(
       query.andWhere(`${entityName}.${key} = :${key}`, {
         [key]: filter[key],
       });
-
     if (
       SingleDateInputSchema.safeParse(filter[key]).success &&
       hasOnlySpecificProperties(filter[key], ['value'])
-    )
-      query.andWhere(`${entityName}.${key} = :${key}`, {
-        [key]: (filter[key] as SingleDateInput).value,
-      });
+    ) {
+      const date = new Date((filter[key] as SingleDateInput).value);
 
+      const start = new Date(date);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(date);
+      end.setHours(23, 59, 59, 999);
+
+      query.andWhere(`${entityName}.${key} BETWEEN :start AND :end`, {
+        start,
+        end,
+      });
+    }
     if (
       MinDateInputSchema.safeParse(filter[key]).success &&
       hasOnlySpecificProperties(filter[key], ['min'])

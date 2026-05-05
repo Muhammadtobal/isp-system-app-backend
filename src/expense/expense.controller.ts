@@ -83,11 +83,7 @@ export class ExpenseController {
     @CurrentUser() req: AuthUser,
   ) {
     const user = req;
-    let user_id;
-    if (user.role !== 'admin') {
-      user_id = user.userId;
-    }
-    console.log('user', user);
+
     let totalExpenses = 0;
 
     const limit = 200;
@@ -95,11 +91,13 @@ export class ExpenseController {
     let lastPage = false;
 
     while (!lastPage) {
-      const result = await this.expenseService.findAll({
-        ...filter,
-        pagination: { page, limit },
-        user_id: { value: user_id },
-      });
+      const result = await this.expenseService.findAll(
+        {
+          ...filter,
+          pagination: { page, limit },
+        },
+        user,
+      );
 
       if (!result.items.length) break;
 
