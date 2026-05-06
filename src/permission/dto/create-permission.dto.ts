@@ -12,6 +12,11 @@ export class CreatePermissionDto {
   @IsString()
   description?: string;
 
+  @ApiProperty({ example: 'translation', required: false })
+  @IsOptional()
+  @IsString()
+  translation?: string;
+
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

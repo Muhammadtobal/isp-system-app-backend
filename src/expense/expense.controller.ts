@@ -116,4 +116,52 @@ export class ExpenseController {
       totalExpenses,
     };
   }
+
+  @Get('expenses-statistics')
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Expense.name)
+  async expensesStatistics(@CurrentUser() req: AuthUser) {
+    const user = req;
+    let user_id;
+
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    let totalExpenses = 0;
+    let activeExpenses = 0;
+    let inactiveExpenses = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.expenseService.findAll({
+        pagination: { page, limit },
+        user_id: { value: user_id },
+      });
+
+      if (!result.items.length) break;
+
+      for (const e of result.items) {
+        totalExpenses++;
+
+        if (e.active) activeExpenses++;
+        else inactiveExpenses++;
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalExpenses,
+      activeExpenses,
+      inactiveExpenses,
+    };
+  }
 }

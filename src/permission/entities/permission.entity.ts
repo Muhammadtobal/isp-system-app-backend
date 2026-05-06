@@ -13,6 +13,9 @@ export class Permission extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
+  @Column('text', { nullable: true })
+  translation?: string;
+
   @OneToMany(
     () => EmployeePermission,
     (employeePermission) => employeePermission.permission,
