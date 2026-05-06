@@ -35,6 +35,7 @@ export class ExpenseService {
   public findAll(filter: FindAllExpenseDto, user?: AuthUser) {
     const query = this.expenseRepository
       .createQueryBuilder('expense')
+      .leftJoinAndSelect('expense.expense_type', 'expense_type')
       .where('true');
     if (user && user.role !== 'admin') {
       query.andWhere('expense.user_id = :userId', {
