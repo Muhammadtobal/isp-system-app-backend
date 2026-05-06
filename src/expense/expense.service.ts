@@ -36,6 +36,8 @@ export class ExpenseService {
     const query = this.expenseRepository
       .createQueryBuilder('expense')
       .leftJoinAndSelect('expense.expense_type', 'expense_type')
+      .leftJoinAndSelect('expense.employee', 'employee')
+      .leftJoinAndSelect('expense.network', 'network')
       .where('true');
     if (user && user.role !== 'admin') {
       query.andWhere('expense.user_id = :userId', {
