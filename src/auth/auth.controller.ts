@@ -99,6 +99,7 @@ export class AuthController {
 
     return {
       employee: safeEmployee,
+      role: 'employee',
       access_token: accessToken,
       expires_in: 15 * 60,
     };
