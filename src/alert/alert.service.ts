@@ -52,7 +52,6 @@ export class AlertService {
           pagination: { page, limit },
           user_id: { value: createAlertDto.user_id },
         });
-
         if (!result.items.length) break;
 
         for (const subscription of result.items) {
@@ -130,6 +129,8 @@ export class AlertService {
   public findAll(filter: FindAllAlertDto) {
     const query = this.alertRepository
       .createQueryBuilder('alert')
+      .leftJoinAndSelect('alert.subscription', 'subscription')
+
       .where('true');
 
     generateQuerySorts<Alert>(query, filter, Alert, 'alert');
