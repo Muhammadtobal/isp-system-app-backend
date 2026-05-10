@@ -52,7 +52,10 @@ export class PaymentController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Payment.name)
   public findOne(@Param('id') id: number) {
-    return this.paymentService.findOne({ id });
+    return this.paymentService.findOne(
+      { id },
+      { relations: { subscription: true } },
+    );
   }
 
   @Patch('update/:id')

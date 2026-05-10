@@ -16,6 +16,7 @@ import { BaseEntity } from 'src/shared/base.entity';
 import { Point } from 'src/point/entities/point.entity';
 import { Exclude } from 'class-transformer';
 import { User } from 'src/user/entities/user.entity';
+import { Alert } from 'src/alert/entities/alert.entity';
 @Entity()
 export class Subscription extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -60,6 +61,9 @@ export class Subscription extends BaseEntity {
 
   @OneToMany(() => Payment, (payment) => payment.subscription)
   payments: Payment[];
+
+  @OneToMany(() => Alert, (alert) => alert.subscription)
+  alerts: Alert[];
 
   @BeforeInsert()
   generateSubscriptionCode() {

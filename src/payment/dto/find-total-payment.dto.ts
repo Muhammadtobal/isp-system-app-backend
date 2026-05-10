@@ -56,4 +56,14 @@ export class FindTotalPaymentDto {
   @IsObject()
   @IsSingleDateOrRange()
   created_at?: SingleDateInput | RangeDateInput | MaxDateInput | MinDateInput;
+
+  @ApiProperty({
+    description: 'Network id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  network_id?: SingleIdInput | ListOfIdsInput;
 }

@@ -1,3 +1,4 @@
+import { Alert } from 'src/alert/entities/alert.entity';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
@@ -63,6 +64,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Subscription, (subscription) => subscription.user)
   subscriptions: Subscription[];
+
+  @OneToMany(() => Alert, (alert) => alert.user)
+  alerts: Alert[];
 
   @OneToMany(() => EmployeeNetwork, (employee_network) => employee_network.user)
   employee_networks: EmployeeNetwork[];
