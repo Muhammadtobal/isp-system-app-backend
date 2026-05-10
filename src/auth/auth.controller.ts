@@ -90,6 +90,7 @@ export class AuthController {
       {
         empId: employee.id,
         userId: employee.user_id,
+        role: 'employee',
       },
       process.env.EMPLOYEE_JWT_KEY as string,
     );

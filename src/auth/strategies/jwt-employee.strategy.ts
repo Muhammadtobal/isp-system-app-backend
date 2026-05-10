@@ -27,6 +27,7 @@ export class JwtEmployeeStrategy extends PassportStrategy(
     return {
       empId: payload.empId,
       userId: payload.userId,
+      role: 'employee',
       ...payload,
       permissions: employee.employee_permissions.map(
         (employeePermission) => employeePermission.permission?.name,
