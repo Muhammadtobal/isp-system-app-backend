@@ -2,9 +2,12 @@ import {
   Injectable,
   ExecutionContext,
   ForbiddenException,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Injectable()
 export class JwtAuthSharedGuard extends AuthGuard([
@@ -48,7 +51,10 @@ export class JwtAuthSharedGuard extends AuthGuard([
     );
 
     if (!hasPermission) {
-      throw new ForbiddenException('ليس لديك الصلاحية');
+      throw new HttpException(
+        ErrorMessages.UNAUTHORIZED,
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     return true;

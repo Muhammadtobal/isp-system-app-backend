@@ -12,4 +12,7 @@ export const ErrorMessages = {
   USER_EXISTS_CONFLICT: 'المستخدم موجود مسبقاً',
 
   NOT_ALLOWED: 'العملية غير مصرح بها',
+
+  MAX_SUBSCRIPTION_REACHED:
+    'لا يمكن إضافة اشتراك جديد، تم الوصول إلى الحد الأقصى',
 };

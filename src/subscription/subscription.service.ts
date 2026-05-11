@@ -50,7 +50,10 @@ export class SubscriptionService {
       }
 
       if (point.count_subscription >= point.max_subscription) {
-        throw new BadRequestException('Max subscription reached');
+        throw new HttpException(
+          ErrorMessages.MAX_SUBSCRIPTION_REACHED,
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const subscription = manager.create(Subscription, createSubscriptionDto);

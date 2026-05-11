@@ -21,4 +21,9 @@ export class CreatePermissionDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  visual?: boolean;
 }

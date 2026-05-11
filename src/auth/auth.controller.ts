@@ -75,7 +75,7 @@ export class AuthController {
 
     if (!employee) {
       throw new HttpException(
-        'لا يوجد حساب بهذه المعلومات',
+        ErrorMessages.UNAUTHORIZED,
         HttpStatus.UNAUTHORIZED,
       );
     }
