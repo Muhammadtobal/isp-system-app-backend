@@ -1,5 +1,10 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { PaginationInput, SortInput } from 'src/shared/dto';
@@ -28,4 +33,9 @@ export class FindAllPermissionDto {
   @ValidateNested()
   @Type(() => SortInput)
   sort?: SortInput;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  visual?: boolean;
 }
