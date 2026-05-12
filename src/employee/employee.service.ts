@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   FindOptionsRelations,
@@ -22,6 +22,7 @@ import { AssignPermissionDto } from './dto/assign-permission.dto';
 import { EmployeePermissionService } from 'src/employee_permission/employee_permission.service';
 import { PermissionService } from 'src/permission/permission.service';
 import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
+import { EmployeeNetworkService } from 'src/employee-network/employee-network.service';
 
 @Injectable()
 export class EmployeeService {
@@ -30,19 +31,23 @@ export class EmployeeService {
     private readonly employeeRepository: Repository<Employee>,
     private readonly employeePermissionService: EmployeePermissionService,
     private readonly permissionService: PermissionService,
+    private readonly employeeNetworkService: EmployeeNetworkService,
   ) {}
   public async create(createEmployeeDto: CreateEmployeeDto) {
     const employee = this.employeeRepository.create(createEmployeeDto);
 
     employee.employee_networks = [];
 
-    const employeeNetwork = new EmployeeNetwork();
-    employeeNetwork.network_id = createEmployeeDto.network_id;
-    employeeNetwork.user_id = createEmployeeDto.user_id;
+    for (const networkId of createEmployeeDto.network_ids) {
+      const employeeNetwork = new EmployeeNetwork();
 
-    employeeNetwork.employee = employee;
+      employeeNetwork.network_id = networkId;
+      employeeNetwork.user_id = createEmployeeDto.user_id;
 
-    employee.employee_networks.push(employeeNetwork);
+      employeeNetwork.employee = employee;
+
+      employee.employee_networks.push(employeeNetwork);
+    }
 
     return await this.employeeRepository.save(employee);
   }
@@ -87,7 +92,39 @@ export class EmployeeService {
   }
 
   public async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-    await this.employeeRepository.update(id, updateEmployeeDto);
+    const findEmployee = await this.findOne(
+      { id },
+      { relations: { employee_networks: true } },
+    );
+
+    if (!findEmployee) {
+      throw new NotFoundException('Employee not found');
+    }
+
+    if (
+      updateEmployeeDto.network_ids &&
+      updateEmployeeDto.network_ids.length > 0
+    ) {
+      if (findEmployee?.employee_networks?.length) {
+        for (const oldItem of findEmployee.employee_networks) {
+          this.employeeNetworkService.remove(oldItem.id);
+        }
+      }
+
+      for (const networkId of updateEmployeeDto.network_ids) {
+        await this.employeeNetworkService.create({
+          employee_id: id,
+          network_id: networkId,
+          user_id: findEmployee.user_id,
+        });
+      }
+    }
+    const { network_ids, ...data } = updateEmployeeDto;
+
+    await this.employeeRepository.update(id, {
+      ...data,
+    });
+
     return this.findOne({ id });
   }
 

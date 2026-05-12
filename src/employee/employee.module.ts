@@ -6,6 +6,7 @@ import { Employee } from './entities/employee.entity';
 import { PermissionModule } from 'src/permission/permission.module';
 import { EmployeePermissionModule } from 'src/employee_permission/employee_permission.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { EmployeeNetworkModule } from 'src/employee-network/employee-network.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from 'src/auth/auth.module';
     forwardRef(() => AuthModule),
     PermissionModule,
     EmployeePermissionModule,
+    forwardRef(() => EmployeeNetworkModule),
   ],
   exports: [EmployeeService],
   controllers: [EmployeeController],

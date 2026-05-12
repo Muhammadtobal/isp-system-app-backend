@@ -17,27 +17,19 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
-import { EmployeeService } from 'src/employee/employee.service';
 
 @Injectable()
 export class EmployeeNetworkService {
   constructor(
     @InjectRepository(EmployeeNetwork)
     private readonly employeeNetworkRepository: Repository<EmployeeNetwork>,
-    private readonly employeeService: EmployeeService,
   ) {}
 
   public async create(createEmployeeNetworkDto: CreateEmployeeNetworkDto) {
     const employeeNetwork = this.employeeNetworkRepository.create(
       createEmployeeNetworkDto,
     );
-    const employee = await this.employeeService.findOne({
-      email: createEmployeeNetworkDto.email,
-    });
-    if (!employee) {
-      throw new HttpException('not found', HttpStatus.BAD_REQUEST);
-    }
-    employeeNetwork.employee_id = employee.id;
+
     return this.employeeNetworkRepository.save(employeeNetwork);
   }
 

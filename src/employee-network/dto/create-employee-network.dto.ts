@@ -7,12 +7,10 @@ export class CreateEmployeeNetworkDto {
   @IsInt()
   network_id: number;
 
-  @ApiProperty({
-    example: 'org@gmail.com',
-  })
+  @ApiProperty({ example: 1 })
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  @IsInt()
+  employee_id: number;
 
   @ApiProperty({ example: 1, required: false })
   @IsOptional()

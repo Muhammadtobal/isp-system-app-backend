@@ -7,6 +7,8 @@ import {
   IsOptional,
   IsBoolean,
   IsInt,
+  ArrayNotEmpty,
+  IsArray,
 } from 'class-validator';
 
 export class CreateEmployeeDto {
@@ -26,10 +28,16 @@ export class CreateEmployeeDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ example: 1, required: true })
+  @ApiProperty({
+    example: [1, 2, 3],
+    required: true,
+    type: [Number],
+  })
   @IsNotEmpty()
-  @IsInt()
-  network_id: number;
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  network_ids: number[];
 
   @ApiProperty({ example: 'refresh_token_example', required: false })
   @IsNotEmpty()
