@@ -7,6 +7,7 @@ import { Expense } from 'src/expense/entities/expense.entity';
 import { Network } from 'src/network/entities/network.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Point } from 'src/point/entities/point.entity';
+import { Product } from 'src/product/entities/product.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Role } from 'src/shared/enums/role.enum';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
@@ -73,6 +74,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Employee, (employee) => employee.user)
   employees: Employee[];
+
+  @OneToMany(() => Product, (product) => product.user)
+  products: Product[];
 
   @OneToMany(
     () => EmployeePermission,

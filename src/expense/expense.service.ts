@@ -32,18 +32,14 @@ export class ExpenseService {
     return this.expenseRepository.save(expense);
   }
 
-  public findAll(filter: FindAllExpenseDto, user?: AuthUser) {
+  public findAll(filter: FindAllExpenseDto) {
     const query = this.expenseRepository
       .createQueryBuilder('expense')
       .leftJoinAndSelect('expense.expense_type', 'expense_type')
       .leftJoinAndSelect('expense.employee', 'employee')
       .leftJoinAndSelect('expense.network', 'network')
       .where('true');
-    if (user && user.role !== 'admin') {
-      query.andWhere('expense.user_id = :userId', {
-        userId: user.userId,
-      });
-    }
+
     generateQuerySorts<Expense>(query, filter, Expense, 'expense');
     generateQueryConditions<Expense>(query, filter, 'expense');
 

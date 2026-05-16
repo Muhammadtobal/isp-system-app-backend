@@ -95,7 +95,7 @@ export class PointController {
     while (!lastPage) {
       const result = await this.pointService.findAll({
         pagination: { page, limit },
-        user_id: { value: user_id },
+        user_id: { value: Number(user_id) },
       });
 
       if (!result.items.length) break;

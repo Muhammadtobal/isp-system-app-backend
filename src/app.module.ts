@@ -19,6 +19,8 @@ import { ExpenseTypeModule } from './expense_type/expense_type.module';
 import { PointModule } from './point/point.module';
 import { EmployeeNetworkModule } from './employee-network/employee-network.module';
 import { AlertModule } from './alert/alert.module';
+import { ProductModule } from './product/product.module';
+import { ProductTypeModule } from './product_type/product_type.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { AlertModule } from './alert/alert.module';
     PointModule,
     EmployeeNetworkModule,
     AlertModule,
+    ProductModule,
+    ProductTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

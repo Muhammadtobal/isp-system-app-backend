@@ -58,6 +58,21 @@ const PermissionsStore = {
   UPDATE_USER: 'updateUser',
   DELETE_USER: 'deleteUser',
   CREATE_USER: 'createUser',
+
+  GET_PRODUCT: 'getProduct',
+  UPDATE_PRODUCT: 'updateProduct',
+  DELETE_PRODUCT: 'deleteProduct',
+  CREATE_PRODUCT: 'createProduct',
+
+  GET_PRODUCT_TYPE: 'getProductType',
+  UPDATE_PRODUCT_TYPE: 'updateProductType',
+  DELETE_PRODUCT_TYPE: 'deleteProductType',
+  CREATE_PRODUCT_TYPE: 'createProductType',
+
+  GET_ALERT: 'getAlert',
+  UPDATE_ALERT: 'updateAlert',
+  DELETE_ALERT: 'deleteAlert',
+  CREATE_ALERT: 'createAlert',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;

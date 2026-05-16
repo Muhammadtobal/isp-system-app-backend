@@ -44,7 +44,7 @@ export class PaymentService {
     return this.paymentRepository.save(payment);
   }
 
-  public findAll(filter: FindAllPaymentDto, user?: AuthUser) {
+  public findAll(filter: FindAllPaymentDto) {
     const query = this.paymentRepository
       .createQueryBuilder('payment')
 
@@ -68,11 +68,6 @@ export class PaymentService {
       ])
       .where('true');
 
-    if (user && user.role !== 'admin') {
-      query.andWhere('payment.user_id = :userId', {
-        userId: user.userId,
-      });
-    }
     generateQuerySorts<Payment>(query, filter, Payment, 'payment');
 
     generateQueryConditions<Payment>(query, filter, 'payment');
