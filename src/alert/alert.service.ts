@@ -22,6 +22,7 @@ import {
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 
 @Injectable()
 export class AlertService {
@@ -40,82 +41,64 @@ export class AlertService {
     await queryRunner.startTransaction();
 
     try {
-      const limit = 200;
+      const lateSubscriptions = await queryRunner.manager
+        .createQueryBuilder(Subscription, 'subscription')
 
-      let page = 1;
-      let lastPage = false;
+        .innerJoin(
+          (qb) =>
+            qb
+              .from(Payment, 'payment')
+              .select('payment.subscription_id', 'subscription_id')
+              .addSelect('MAX(payment.created_at)', 'last_payment_date')
+              .groupBy('payment.subscription_id'),
+          'last_payment',
+          'last_payment.subscription_id = subscription.id',
+        )
 
-      const alerts: Alert[] = [];
+        .leftJoin(Alert, 'alert', 'alert.subscription_id = subscription.id')
 
-      while (!lastPage) {
-        const result = await this.subscriptionService.findAll({
-          pagination: { page, limit },
-          user_id: { value: createAlertDto.user_id },
-        });
-        if (!result.items.length) break;
+        .select('subscription.id', 'subscription_id')
+        .addSelect('subscription.user_id', 'user_id')
+        .addSelect('last_payment.last_payment_date', 'last_payment_date')
 
-        for (const subscription of result.items) {
-          const fullSubscription = await queryRunner.manager.findOne(
-            Subscription,
-            {
-              where: { id: subscription.id },
-              relations: {
-                payments: true,
-              },
-            },
-          );
+        .where('subscription.user_id = :userId', {
+          userId: createAlertDto.user_id,
+        })
 
-          if (!fullSubscription) continue;
+        .andWhere('alert.id IS NULL')
 
-          if (!fullSubscription.payments?.length) continue;
+        .andWhere(
+          `
+        last_payment.last_payment_date
+        < DATE_SUB(NOW(), INTERVAL 30 DAY)
+      `,
+        )
 
-          const lastPayment = fullSubscription.payments.sort(
-            (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime(),
-          )[0];
+        .getRawMany();
 
-          const lastPaymentDate = new Date(lastPayment.created_at);
-
-          const now = new Date();
-
-          const diffDays = Math.floor(
-            (now.getTime() - lastPaymentDate.getTime()) / (1000 * 60 * 60 * 24),
-          );
-
-          if (diffDays > 30) {
-            const exists = await queryRunner.manager.findOne(Alert, {
-              where: {
-                subscription_id: fullSubscription.id,
-              },
-            });
-
-            if (exists) continue;
-
-            const alert = queryRunner.manager.create(Alert, {
-              subscription_id: fullSubscription.id,
-              user_id: createAlertDto.user_id,
-            });
-
-            alerts.push(alert);
-          }
-        }
-
-        if (result.items.length < limit) {
-          lastPage = true;
-        } else {
-          page++;
-        }
+      if (!lateSubscriptions.length) {
+        await queryRunner.commitTransaction();
+        console.log(lateSubscriptions);
+        return {
+          done: true,
+          created: 0,
+        };
       }
 
-      if (alerts.length) {
-        await queryRunner.manager.save(Alert, alerts);
-      }
+      const alerts = lateSubscriptions.map((subscription) =>
+        queryRunner.manager.create(Alert, {
+          subscription_id: subscription.subscription_id,
+          user_id: subscription.user_id,
+        }),
+      );
+
+      await queryRunner.manager.save(Alert, alerts);
 
       await queryRunner.commitTransaction();
 
       return {
         done: true,
+        created: alerts.length,
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -125,7 +108,6 @@ export class AlertService {
       await queryRunner.release();
     }
   }
-
   public findAll(filter: FindAllAlertDto) {
     const query = this.alertRepository
       .createQueryBuilder('alert')

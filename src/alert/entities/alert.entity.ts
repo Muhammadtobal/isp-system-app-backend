@@ -21,7 +21,7 @@ export class Alert extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
-  @Column('bigint')
+  @Column('bigint', { unique: true })
   subscription_id: number;
 
   @Column('bigint')

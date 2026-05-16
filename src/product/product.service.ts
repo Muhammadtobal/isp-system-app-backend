@@ -35,7 +35,6 @@ export class ProductService {
   public findAll(filter: FindAllProductDto) {
     const query = this.productRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.product_type', 'product_type')
       .where('true');
 
     generateQuerySorts<Product>(query, filter, Product, 'product');

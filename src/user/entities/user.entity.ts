@@ -10,6 +10,7 @@ import { Point } from 'src/point/entities/point.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Role } from 'src/shared/enums/role.enum';
+import { Sold } from 'src/sold/entities/sold.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import {
   Column,
@@ -77,6 +78,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Product, (product) => product.user)
   products: Product[];
+
+  @OneToMany(() => Sold, (sold) => sold.user)
+  sales: Sold[];
 
   @OneToMany(
     () => EmployeePermission,

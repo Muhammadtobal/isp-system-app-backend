@@ -15,7 +15,7 @@ import {
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
 
-export class FindAllProductTypeDto {
+export class FindAllSoldDto {
   @ApiProperty({
     description: 'Pagination object',
     example: {
@@ -39,4 +39,14 @@ export class FindAllProductTypeDto {
   @ValidateNested()
   @Type(() => SortInput)
   sort?: SortInput;
+
+  @ApiProperty({
+    description: 'user id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  user_id?: SingleIdInput | ListOfIdsInput;
 }

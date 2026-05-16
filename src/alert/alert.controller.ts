@@ -20,6 +20,8 @@ import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 
 import { Alert } from './entities/alert.entity';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
 
 @Controller('alert')
 export class AlertController {
@@ -28,7 +30,16 @@ export class AlertController {
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Alert.name)
-  public async create(@Body() createAlertDto: CreateAlertDto) {
+  public async create(
+    @Body() createAlertDto: CreateAlertDto,
+
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+
+    if (user.role !== 'admin') {
+      createAlertDto.user_id = user.userId;
+    }
     await this.alertService.create(createAlertDto);
     return {
       done: true,

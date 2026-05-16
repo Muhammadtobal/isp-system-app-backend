@@ -20,7 +20,7 @@ import { PointModule } from './point/point.module';
 import { EmployeeNetworkModule } from './employee-network/employee-network.module';
 import { AlertModule } from './alert/alert.module';
 import { ProductModule } from './product/product.module';
-import { ProductTypeModule } from './product_type/product_type.module';
+import { SoldModule } from './sold/sold.module';
 
 @Module({
   imports: [
@@ -55,7 +55,7 @@ import { ProductTypeModule } from './product_type/product_type.module';
     EmployeeNetworkModule,
     AlertModule,
     ProductModule,
-    ProductTypeModule,
+    SoldModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -23,13 +23,6 @@ export class CreateProductDto {
   @IsString()
   name: string;
 
-  @ApiProperty({
-    example: 1,
-  })
-  @IsNotEmpty()
-  @IsInt()
-  product_type_id: number;
-
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()
