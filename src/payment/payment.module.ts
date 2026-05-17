@@ -7,7 +7,7 @@ import { SubscriptionModule } from 'src/subscription/subscription.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Payment]), SubscriptionModule],
-
+  exports: [PaymentService],
   controllers: [PaymentController],
   providers: [PaymentService],
 })

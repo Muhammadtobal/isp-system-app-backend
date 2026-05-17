@@ -13,7 +13,7 @@ export class Permission extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: true })
   visual: boolean;
 
   @Column('text', { nullable: true })

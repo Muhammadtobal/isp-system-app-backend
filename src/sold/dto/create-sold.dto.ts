@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsInt,
   IsString,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -28,4 +29,9 @@ export class CreateSoldDto {
   @IsOptional()
   @IsString()
   unit?: string;
+
+  @ApiProperty({ example: 'true or false', required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

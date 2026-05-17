@@ -12,7 +12,7 @@ import { PointModule } from 'src/point/point.module';
     SubscriptionModule,
     PointModule,
   ],
-
+  exports: [CustomerService],
   controllers: [CustomerController],
   providers: [CustomerService],
 })

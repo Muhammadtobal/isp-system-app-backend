@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsNotEmpty,
   IsObject,
   IsOptional,
@@ -59,4 +60,9 @@ export class FindAllCustomerDto {
   @IsObject()
   @IsSingleIdOrList()
   user_id?: SingleIdInput | ListOfIdsInput;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

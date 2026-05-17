@@ -44,7 +44,6 @@ export class SoldService {
     const query = this.soldRepository
       .createQueryBuilder('sold')
       .leftJoinAndSelect('sold.product', 'product')
-      .leftJoinAndSelect('sold.user', 'user')
       .where('true');
 
     generateQuerySorts<Sold>(query, filter, Sold, 'sold');
