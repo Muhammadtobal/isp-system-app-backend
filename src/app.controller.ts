@@ -25,7 +25,7 @@ export class AppController {
 
   @Get('general-statistics')
   @UseGuards(JwtAuthUserGuard)
-  public async findAll(@CurrentUser() req: AuthUser) {
+  public async generalStatistics(@CurrentUser() req: AuthUser) {
     const user = req;
 
     let user_id;
