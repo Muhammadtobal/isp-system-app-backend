@@ -64,10 +64,10 @@ const PermissionsStore = {
   DELETE_PRODUCT: 'deleteProduct',
   CREATE_PRODUCT: 'createProduct',
 
-  GET_PRODUCT_TYPE: 'getProductType',
-  UPDATE_PRODUCT_TYPE: 'updateProductType',
-  DELETE_PRODUCT_TYPE: 'deleteProductType',
-  CREATE_PRODUCT_TYPE: 'createProductType',
+  GET_SOLD: 'getSold',
+  UPDATE_SOLD: 'updateSold',
+  DELETE_SOLD: 'deleteSold',
+  CREATE_SOLD: 'createSold',
 
   GET_ALERT: 'getAlert',
   UPDATE_ALERT: 'updateAlert',
