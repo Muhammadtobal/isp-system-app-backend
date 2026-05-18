@@ -140,4 +140,19 @@ export class SubscriptionService {
       );
     });
   }
+
+  async getPlansSubscribers(user_id: number) {
+    return this.subscriptionRepository
+      .createQueryBuilder('subscription')
+      .leftJoin('subscription.plan', 'plan')
+      .select('plan.id', 'planId')
+      .addSelect('plan.name', 'planName')
+      .addSelect('COUNT(subscription.id)', 'count')
+      .where(user_id ? 'subscription.user_id = :userId' : '1=1', {
+        userId: user_id,
+      })
+      .groupBy('plan.id')
+      .addGroupBy('plan.name')
+      .getRawMany();
+  }
 }

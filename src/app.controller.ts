@@ -37,7 +37,6 @@ export class AppController {
     const limit = 200;
 
     let activePlans = 0;
-
     let page = 1;
     let lastPage = false;
 
@@ -63,6 +62,9 @@ export class AppController {
         page++;
       }
     }
+
+    const plansWithSubscriptions =
+      await this.subscriptionService.getPlansSubscribers(Number(user_id));
 
     let activeCustomers = 0;
 
@@ -207,8 +209,10 @@ export class AppController {
       }
     }
     const netProfit = totalPayments + totalSold - totalExpenses;
+
     return {
       activePlans,
+      plansWithSubscriptions,
       activeCustomers,
       activeSubscriptions,
       totalSold,

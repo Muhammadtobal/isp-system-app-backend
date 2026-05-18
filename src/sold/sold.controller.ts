@@ -72,50 +72,51 @@ export class SoldController {
     };
   }
 
-  // @Get('sold-statistics')
-  // @UseGuards(JwtAuthSharedGuard)
-  // @Permissions(Operation.GET + Sold.name)
-  // async soldStatistics(@CurrentUser() req: AuthUser) {
-  //   const user = req;
+  @Get('sold-statistics')
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Sold.name)
+  public async soldStatistics(@CurrentUser() req: AuthUser) {
+    const user = req;
 
-  //   let user_id;
-  //   if (user.role !== 'admin') {
-  //     user_id = user.userId;
-  //   }
+    let user_id;
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
 
-  //   let totalSold = 0;
-  //   let totalAmount = 0;
-  //   let totalRevenue = 0;
+    let totalSold = 0;
+    let activeSold = 0;
+    let inactiveSold = 0;
 
-  //   const limit = 200;
-  //   let page = 1;
-  //   let lastPage = false;
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
 
-  //   while (!lastPage) {
-  //     const result = await this.soldService.findAll({
-  //       pagination: { page, limit },
-  //       user_id: user_id ? { value: Number(user_id) } : undefined,
-  //     });
+    while (!lastPage) {
+      const result = await this.soldService.findAll({
+        pagination: { page, limit },
+        user_id: { value: Number(user_id) },
+      });
 
-  //     if (!result.items.length) break;
+      if (!result.items.length) break;
 
-  //     for (const s of result.items) {
-  //       totalSold++;
-  //       totalAmount += Number(s.amount);
-  //       totalRevenue += Number(s.value) * Number(s.amount);
-  //     }
+      for (const s of result.items) {
+        totalSold++;
 
-  //     if (result.items.length < limit) {
-  //       lastPage = true;
-  //     } else {
-  //       page++;
-  //     }
-  //   }
+        if (s.active) activeSold++;
+        else inactiveSold++;
+      }
 
-  //   return {
-  //     totalSold,
-  //     totalAmount,
-  //     totalRevenue,
-  //   };
-  // }
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalSold,
+      activeSold,
+      inactiveSold,
+    };
+  }
 }
