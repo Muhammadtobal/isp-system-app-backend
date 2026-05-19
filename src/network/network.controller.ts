@@ -24,7 +24,7 @@ export class NetworkController {
   constructor(private readonly networkService: NetworkService) {}
 
   @Post('create')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Network.name)
   create(@Body() createNetworkDto: CreateNetworkDto) {
     return this.networkService.create(createNetworkDto);
@@ -38,21 +38,21 @@ export class NetworkController {
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Network.name)
   findOne(@Param('id') id: number) {
     return this.networkService.findOne({ id });
   }
 
   @Patch('update/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.UPDATE + Network.name)
   update(@Param('id') id: number, @Body() updateNetworkDto: UpdateNetworkDto) {
     return this.networkService.update(id, updateNetworkDto);
   }
 
   @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Network.name)
   remove(@Param('id') id: number) {
     this.networkService.remove(id);

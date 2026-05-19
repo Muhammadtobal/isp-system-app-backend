@@ -14,6 +14,7 @@ import { CreateEmployeePermissionDto } from './dto/create-employee_permission.dt
 import { UpdateEmployeePermissionDto } from './dto/update-employee_permission.dto';
 import { FindAllEmployeePermissionDto } from './dto/find-all-employee-permission.dto';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 
 @Controller('employee-permission')
 export class EmployeePermissionController {
@@ -22,13 +23,13 @@ export class EmployeePermissionController {
   ) {}
 
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   public findAll(@Body() filter: FindAllEmployeePermissionDto) {
     return this.employeePermissionService.findAll(filter);
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   public findOne(@Param('id') id: number) {
     return this.employeePermissionService.findOne({ id });
   }

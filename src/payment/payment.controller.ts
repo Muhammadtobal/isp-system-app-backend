@@ -48,7 +48,6 @@ export class PaymentController {
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Payment.name)
   public findOne(@Param('id') id: number) {
@@ -79,7 +78,7 @@ export class PaymentController {
   }
 
   @Post('payments-total')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + 'Payment')
   public async paymentsTotal(
     @Body() filter: FindTotalPaymentDto,

@@ -73,6 +73,11 @@ const PermissionsStore = {
   UPDATE_ALERT: 'updateAlert',
   DELETE_ALERT: 'deleteAlert',
   CREATE_ALERT: 'createAlert',
+
+  GET_DOMAIN: 'getDomain',
+  UPDATE_DOMAIN: 'updateDomain',
+  DELETE_DOMAIN: 'deleteDomain',
+  CREATE_DOMAIN: 'createDomain',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;

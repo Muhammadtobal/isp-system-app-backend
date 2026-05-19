@@ -21,6 +21,7 @@ import { EmployeeNetworkModule } from './employee-network/employee-network.modul
 import { AlertModule } from './alert/alert.module';
 import { ProductModule } from './product/product.module';
 import { SoldModule } from './sold/sold.module';
+import { DomainModule } from './domain/domain.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { SoldModule } from './sold/sold.module';
     AlertModule,
     ProductModule,
     SoldModule,
+    DomainModule,
   ],
   controllers: [AppController],
   providers: [AppService],

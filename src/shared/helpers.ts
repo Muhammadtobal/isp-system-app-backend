@@ -87,6 +87,17 @@ export function generateQueryConditions<T>(
       SingleDateInputSchema.safeParse(filter[key]).success &&
       hasOnlySpecificProperties(filter[key], ['value'])
     ) {
+      const value = (filter[key] as SingleDateInput).value;
+      const isYearMonth = /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+
+      if (isYearMonth) {
+        query.andWhere(`DATE_FORMAT(${entityName}.${key}, '%Y-%m') = :${key}`, {
+          [key]: value,
+        });
+
+        continue;
+      }
+
       const date = new Date((filter[key] as SingleDateInput).value);
 
       const start = new Date(date);

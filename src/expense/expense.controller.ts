@@ -76,7 +76,7 @@ export class ExpenseController {
   }
 
   @Post('expenses-total')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + 'Expense')
   public async expensesTotal(
     @Body() filter: FindTotalExpenseDto,

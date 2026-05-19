@@ -1,8 +1,19 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { PaginationInput, SortInput } from 'src/shared/dto';
+import {
+  ListOfIdsInput,
+  PaginationInput,
+  SingleIdInput,
+  SortInput,
+} from 'src/shared/dto';
+import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
 
 export class FindAllExpenseTypeDto {
   @ApiProperty({
@@ -28,4 +39,14 @@ export class FindAllExpenseTypeDto {
   @ValidateNested()
   @Type(() => SortInput)
   sort?: SortInput;
+
+  @ApiProperty({
+    description: 'user id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  user_id?: SingleIdInput | ListOfIdsInput;
 }

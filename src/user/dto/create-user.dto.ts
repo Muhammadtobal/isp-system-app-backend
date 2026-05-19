@@ -66,4 +66,9 @@ export class CreateUserDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsString()
+  logo?: string;
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { JwtAuthUserGuard } from './auth/guards/jwt-auth-user.guard';
 import { CurrentUser } from './shared/decorators/req.guard.decorate';
@@ -10,6 +10,7 @@ import { JwtAuthSharedGuard } from './auth/guards/jwt-auth-shared.guard';
 import { ExpenseService } from './expense/expense.service';
 import { PaymentService } from './payment/payment.service';
 import { SoldService } from './sold/sold.service';
+import { AnnualDto } from './shared/annual.dto';
 
 @Controller()
 export class AppController {
@@ -219,6 +220,115 @@ export class AppController {
       totalExpenses,
       totalPayments,
       netProfit,
+    };
+  }
+
+  @Post('annual-statistics')
+  @UseGuards(JwtAuthUserGuard)
+  public async annualStatistics(
+    @Body() filter: AnnualDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+
+    let user_id;
+
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    const limit = 200;
+
+    let activePlans = 0;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.planService.findAll({
+        ...filter,
+        pagination: {
+          page,
+          limit,
+        },
+        user_id: {
+          value: Number(user_id),
+        },
+        active: true,
+      });
+
+      if (!result.items.length) break;
+
+      activePlans += result.items.length;
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    let activeCustomers = 0;
+
+    page = 1;
+    lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.customerService.findAll({
+        ...filter,
+        pagination: {
+          page,
+          limit,
+        },
+        user_id: {
+          value: Number(user_id),
+        },
+        active: true,
+      });
+
+      if (!result.items.length) break;
+
+      activeCustomers += result.items.length;
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    let activeSubscriptions = 0;
+
+    page = 1;
+    lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.subscriptionService.findAll({
+        ...filter,
+        pagination: {
+          page,
+          limit,
+        },
+        user_id: {
+          value: Number(user_id),
+        },
+        active: true,
+      });
+
+      if (!result.items.length) break;
+
+      activeSubscriptions += result.items.length;
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      activePlans,
+      activeCustomers,
+      activeSubscriptions,
     };
   }
 }

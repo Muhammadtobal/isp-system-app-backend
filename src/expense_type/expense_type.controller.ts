@@ -18,31 +18,42 @@ import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Operation } from 'src/shared/enums/operation..enum';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
 
 @Controller('expense-type')
 export class ExpenseTypeController {
   constructor(private readonly expenseTypeService: ExpenseTypeService) {}
 
   @Post('create')
-  @UseGuards(JwtAuthUserGuard)
-  create(@Body() createExpenseTypeDto: CreateExpenseTypeDto) {
+  @UseGuards(JwtAuthSharedGuard)
+  create(
+    @Body() createExpenseTypeDto: CreateExpenseTypeDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+
+    if (user.role !== 'admin') {
+      createExpenseTypeDto.user_id = user.userId;
+    }
+
     return this.expenseTypeService.create(createExpenseTypeDto);
   }
 
   @Post('get-all')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   findAll(@Body() filter: FindAllExpenseTypeDto) {
     return this.expenseTypeService.findAll(filter);
   }
 
   @Get('get-one/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   findOne(@Param('id') id: number) {
     return this.expenseTypeService.findOne({ id });
   }
 
   @Patch('update/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   update(
     @Param('id') id: number,
     @Body() updateExpenseTypeDto: UpdateExpenseTypeDto,
@@ -51,7 +62,7 @@ export class ExpenseTypeController {
   }
 
   @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   remove(@Param('id') id: number) {
     this.expenseTypeService.remove(id);
     return {

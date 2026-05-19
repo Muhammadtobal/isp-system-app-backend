@@ -14,7 +14,10 @@ export class Permission extends BaseEntity {
   description?: string;
 
   @Column({ type: 'boolean', default: true })
-  visual: boolean;
+  visual_for_emp: boolean;
+
+  @Column({ type: 'boolean', default: true })
+  visual_for_user: boolean;
 
   @Column('text', { nullable: true })
   translation?: string;

@@ -56,7 +56,7 @@ export class UserController {
     if (user.role !== 'admin') {
       throw new HttpException(
         ErrorMessages.NOT_ALLOWED,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
@@ -136,7 +136,7 @@ export class UserController {
     if (userReq.role !== 'admin') {
       throw new HttpException(
         ErrorMessages.NOT_ALLOWED,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 

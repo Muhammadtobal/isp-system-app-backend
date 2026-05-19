@@ -2,14 +2,21 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { PaginationInput, SortInput } from 'src/shared/dto';
+import {
+  ListOfIdsInput,
+  PaginationInput,
+  SingleIdInput,
+  SortInput,
+} from 'src/shared/dto';
+import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
 
-export class FindAllPermissionDto {
+export class FindAllDomainDto {
   @ApiProperty({
     description: 'Pagination object',
     example: {
@@ -34,13 +41,13 @@ export class FindAllPermissionDto {
   @Type(() => SortInput)
   sort?: SortInput;
 
-  @ApiProperty({ example: true, required: false })
+  @ApiProperty({
+    description: 'user id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
   @IsOptional()
-  @IsBoolean()
-  visual_for_emp?: boolean;
-
-  @ApiProperty({ example: true, required: false })
-  @IsOptional()
-  @IsBoolean()
-  visual_for_user?: boolean;
+  @IsObject()
+  @IsSingleIdOrList()
+  user_id?: SingleIdInput | ListOfIdsInput;
 }

@@ -40,7 +40,7 @@ export class EmployeeController {
   ) {}
 
   @Post('create')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Employee.name)
   public async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto,
@@ -127,7 +127,7 @@ export class EmployeeController {
   @Patch('update/:id')
   @UseGuards(JwtAuthUserGuard)
   @Permissions(Operation.UPDATE + Employee.name)
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   public async update(
     @Param('id') id: number,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
@@ -154,7 +154,7 @@ export class EmployeeController {
   }
 
   @Delete('remove/:id')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Employee.name)
   @UseGuards(JwtAuthUserGuard)
   remove(@Param('id') id: number) {
@@ -165,7 +165,7 @@ export class EmployeeController {
   }
 
   @Post('assign-permission')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   public async assignPermission(
     @Body() assignPermissionDto: AssignPermissionDto,
     @CurrentUser() req: AuthUser,

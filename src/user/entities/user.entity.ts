@@ -1,9 +1,11 @@
 import { Alert } from 'src/alert/entities/alert.entity';
 import { Customer } from 'src/customer/entities/customer.entity';
+import { Domain } from 'src/domain/entities/domain.entity';
 import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { EmployeePermission } from 'src/employee_permission/entities/employee_permission.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
+import { ExpenseType } from 'src/expense_type/entities/expense_type.entity';
 import { Network } from 'src/network/entities/network.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Point } from 'src/point/entities/point.entity';
@@ -27,6 +29,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
+
+  @Column({ type: 'text', nullable: true })
+  logo?: string;
 
   @Column({ type: 'varchar', length: 255 })
   description: string;
@@ -76,11 +81,17 @@ export class User extends BaseEntity {
   @OneToMany(() => Employee, (employee) => employee.user)
   employees: Employee[];
 
+  @OneToMany(() => ExpenseType, (expense_type) => expense_type.user)
+  expense_types: ExpenseType[];
+
   @OneToMany(() => Product, (product) => product.user)
   products: Product[];
 
   @OneToMany(() => Sold, (sold) => sold.user)
   sales: Sold[];
+
+  @OneToMany(() => Domain, (domain) => domain.user)
+  domains: Domain[];
 
   @OneToMany(
     () => EmployeePermission,
