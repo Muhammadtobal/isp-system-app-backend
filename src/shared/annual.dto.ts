@@ -36,7 +36,7 @@ export class AnnualDto {
     example: {
       single: {
         summary: 'Single date',
-        value: { value: '2026-04-25' },
+        value: { value: '2026-04' },
       },
     },
   })
