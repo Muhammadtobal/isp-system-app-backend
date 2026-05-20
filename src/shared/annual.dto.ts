@@ -29,10 +29,7 @@ export class AnnualDto {
     description: 'Filter by created_at (single date or range or min/max)',
     oneOf: [{ $ref: getSchemaPath(SingleDateInput) }],
     example: {
-      single: {
-        summary: 'Single date',
-        value: { value: '2026' },
-      },
+      value: '2026',
     },
   })
   @IsNotEmpty()
