@@ -88,11 +88,11 @@ export function generateQueryConditions<T>(
       hasOnlySpecificProperties(filter[key], ['value'])
     ) {
       const value = (filter[key] as SingleDateInput).value;
-      const isYearMonth = /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+      const isYear = /^\d{4}$/.test(value);
 
-      if (isYearMonth) {
-        query.andWhere(`DATE_FORMAT(${entityName}.${key}, '%Y-%m') = :${key}`, {
-          [key]: value,
+      if (isYear) {
+        query.andWhere(`YEAR(${entityName}.${key}) = :${key}`, {
+          [key]: Number(value),
         });
 
         continue;

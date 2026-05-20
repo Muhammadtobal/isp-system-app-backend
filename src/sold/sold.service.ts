@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  DataSource,
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
@@ -20,6 +21,7 @@ import {
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { ProductService } from 'src/product/product.service';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class SoldService {
@@ -27,6 +29,7 @@ export class SoldService {
     @InjectRepository(Sold)
     private readonly soldRepository: Repository<Sold>,
     private readonly productService: ProductService,
+    private readonly dataSource: DataSource,
   ) {}
 
   public async create(createSoldDto: CreateSoldDto) {
@@ -70,8 +73,35 @@ export class SoldService {
   }
 
   public async update(id: number, updateSoldDto: UpdateSoldDto) {
-    await this.soldRepository.update(id, updateSoldDto);
-    return this.findOne({ id });
+    return await this.dataSource.transaction(async (manager) => {
+      await manager.delete(Sold, id);
+
+      if (updateSoldDto.product_id && updateSoldDto.amount) {
+        const product = await manager.findOne(Product, {
+          where: {
+            id: updateSoldDto.product_id,
+          },
+        });
+
+        if (!product) {
+          throw new HttpException('لايوجد منتج', HttpStatus.BAD_REQUEST);
+        }
+
+        const sold = manager.create(Sold, {
+          amount: updateSoldDto.amount,
+          product_id: updateSoldDto.product_id,
+          unit: updateSoldDto.unit,
+          active: updateSoldDto.active,
+          user_id: updateSoldDto.user_id,
+        });
+
+        sold.value = Number(updateSoldDto.amount) * Number(product.price);
+
+        return await manager.save(Sold, sold);
+      }
+
+      return null;
+    });
   }
 
   public remove(id: number) {

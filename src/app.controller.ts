@@ -222,7 +222,6 @@ export class AppController {
       netProfit,
     };
   }
-
   @Post('annual-statistics')
   @UseGuards(JwtAuthUserGuard)
   public async annualStatistics(
@@ -239,7 +238,25 @@ export class AppController {
 
     const limit = 200;
 
-    let activePlans = 0;
+    const statistics: Record<
+      number,
+      {
+        month: number;
+        activePlans: number;
+        activeCustomers: number;
+        activeSubscriptions: number;
+      }
+    > = {};
+
+    for (let i = 1; i <= 12; i++) {
+      statistics[i] = {
+        month: i,
+        activePlans: 0,
+        activeCustomers: 0,
+        activeSubscriptions: 0,
+      };
+    }
+
     let page = 1;
     let lastPage = false;
 
@@ -258,7 +275,11 @@ export class AppController {
 
       if (!result.items.length) break;
 
-      activePlans += result.items.length;
+      for (const item of result.items) {
+        const month = new Date(item.created_at).getMonth() + 1;
+
+        statistics[month].activePlans++;
+      }
 
       if (result.items.length < limit) {
         lastPage = true;
@@ -266,8 +287,6 @@ export class AppController {
         page++;
       }
     }
-
-    let activeCustomers = 0;
 
     page = 1;
     lastPage = false;
@@ -287,7 +306,11 @@ export class AppController {
 
       if (!result.items.length) break;
 
-      activeCustomers += result.items.length;
+      for (const item of result.items) {
+        const month = new Date(item.created_at).getMonth() + 1;
+
+        statistics[month].activeCustomers++;
+      }
 
       if (result.items.length < limit) {
         lastPage = true;
@@ -295,8 +318,6 @@ export class AppController {
         page++;
       }
     }
-
-    let activeSubscriptions = 0;
 
     page = 1;
     lastPage = false;
@@ -316,7 +337,11 @@ export class AppController {
 
       if (!result.items.length) break;
 
-      activeSubscriptions += result.items.length;
+      for (const item of result.items) {
+        const month = new Date(item.created_at).getMonth() + 1;
+
+        statistics[month].activeSubscriptions++;
+      }
 
       if (result.items.length < limit) {
         lastPage = true;
@@ -325,10 +350,6 @@ export class AppController {
       }
     }
 
-    return {
-      activePlans,
-      activeCustomers,
-      activeSubscriptions,
-    };
+    return Object.values(statistics);
   }
 }

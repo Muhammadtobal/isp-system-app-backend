@@ -58,7 +58,16 @@ export class SoldController {
   @Patch('update/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.UPDATE + Sold.name)
-  update(@Param('id') id: number, @Body() updateSoldDto: UpdateSoldDto) {
+  update(
+    @Param('id') id: number,
+    @Body() updateSoldDto: UpdateSoldDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+
+    if (user.role !== 'admin') {
+      updateSoldDto.user_id = user.userId;
+    }
     return this.soldService.update(id, updateSoldDto);
   }
 

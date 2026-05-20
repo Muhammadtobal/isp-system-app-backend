@@ -25,23 +25,18 @@ import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.dec
 import { IsSingleDateOrRange } from 'src/shared/decorators/is-single-date-or-range.decorator';
 
 export class AnnualDto {
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Filter by created_at (single date or range or min/max)',
-    oneOf: [
-      { $ref: getSchemaPath(SingleDateInput) },
-      { $ref: getSchemaPath(RangeDateInput) },
-      { $ref: getSchemaPath(MinDateInput) },
-      { $ref: getSchemaPath(MaxDateInput) },
-    ],
+    oneOf: [{ $ref: getSchemaPath(SingleDateInput) }],
     example: {
       single: {
         summary: 'Single date',
-        value: { value: '2026-04' },
+        value: { value: '2026' },
       },
     },
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsObject()
   @IsSingleDateOrRange()
-  created_at?: SingleDateInput;
+  created_at: SingleDateInput;
 }
