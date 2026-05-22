@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { JwtAuthUserGuard } from './auth/guards/jwt-auth-user.guard';
 import { CurrentUser } from './shared/decorators/req.guard.decorate';
@@ -352,4 +360,21 @@ export class AppController {
 
     return Object.values(statistics);
   }
+
+  // @Post('upload/image')
+  // @UseGuards(JwtAuthSharedGuard)
+  // @UseInterceptors(MulterImageConfigInterceptor)
+  // async uploadImages(@UploadedFiles() file: Express.Multer.File) {
+  //   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+
+  //   const host = process.env.HOST || 'localhost';
+
+  //   const port = process.env.PORT;
+
+  //   const uploadFolder = process.env.DESTINATION || 'uploads';
+
+  //   `${protocol}://${host}:${port}/${uploadFolder}/${file.filename}`;
+
+  //   return { done: true };
+  // }
 }

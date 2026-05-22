@@ -48,6 +48,12 @@ export class User extends BaseEntity {
   @Column({ type: 'text' })
   address: string;
 
+  @Column('varchar', { length: 255, nullable: true })
+  resetPasswordToken?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordExpires?: Date | null;
+
   @Column({
     type: 'enum',
     enum: Role,

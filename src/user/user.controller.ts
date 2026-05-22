@@ -10,6 +10,9 @@ import {
   Request,
   HttpException,
   HttpStatus,
+  UploadedFile,
+  UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
@@ -20,11 +23,19 @@ import { FindAllUserDto } from './dto/find-all-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
-import { AuthUser } from 'src/shared/helpers';
+import { AuthUser, buildFileUrl } from 'src/shared/helpers';
 import { User } from './entities/user.entity';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { MulterImageConfigInterceptor } from 'src/shared/helpers';
+import { ApiConsumes } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as path from 'path';
+import {
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from './dto/forget-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -32,18 +43,44 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
-
   @Post('create')
-  public async create(@Body() createUserDto: CreateUserDto) {
+  @UseInterceptors(MulterImageConfigInterceptor)
+  public async create(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() logo: Express.Multer.File,
+  ) {
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+
+    let imageUrl: string | undefined;
 
     const user = await this.userService.create({
       ...createUserDto,
     });
 
-    return this.userService.findOne({ id: user.id });
-  }
+    if (logo) {
+      const uploadFolder = process.env.DESTINATION || 'uploads';
 
+      if (!fs.existsSync(uploadFolder)) {
+        fs.mkdirSync(uploadFolder, { recursive: true });
+      }
+
+      const fileName = `${Date.now()}-${logo.originalname}`;
+
+      const filePath = path.join(uploadFolder, fileName);
+
+      fs.writeFileSync(filePath, logo.buffer);
+
+      imageUrl = `${uploadFolder}/${fileName}`;
+
+      await this.userService.update(user.id, {
+        logo: imageUrl,
+      });
+    }
+
+    return this.userService.findOne({
+      id: user.id,
+    });
+  }
   @Post('get-all')
   @UseGuards(JwtAuthUserGuard)
   @Permissions(Operation.GET + User.name)
@@ -64,14 +101,16 @@ export class UserController {
 
     const safeItems = users.items.map((u) => {
       const { password, ...rest } = u;
-      return rest;
+
+      return {
+        ...rest,
+        logo: buildFileUrl(rest.logo),
+      };
     });
 
     return {
-      data: {
-        ...users,
-        items: safeItems,
-      },
+      ...users,
+      items: safeItems,
     };
   }
 
@@ -95,27 +134,58 @@ export class UserController {
       );
     }
     const { password, ...userSaved } = user;
-    return userSaved;
+    return {
+      ...userSaved,
+      logo: buildFileUrl(userSaved.logo),
+    };
   }
 
   @Patch('update/:id')
   @UseGuards(JwtAuthUserGuard)
+  @UseInterceptors(MulterImageConfigInterceptor)
   @Permissions(Operation.UPDATE + User.name)
   @UseGuards(JwtAuthUserGuard)
   public async update(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
     @Request() req: any,
+    @UploadedFile() logo: Express.Multer.File,
   ) {
-    // const userReq = getUser(req.user);
-    // if (userReq.role !== 'admin') {
-    //   throw new HttpException('غير مصرح لك', HttpStatus.BAD_REQUEST);
-    // }
+    const existingUser = await this.userService.findOne({ id });
 
+    if (!existingUser) {
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_USER,
+        HttpStatus.NOT_FOUND,
+      );
+    }
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
+    if (logo) {
+      const fileName = `${Date.now()}-${logo.originalname}`;
+
+      const uploadPath = path.join(
+        process.cwd(),
+        process.env.DESTINATION || 'uploads',
+        fileName,
+      );
+
+      fs.writeFileSync(uploadPath, logo.buffer);
+
+      if (existingUser.logo) {
+        const oldPath = path.join(process.cwd(), existingUser.logo);
+
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+
+      updateUserDto.logo = `uploads/${fileName}`;
+    }
+
     const data = await this.userService.update(id, updateUserDto);
+
     if (!data) {
       throw new HttpException(
         ErrorMessages.NOT_FOUND_USER,
@@ -125,7 +195,10 @@ export class UserController {
 
     const { password, ...safeUser } = data;
 
-    return safeUser;
+    return {
+      ...safeUser,
+      logo: buildFileUrl(safeUser.logo),
+    };
   }
 
   @Delete('remove/:id')
@@ -236,6 +309,19 @@ export class UserController {
       totalUsers,
       activeUsers,
       inactiveUsers,
+    };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() input: ForgotPasswordInput) {
+    return this.userService.forgotPassword(input.email);
+  }
+  @Post('reset-password')
+  async resetPassword(@Body() input: ResetPasswordInput) {
+    await this.userService.resetPassword(input.token, input.newPassword);
+
+    return {
+      done: true,
     };
   }
 }

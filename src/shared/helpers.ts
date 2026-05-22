@@ -27,8 +27,12 @@ import {
   SingleIdInputSchema,
   SingleNumberInputSchema,
 } from 'src/shared/zod-schemas';
+import { diskStorage, memoryStorage } from 'multer';
 
 import { Request } from 'express';
+import { extname } from 'path';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 export interface RequestWithUser extends Request {
   user: {
@@ -331,4 +335,61 @@ export interface AuthUser {
   role: string;
   empId?: number;
   permissions?: string[];
+}
+
+// export const multerImageOptions = () => ({
+//   storage: memoryStorage(),
+
+//   limits: {
+//     fileSize: Number(process.env.MAX_SIZE_IMAGE),
+//   },
+
+//   fileFilter: (req: any, file, cb) => {
+//     const allowed = ['jpg', 'jpeg', 'png'];
+
+//     const ext = extname(file.originalname).slice(1).toLowerCase();
+
+//     if (!allowed.includes(ext)) {
+//       return cb(
+//         new HttpException('المسار غير صحيح', HttpStatus.BAD_REQUEST),
+//         false,
+//       );
+//     }
+
+//     cb(null, true);
+//   },
+// });
+
+export const MulterImageConfigInterceptor = FileInterceptor('logo', {
+  storage: memoryStorage(),
+
+  limits: {
+    fileSize: Number(process.env.MAX_SIZE_IMAGE ?? 12582912),
+  },
+
+  fileFilter: (req, file, cb) => {
+    const allowed = ['jpg', 'jpeg', 'png'];
+
+    const ext = extname(file.originalname).slice(1).toLowerCase();
+
+    if (!allowed.includes(ext)) {
+      return cb(
+        new HttpException('صيغة الصورة غير مدعومة', HttpStatus.BAD_REQUEST),
+        false,
+      );
+    }
+
+    cb(null, true);
+  },
+});
+
+export function buildFileUrl(filePath?: string) {
+  if (!filePath) return null;
+
+  const host =
+    process.env.FRONTEND_URL?.replace(/\/$/, '') || 'http://localhost:3000';
+
+  const base = process.env.BASE_URL || '';
+
+  return `${host}${base}/${filePath}`;
 }

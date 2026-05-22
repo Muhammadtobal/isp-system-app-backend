@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
@@ -37,6 +38,12 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('swagger', app, document);
+  app.useStaticAssets(
+    join(process.cwd(), process.env.DESTINATION || 'uploads'),
+    {
+      prefix: `${process.env.BASE_URL}/${process.env.DESTINATION}/`,
+    },
+  );
   await app.listen(process.env.PORT!);
 
   console.log(
