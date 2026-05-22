@@ -12,7 +12,7 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   app.setGlobalPrefix(process.env.BASE_URL as string);
-  app.enableCors({ origin: process.env.FRONT_URL, credentials: true });
+  app.enableCors({ origin: process.env.FRONTEND_URL, credentials: true });
 
   if (process.env.NODE_ENV === 'production') {
     app.use(helmet());

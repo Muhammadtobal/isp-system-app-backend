@@ -93,7 +93,7 @@ export class UserService {
 
     await this.userRepository.save(user);
 
-    const link = `${process.env.FRONTEND_URL}?token=${token}`;
+    const link = `${process.env.RESET_PASSWORD_URL}?token=${token}`;
 
     await this.mailService.sendResetPasswordEmail(user.email, link);
 
