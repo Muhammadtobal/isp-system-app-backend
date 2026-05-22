@@ -386,8 +386,7 @@ export const MulterImageConfigInterceptor = FileInterceptor('logo', {
 export function buildFileUrl(filePath?: string) {
   if (!filePath) return null;
 
-  const host =
-    process.env.FRONTEND_URL?.replace(/\/$/, '') || 'http://localhost:3000';
+  const host = process.env.HOST?.replace(/\/$/, '') || 'http://localhost:3000';
 
   const base = process.env.BASE_URL || '';
 
