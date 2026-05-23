@@ -44,7 +44,7 @@ export class AlertService {
       const lateSubscriptions = await queryRunner.manager
         .createQueryBuilder(Subscription, 'subscription')
 
-        .innerJoin(
+        .leftJoin(
           (qb) =>
             qb
               .from(Payment, 'payment')
@@ -69,16 +69,17 @@ export class AlertService {
 
         .andWhere(
           `
-        last_payment.last_payment_date
-        < DATE_SUB(NOW(), INTERVAL 30 DAY)
-      `,
+    (
+      last_payment.last_payment_date IS NULL
+      OR last_payment.last_payment_date < DATE_SUB(NOW(), INTERVAL 30 DAY)
+    )
+  `,
         )
 
         .getRawMany();
 
       if (!lateSubscriptions.length) {
         await queryRunner.commitTransaction();
-        console.log(lateSubscriptions);
         return {
           done: true,
           created: 0,
