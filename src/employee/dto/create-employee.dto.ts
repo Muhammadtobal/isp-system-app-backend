@@ -39,12 +39,6 @@ export class CreateEmployeeDto {
   @IsInt({ each: true })
   network_ids: number[];
 
-  @ApiProperty({ example: 'refresh_token_example', required: false })
-  @IsNotEmpty()
-  @IsOptional()
-  @IsString()
-  refresh_token?: string;
-
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

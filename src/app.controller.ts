@@ -34,7 +34,10 @@ export class AppController {
 
   @Get('general-statistics')
   @UseGuards(JwtAuthUserGuard)
-  public async generalStatistics(@CurrentUser() req: AuthUser) {
+  public async generalStatistics(
+    @Body() filter: AnnualDto,
+    @CurrentUser() req: AuthUser,
+  ) {
     const user = req;
 
     let user_id;
@@ -51,6 +54,7 @@ export class AppController {
 
     while (!lastPage) {
       const result = await this.planService.findAll({
+        ...filter,
         pagination: {
           page,
           limit,
@@ -82,6 +86,7 @@ export class AppController {
 
     while (!lastPage) {
       const result = await this.customerService.findAll({
+        ...filter,
         pagination: {
           page,
           limit,
@@ -110,6 +115,7 @@ export class AppController {
 
     while (!lastPage) {
       const result = await this.subscriptionService.findAll({
+        ...filter,
         pagination: {
           page,
           limit,
@@ -138,6 +144,7 @@ export class AppController {
 
     while (!lastPage) {
       const result = await this.expenseService.findAll({
+        ...filter,
         pagination: {
           page,
           limit,
@@ -167,6 +174,7 @@ export class AppController {
 
     while (!lastPage) {
       const result = await this.paymentService.findAll({
+        ...filter,
         pagination: {
           page,
           limit,
@@ -196,6 +204,7 @@ export class AppController {
 
     while (!lastPage) {
       const result = await this.soldService.findAll({
+        ...filter,
         pagination: {
           page,
           limit,
