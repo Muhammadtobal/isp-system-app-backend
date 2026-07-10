@@ -5,6 +5,7 @@ import {
   IsInt,
   IsOptional,
   IsBoolean,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateCustomerDto {
@@ -27,6 +28,30 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   @IsString()
   phone: string;
+
+  @ApiProperty({
+    example: '2026-07-09T00:00:00Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  start_date?: string;
+
+  @ApiProperty({
+    example: '2026-08-09T00:00:00Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  expire_date?: string;
+
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  auto_renew?: boolean;
 
   @ApiProperty({ example: 1 })
   @IsNotEmpty()

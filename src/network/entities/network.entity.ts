@@ -39,6 +39,9 @@ export class Network extends BaseEntity {
   @OneToMany(() => Plan, (plan) => plan.network)
   plans: Plan[];
 
+  // @OneToMany(() => NetworkAccount, (network_account) => network_account.network)
+  // network_accounts: NetworkAccount[];
+
   @OneToMany(() => Point, (point) => point.network)
   points: Point[];
 

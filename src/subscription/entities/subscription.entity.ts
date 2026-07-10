@@ -31,6 +31,26 @@ export class Subscription extends BaseEntity {
   @Column('bigint')
   point_id: number;
 
+  @Column({ unique: true, nullable: true })
+  radius_username: string;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  start_date?: Date;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  expire_date?: Date;
+
+  @Column({
+    default: true,
+  })
+  auto_renew: boolean;
+
   @Column({ type: 'boolean', default: true })
   status: boolean;
 

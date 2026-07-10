@@ -60,4 +60,19 @@ export class NetworkController {
       done: true,
     };
   }
+
+  @Get('stats')
+  async getStats() {
+    return this.networkService.getStats();
+  }
+
+  @Get('temperature')
+  async temperature() {
+    const temp = await this.networkService.getCpuTemperature();
+
+    return {
+      cpuTemperature: temp,
+      unit: '°C',
+    };
+  }
 }

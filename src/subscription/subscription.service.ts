@@ -27,6 +27,10 @@ import {
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { Point } from 'src/point/entities/point.entity';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { RadiusService } from 'src/radius/radius.service';
+import { Plan } from 'src/plan/entities/plan.entity';
+import { PointService } from 'src/point/point.service';
+import { PlanService } from 'src/plan/plan.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -34,38 +38,54 @@ export class SubscriptionService {
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
     private dataSource: DataSource,
+
+    private readonly radiusService: RadiusService,
+    private readonly pointService: PointService,
+    private readonly planService: PlanService,
   ) {}
 
   public async create(createSubscriptionDto: CreateSubscriptionDto) {
-    return this.dataSource.transaction(async (manager) => {
-      const point = await manager.findOne(Point, {
-        where: { id: createSubscriptionDto.point_id },
-      });
-
-      if (!point) {
-        throw new HttpException(
-          ErrorMessages.POINT_NOT_FOUND,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      if (point.count_subscription >= point.max_subscription) {
-        throw new HttpException(
-          ErrorMessages.MAX_SUBSCRIPTION_REACHED,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const subscription = manager.create(Subscription, createSubscriptionDto);
-      const saved = await manager.save(subscription);
-
-      await manager.increment(Point, { id: point.id }, 'count_subscription', 1);
-
-      return saved;
+    const point = await this.pointService.findOne({
+      id: createSubscriptionDto.point_id,
     });
+    if (!point) {
+      throw new HttpException(
+        ErrorMessages.POINT_NOT_FOUND,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (point.count_subscription >= point.max_subscription) {
+      throw new HttpException(
+        ErrorMessages.MAX_SUBSCRIPTION_REACHED,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const subscription = this.subscriptionRepository.create(
+      createSubscriptionDto,
+    );
+    const saved = await this.subscriptionRepository.save(subscription);
+
+    await this.pointService.update(point.id, {
+      count_subscription: point.count_subscription + 1,
+    });
+    const plan = await this.planService.findOne({
+      id: createSubscriptionDto.plan_id,
+    });
+    if (!plan) return null;
+
+    const username = `pppoe${saved.id}`;
+
+    const password = Math.random().toString(36).slice(-8);
+
+    await this.radiusService.createPppoeUser(username, password, plan);
+    saved.radius_username = username;
+
+    return await this.subscriptionRepository.save(saved);
   }
 
-  public findAll(filter: FindAllSubscriptionDto) {
+  public async findAll(filter: FindAllSubscriptionDto) {
     const query = this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoin('subscription.plan', 'plan')
@@ -75,7 +95,6 @@ export class SubscriptionService {
         'subscription',
 
         'plan.name',
-        'plan.speed',
         'plan.price',
 
         'customer.name',
@@ -92,10 +111,24 @@ export class SubscriptionService {
 
     generateQueryConditions<Subscription>(query, filter, 'subscription');
 
-    return customPaginate<Subscription, PaginationMetadata>(query, {
-      limit: filter.pagination.limit,
-      page: filter.pagination.page,
-    });
+    const result = await customPaginate<Subscription, PaginationMetadata>(
+      query,
+      {
+        limit: filter.pagination.limit,
+        page: filter.pagination.page,
+      },
+    );
+
+    const onlineUsers = await this.radiusService.getOnlineUsers();
+
+    const onlineSet = new Set(onlineUsers.map((user) => user.username));
+
+    result.items = result.items.map((subscription: any) => ({
+      ...subscription,
+      is_online: onlineSet.has(subscription.radius_username),
+    }));
+
+    return result;
   }
 
   public findOne(

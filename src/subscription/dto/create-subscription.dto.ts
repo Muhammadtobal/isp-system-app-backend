@@ -24,17 +24,42 @@ export class CreateSubscriptionDto {
   @IsInt()
   point_id: number;
 
-  @ApiProperty({ example: true, required: false })
+  @ApiProperty({
+    example: '2026-07-09T00:00:00Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  start_date?: string;
+
+  @ApiProperty({
+    example: '2026-08-09T00:00:00Z',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  expire_date?: string;
+
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  auto_renew?: boolean;
+
+  @ApiProperty({
+    example: true,
+    required: false,
+  })
   @IsOptional()
   @IsBoolean()
   status?: boolean;
 
-  @ApiProperty({ example: true, required: false })
-  @IsOptional()
-  @IsBoolean()
-  active?: boolean;
-
-  @ApiProperty({ example: 1, required: false })
+  @ApiProperty({
+    example: 1,
+    required: false,
+  })
   @IsOptional()
   @IsInt()
   user_id?: number;

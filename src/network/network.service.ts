@@ -6,6 +6,8 @@ import {
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
+import si from 'systeminformation';
+import wmi from 'node-wmi';
 
 import { CreateNetworkDto } from './dto/create-network.dto';
 import { UpdateNetworkDto } from './dto/update-network.dto';
@@ -67,5 +69,50 @@ export class NetworkService {
 
   public remove(id: number) {
     this.networkRepository.delete(id);
+  }
+
+  async getStats() {
+    const [cpu, mem, fsSize, currentLoad, time] = await Promise.all([
+      si.cpu(),
+      si.mem(),
+      si.fsSize(),
+      si.currentLoad(),
+      si.time(),
+    ]);
+
+    return {
+      uptime: time.uptime,
+
+      cpu: {
+        manufacturer: cpu.manufacturer,
+        brand: cpu.brand,
+        cores: cpu.cores,
+        physicalCores: cpu.physicalCores,
+        usage: Number(currentLoad.currentLoad.toFixed(2)),
+      },
+
+      memory: {
+        total: mem.total,
+        used: mem.used,
+        free: mem.free,
+        usagePercent: Number(((mem.used / mem.total) * 100).toFixed(2)),
+      },
+
+      disks: fsSize.map((disk) => ({
+        fs: disk.fs,
+        mount: disk.mount,
+        size: disk.size,
+        used: disk.used,
+        usagePercent: disk.use,
+      })),
+    };
+  }
+
+  async getCpuTemperature(): Promise<number | null> {
+    const data = await si.cpuTemperature();
+
+    console.log(data);
+
+    return data.main ?? null;
   }
 }

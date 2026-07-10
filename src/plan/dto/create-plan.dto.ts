@@ -6,8 +6,10 @@ import {
   IsNumber,
   IsBoolean,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ServiceType } from 'src/shared/enums/service_type.enum';
 
 export class CreatePlanDto {
   @ApiProperty({ example: 'Premium Plan' })
@@ -15,10 +17,61 @@ export class CreatePlanDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 100.5 })
-  @IsNotEmpty()
-  @IsNumber()
-  speed: number;
+  @ApiProperty({
+    example: 'pppoe',
+    enum: ['pppoe', 'hotspot'],
+  })
+  @IsEnum(ServiceType)
+  service_type: ServiceType;
+
+  @ApiProperty({
+    example: 20000,
+    description: 'Download speed in Kbps',
+  })
+  @IsInt()
+  download_speed: number;
+
+  @ApiProperty({
+    example: 20000,
+    description: 'Upload speed in Kbps',
+  })
+  @IsInt()
+  upload_speed: number;
+
+  @ApiProperty({
+    example: 102400,
+    required: false,
+    description: 'Quota in MB (NULL = Unlimited)',
+  })
+  @IsOptional()
+  @IsInt()
+  quota_mb?: number;
+
+  @ApiProperty({
+    example: 7200,
+    required: false,
+    description: 'Session timeout in seconds',
+  })
+  @IsOptional()
+  @IsInt()
+  session_timeout?: number;
+
+  @ApiProperty({
+    example: 30,
+    required: false,
+    description: 'Subscription validity in days',
+  })
+  @IsOptional()
+  @IsInt()
+  validity_days?: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'Maximum simultaneous sessions',
+  })
+  @IsOptional()
+  @IsInt()
+  simultaneous_use?: number;
 
   @ApiProperty({ example: 49.99 })
   @IsNotEmpty()

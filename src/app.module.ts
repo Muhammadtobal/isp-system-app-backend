@@ -22,19 +22,32 @@ import { AlertModule } from './alert/alert.module';
 import { ProductModule } from './product/product.module';
 import { SoldModule } from './sold/sold.module';
 import { DomainModule } from './domain/domain.module';
+import { RadiusModule } from './radius/radius.module';
+import { HotspotModule } from './hotspot/hotspot.module';
 
+console.log({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  pass: process.env.DB_PASSWORD,
+});
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
+
     TypeOrmModule.forRoot({
       type: 'mysql',
+
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
+
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
+
       database: process.env.DB_NAME,
+
       autoLoadEntities: true,
       synchronize: process.env.SYNC === 'true',
       logging: true,
@@ -58,6 +71,9 @@ import { DomainModule } from './domain/domain.module';
     ProductModule,
     SoldModule,
     DomainModule,
+    RadiusModule,
+
+    HotspotModule,
   ],
   controllers: [AppController],
   providers: [AppService],

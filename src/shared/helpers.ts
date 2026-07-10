@@ -392,3 +392,10 @@ export function buildFileUrl(filePath?: string) {
 
   return `${host}${base}/${filePath}`;
 }
+
+export type RouterConnectionData = {
+  ipAddress: string;
+  username: string;
+  password: string;
+  apiPort: number;
+};
