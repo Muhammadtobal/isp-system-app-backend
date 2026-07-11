@@ -37,10 +37,10 @@ export class HotSpotController {
   //   }
 
   // توليد بطاقات
-  @Post('generate')
-  generate(@Body() dto: GenerateHotspotVoucherDto) {
-    return this.hotSpotService.generateVouchers(dto.profile_id, dto.quantity);
-  }
+  // @Post('generate')
+  // generate(@Body() dto: GenerateHotspotVoucherDto) {
+  //   return this.hotSpotService.generateVouchers(dto);
+  // }
 
   @Post('get-all-hotSpot-profile')
   findAllHotSpotProfile(@Body() filter: FindAllHotspotProfileDto) {

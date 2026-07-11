@@ -5,6 +5,21 @@ import { IsNull, Repository } from 'typeorm';
 import { RadCheck } from './entities/ radcheck.entity';
 import { RadReply } from './entities/radreply.entity';
 import { RadAcct } from './entities/radacct.entity';
+import { RadGroupCheck } from './entities/radgroupcheck.entity';
+import { RadGroupReply } from './entities/radgroupreply.entity';
+import { RadUserGroup } from './entities/radusergroup.entity';
+import { CreatePppoeUserDto } from './dto/create-pppoe-user.dto';
+import {
+  CreateHotspotUserDto,
+  HotspotUserResult,
+} from './dto/create-hotspot-user.dto';
+import { CreateGroupDto } from './dto/create-group.dto';
+import {
+  MikrotikAttributes,
+  Operators,
+  RadiusCheckAttributes,
+  RadiusReplyAttributes,
+} from './constants/radius-attributes';
 
 @Injectable()
 export class RadiusService {
@@ -17,77 +32,41 @@ export class RadiusService {
 
     @InjectRepository(RadAcct)
     private readonly radAcctRepository: Repository<RadAcct>,
+
+    @InjectRepository(RadGroupCheck)
+    private readonly groupCheckRepo: Repository<RadGroupCheck>,
+
+    @InjectRepository(RadGroupReply)
+    private readonly groupReplyRepo: Repository<RadGroupReply>,
+
+    @InjectRepository(RadUserGroup)
+    private readonly userGroupRepo: Repository<RadUserGroup>,
   ) {}
 
-  /*
-  ============================================
-  إنشاء مستخدم PPPoE
-  ============================================
-  */
-  async createPppoeUser(username: string, password: string, plan: any) {
-    // 1- إضافة اسم المستخدم وكلمة المرور
-
-    await this.radCheckRepository.save({
-      username,
-
-      attribute: 'Cleartext-Password',
-
-      op: ':=',
-
-      value: password,
-    });
-
-    // 2- إضافة سرعة الإنترنت
-
-    await this.radReplyRepository.save({
-      username,
-
-      attribute: 'Mikrotik-Rate-Limit',
-
-      op: ':=',
-
-      value: `${plan.download_speed}k/${plan.upload_speed}k`,
-    });
-
-    // 3- عدد الجلسات
-
-    if (plan.simultaneous_use) {
-      await this.radReplyRepository.save({
-        username,
-
-        attribute: 'Simultaneous-Use',
-
-        op: ':=',
-
-        value: String(plan.simultaneous_use),
+  async createPppoeUser(dto: CreatePppoeUserDto) {
+    for (const item of dto.checks) {
+      await this.radCheckRepository.save({
+        username: dto.username,
+        attribute: item.attribute,
+        op: item.op,
+        value: item.value,
       });
     }
 
-    // 4- مدة الجلسة
-
-    if (plan.session_timeout) {
+    for (const item of dto.replies) {
       await this.radReplyRepository.save({
-        username,
-
-        attribute: 'Session-Timeout',
-
-        op: ':=',
-
-        value: String(plan.session_timeout),
+        username: dto.username,
+        attribute: item.attribute,
+        op: item.op,
+        value: item.value,
       });
     }
 
     return {
-      username,
-      message: 'Radius user created',
+      username: dto.username,
+      message: 'Radius user created successfully',
     };
   }
-
-  /*
-  ============================================
-  تغيير كلمة المرور
-  ============================================
-  */
 
   async changePassword(username: string, newPassword: string) {
     await this.radCheckRepository.update(
@@ -104,20 +83,10 @@ export class RadiusService {
     return true;
   }
 
-  /*
-  ============================================
-  تحديث الباقة
-  ============================================
-  */
-
   async updatePlan(username: string, plan: any) {
-    // حذف خصائص السرعة القديمة
-
     await this.radReplyRepository.delete({
       username,
     });
-
-    // إعادة بناء الخصائص
 
     await this.radReplyRepository.save({
       username,
@@ -143,12 +112,6 @@ export class RadiusService {
 
     return true;
   }
-
-  /*
-  ============================================
-  تعطيل مستخدم
-  ============================================
-  */
 
   async disableUser(username: string) {
     await this.radCheckRepository.update(
@@ -166,12 +129,6 @@ export class RadiusService {
     return true;
   }
 
-  /*
-  ============================================
-  حذف مستخدم من Radius
-  ============================================
-  */
-
   async deleteUser(username: string) {
     await this.radCheckRepository.delete({
       username,
@@ -184,12 +141,6 @@ export class RadiusService {
     return true;
   }
 
-  /*
-  ============================================
-  المستخدمون المتصلون حاليا
-  ============================================
-  */
-
   async getOnlineUsers() {
     return await this.radAcctRepository.find({
       where: {
@@ -197,12 +148,6 @@ export class RadiusService {
       },
     });
   }
-
-  /*
-  ============================================
-  استهلاك مستخدم
-  ============================================
-  */
 
   async getUserUsage(username: string) {
     const sessions = await this.radAcctRepository.find({
@@ -229,51 +174,142 @@ export class RadiusService {
     };
   }
 
-  async createHotspotUser(username: string, password: string, profile: any) {
-    await this.radCheckRepository.save({
-      username,
+  async createHotspotUser(dto: CreateHotspotUserDto) {
+    const count = dto.count ?? 1;
 
-      attribute: 'Cleartext-Password',
+    const users: HotspotUserResult[] = [];
 
-      op: ':=',
+    for (let i = 0; i < count; i++) {
+      const username =
+        dto.generateUsername || !dto.username
+          ? this.generateVoucherUsername()
+          : dto.username;
 
-      value: password,
-    });
+      const password = dto.password || this.generateVoucherPassword();
 
-    await this.radReplyRepository.save({
-      username,
+      const checks = [...dto.checks];
 
-      attribute: 'Mikrotik-Rate-Limit',
+      if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
+        checks.push({
+          attribute: 'Cleartext-Password',
+          op: ':=',
+          value: password,
+        });
+      }
 
-      op: ':=',
+      for (const item of checks) {
+        await this.radCheckRepository.save({
+          username,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        });
+      }
 
-      value: `${profile.download_speed}k/${profile.upload_speed}k`,
-    });
+      for (const item of dto.replies) {
+        await this.radReplyRepository.save({
+          username,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        });
+      }
 
-    if (profile.session_time) {
-      await this.radReplyRepository.save({
+      users.push({
         username,
+        password,
+      });
 
-        attribute: 'Session-Timeout',
+      if (!dto.generateUsername && dto.username) {
+        break;
+      }
+    }
 
-        op: ':=',
+    return {
+      count: users.length,
+      users,
+    };
+  }
 
-        value: String(profile.session_time),
+  async createGroup(dto: CreateGroupDto) {
+    for (const item of dto.checks) {
+      await this.groupCheckRepo.save({
+        groupname: dto.name,
+
+        attribute: item.attribute,
+
+        op: item.op,
+
+        value: item.value,
       });
     }
 
-    if (profile.quota_mb) {
-      await this.radReplyRepository.save({
-        username,
+    for (const item of dto.replies) {
+      await this.groupReplyRepo.save({
+        groupname: dto.name,
 
-        attribute: 'Mikrotik-Total-Limit',
+        attribute: item.attribute,
 
-        op: ':=',
+        op: item.op,
 
-        value: String(profile.quota_mb * 1024 * 1024),
+        value: item.value,
       });
     }
+
+    return {
+      message: 'Group created successfully',
+    };
+  }
+  async assignGroup(username: string, group: string) {
+    await this.userGroupRepo.save({
+      username,
+      groupname: group,
+      priority: 1,
+    });
 
     return true;
+  }
+
+  async removeGroup(username: string) {
+    await this.userGroupRepo.delete({
+      username,
+    });
+
+    return true;
+  }
+  private generateVoucherUsername(length = 8): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    let username = '';
+
+    for (let i = 0; i < length; i++) {
+      username += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return username;
+  }
+
+  private generateVoucherPassword(length = 6): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    let password = '';
+
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return password;
+  }
+
+  getRadiusAttributes() {
+    return {
+      operators: Operators,
+
+      check: RadiusCheckAttributes,
+
+      reply: RadiusReplyAttributes,
+
+      mikrotik: MikrotikAttributes,
+    };
   }
 }

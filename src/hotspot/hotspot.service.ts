@@ -35,43 +35,43 @@ export class HotSpotService {
     return this.profileRepository.save(data);
   }
 
-  async generateVouchers(profileId: number, quantity: number) {
-    const profile = await this.profileRepository.findOne({
-      where: {
-        id: profileId,
-      },
-    });
-    if (!profile) return null;
-    const vouchers: HotspotVoucher[] = [];
+  // async generateVouchers(profileId: number, quantity: number) {
+  //   const profile = await this.profileRepository.findOne({
+  //     where: {
+  //       id: profileId,
+  //     },
+  //   });
+  //   if (!profile) return null;
+  //   const vouchers: HotspotVoucher[] = [];
 
-    for (let i = 0; i < quantity; i++) {
-      const username = `HS${Date.now()}${i}`;
+  //   for (let i = 0; i < quantity; i++) {
+  //     const username = `HS${Date.now()}${i}`;
 
-      const password = Math.random().toString(36).substring(2, 8);
+  //     const password = Math.random().toString(36).substring(2, 8);
 
-      const voucher = await this.voucherRepository.save({
-        code: username,
+  //     const voucher = await this.voucherRepository.save({
+  //       code: username,
 
-        username,
+  //       username,
 
-        password,
+  //       password,
 
-        profile_id: profile.id,
-      });
+  //       profile_id: profile.id,
+  //     });
 
-      await this.radiusService.createHotspotUser(
-        username,
+  //     await this.radiusService.createHotspotUser(
+  //       username,
 
-        password,
+  //       password,
 
-        profile,
-      );
+  //       profile,
+  //     );
 
-      vouchers.push(voucher);
-    }
+  //     vouchers.push(voucher);
+  //   }
 
-    return vouchers;
-  }
+  //   return vouchers;
+  // }
 
   async activateVoucher(username: string) {
     return this.voucherRepository.update(

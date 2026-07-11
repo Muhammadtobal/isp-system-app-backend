@@ -1,17 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
 
-@Entity('radcheck')
-export class RadCheck {
+@Entity('radgroupcheck')
+export class RadGroupCheck {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 64, unique: true })
-  username: string;
+  @Index()
+  @Column({ length: 64 })
+  groupname: string;
 
   @Column({ length: 64 })
   attribute: string;
 
-  @Column({ type: 'char', length: 2, default: '==' })
+  @Column({
+    type: 'char',
+    length: 2,
+    default: ':=',
+  })
   op: string;
 
   @Column({ length: 253 })

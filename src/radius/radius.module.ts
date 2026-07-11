@@ -8,12 +8,25 @@ import { RadReply } from './entities/radreply.entity';
 import { RadAcct } from './entities/radacct.entity';
 import { RadPostAuth } from './entities/radpostauth.entity';
 import { Nas } from './entities/nas.entity';
+import { RadUserGroup } from './entities/radusergroup.entity';
+import { RadGroupReply } from './entities/radgroupreply.entity';
+import { RadGroupCheck } from './entities/radgroupcheck.entity';
+import { RadiusController } from './radius.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RadCheck, RadReply, RadAcct, RadPostAuth, Nas]),
+    TypeOrmModule.forFeature([
+      RadCheck,
+      RadReply,
+      RadAcct,
+      RadPostAuth,
+      Nas,
+      RadGroupCheck,
+      RadGroupReply,
+      RadUserGroup,
+    ]),
   ],
-
+  controllers: [RadiusController],
   providers: [RadiusService],
 
   exports: [RadiusService],

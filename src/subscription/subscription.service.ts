@@ -79,7 +79,7 @@ export class SubscriptionService {
 
     const password = Math.random().toString(36).slice(-8);
 
-    await this.radiusService.createPppoeUser(username, password, plan);
+    // await this.radiusService.createPppoeUser(username, password, plan);
     saved.radius_username = username;
 
     return await this.subscriptionRepository.save(saved);
