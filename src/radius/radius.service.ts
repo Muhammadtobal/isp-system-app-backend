@@ -44,9 +44,27 @@ export class RadiusService {
   ) {}
 
   async createPppoeUser(dto: CreatePppoeUserDto) {
-    for (const item of dto.checks) {
+    const username =
+      dto.generateUsername || !dto.username
+        ? this.generateVoucherUsername()
+        : dto.username;
+
+    const password = dto.password || this.generateVoucherPassword();
+
+    const checks = [...dto.checks];
+
+    // إضافة كلمة المرور إذا لم تكن موجودة
+    if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
+      checks.push({
+        attribute: 'Cleartext-Password',
+        op: ':=',
+        value: password,
+      });
+    }
+
+    for (const item of checks) {
       await this.radCheckRepository.save({
-        username: dto.username,
+        username,
         attribute: item.attribute,
         op: item.op,
         value: item.value,
@@ -55,7 +73,7 @@ export class RadiusService {
 
     for (const item of dto.replies) {
       await this.radReplyRepository.save({
-        username: dto.username,
+        username,
         attribute: item.attribute,
         op: item.op,
         value: item.value,
@@ -63,8 +81,9 @@ export class RadiusService {
     }
 
     return {
-      username: dto.username,
-      message: 'Radius user created successfully',
+      username,
+      password,
+      message: 'PPPoE user created successfully',
     };
   }
 
