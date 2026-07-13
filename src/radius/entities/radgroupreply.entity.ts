@@ -6,10 +6,16 @@ export class RadGroupReply {
   id: number;
 
   @Index()
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   groupname: string;
 
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   attribute: string;
 
   @Column({
@@ -19,6 +25,9 @@ export class RadGroupReply {
   })
   op: string;
 
-  @Column({ length: 253 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   value: string;
 }

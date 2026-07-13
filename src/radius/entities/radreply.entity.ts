@@ -5,7 +5,6 @@ export class RadReply {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index()
   @Column({ length: 64 })
   username: string;
 

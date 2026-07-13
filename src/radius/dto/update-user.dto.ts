@@ -1,52 +1,52 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
-  IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { RadiusAttributeDto } from './radius-attribute.dto';
-import { Type } from 'class-transformer';
 
-export class CreatePppoeUserDto {
-  @ApiProperty({
-    example: 'ahmad',
-    required: false,
+export class UpdateUserDto {
+  @ApiPropertyOptional({
+    example: 'ahmad-new',
+    description: 'New username',
   })
-  @IsString()
   @IsOptional()
+  @IsString()
   username?: string;
 
-  @ApiProperty({
-    required: false,
+  @ApiPropertyOptional({
     example: '123456',
+    description: 'New password',
   })
-  @IsString()
   @IsOptional()
+  @IsString()
   password?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: [RadiusAttributeDto],
   })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RadiusAttributeDto)
-  checks: RadiusAttributeDto[];
+  checks?: RadiusAttributeDto[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: [RadiusAttributeDto],
   })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RadiusAttributeDto)
-  replies: RadiusAttributeDto[];
+  replies?: RadiusAttributeDto[];
 
-  @ApiProperty({
-    example: true,
-    required: false,
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Generate new username automatically',
   })
   @IsOptional()
   @IsBoolean()

@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 
 import { RadCheck } from './entities/ radcheck.entity';
 import { RadReply } from './entities/radreply.entity';
@@ -8,11 +13,7 @@ import { RadAcct } from './entities/radacct.entity';
 import { RadGroupCheck } from './entities/radgroupcheck.entity';
 import { RadGroupReply } from './entities/radgroupreply.entity';
 import { RadUserGroup } from './entities/radusergroup.entity';
-import { CreatePppoeUserDto } from './dto/create-pppoe-user.dto';
-import {
-  CreateHotspotUserDto,
-  HotspotUserResult,
-} from './dto/create-hotspot-user.dto';
+import { CreateUserDto, HotspotUserResult } from './dto/create-user.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
 import {
   MikrotikAttributes,
@@ -20,6 +21,15 @@ import {
   RadiusCheckAttributes,
   RadiusReplyAttributes,
 } from './constants/radius-attributes';
+import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  customPaginate,
+  generateQueryConditions,
+  generateQuerySorts,
+} from 'src/shared/helpers';
+import { FindAllUserDto } from './dto/find-all-user.dto';
+import { NetworkRadius } from './entities/network-radius.entity';
+import { CreateNetworkRadiusDto } from './dto/network-radius.dto';
 
 @Injectable()
 export class RadiusService {
@@ -41,113 +51,124 @@ export class RadiusService {
 
     @InjectRepository(RadUserGroup)
     private readonly userGroupRepo: Repository<RadUserGroup>,
+    @InjectRepository(NetworkRadius)
+    private readonly networkRadiusRepo: Repository<NetworkRadius>,
   ) {}
 
-  async createPppoeUser(dto: CreatePppoeUserDto) {
-    const username =
-      dto.generateUsername || !dto.username
-        ? this.generateVoucherUsername()
-        : dto.username;
+  // async createPppoeUser(dto: CreateUserDto) {
+  //   const username =
+  //     dto.generateUsername || !dto.username
+  //       ? this.generateVoucherUsername()
+  //       : dto.username;
 
-    const password = dto.password || this.generateVoucherPassword();
+  //   const password = dto.password || this.generateVoucherPassword();
 
-    const checks = [...dto.checks];
+  //   const checks = [...dto.checks];
 
-    // إضافة كلمة المرور إذا لم تكن موجودة
-    if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
-      checks.push({
-        attribute: 'Cleartext-Password',
-        op: ':=',
-        value: password,
+  //   // إضافة كلمة المرور إذا لم تكن موجودة
+  //   if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
+  //     checks.push({
+  //       attribute: 'Cleartext-Password',
+  //       op: ':=',
+  //       value: password,
+  //     });
+  //   }
+
+  //   for (const item of checks) {
+  //     await this.radCheckRepository.save({
+  //       username,
+  //       attribute: item.attribute,
+  //       op: item.op,
+  //       value: item.value,
+  //     });
+  //   }
+
+  //   for (const item of dto.replies) {
+  //     await this.radReplyRepository.save({
+  //       username,
+  //       attribute: item.attribute,
+  //       op: item.op,
+  //       value: item.value,
+  //     });
+  //   }
+
+  //   return {
+  //     username,
+  //     password,
+  //   };
+  // }
+
+  public async createRadiusUsers(dto: CreateUserDto) {
+    const count = dto.generateUsername || dto.count ? (dto.count ?? 1) : 1;
+
+    const users: HotspotUserResult[] = [];
+
+    for (let i = 0; i < count; i++) {
+      let username: string;
+
+      if (dto.generateUsername || !dto.username) {
+        // توليد اسم مستخدم غير مستخدم
+        do {
+          username = this.generateVoucherUsername();
+        } while (await this.usernameExists(username));
+      } else {
+        username = dto.username;
+
+        // التحقق من اسم المستخدم المدخل
+        if (await this.usernameExists(username)) {
+          throw new HttpException(
+            `Username '${username}' already exists`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+
+      const password = dto.password || this.generateVoucherPassword();
+
+      const checks = [...dto.checks];
+
+      if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
+        checks.push({
+          attribute: 'Cleartext-Password',
+          op: ':=',
+          value: password,
+        });
+      }
+
+      await this.radCheckRepository.save(
+        checks.map((item) => ({
+          username,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        })),
+      );
+
+      await this.radReplyRepository.save(
+        dto.replies.map((item) => ({
+          username,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        })),
+      );
+
+      await this.createUserRadius({
+        network_id: dto.network_id,
+        username,
       });
+      users.push({
+        username,
+        password,
+      });
+
+      if (!dto.generateUsername && dto.username) {
+        break;
+      }
     }
 
-    for (const item of checks) {
-      await this.radCheckRepository.save({
-        username,
-        attribute: item.attribute,
-        op: item.op,
-        value: item.value,
-      });
-    }
-
-    for (const item of dto.replies) {
-      await this.radReplyRepository.save({
-        username,
-        attribute: item.attribute,
-        op: item.op,
-        value: item.value,
-      });
-    }
-
-    return {
-      username,
-      password,
-      message: 'PPPoE user created successfully',
-    };
+    return users;
   }
-
-  async changePassword(username: string, newPassword: string) {
-    await this.radCheckRepository.update(
-      {
-        username,
-        attribute: 'Cleartext-Password',
-      },
-
-      {
-        value: newPassword,
-      },
-    );
-
-    return true;
-  }
-
-  async updatePlan(username: string, plan: any) {
-    await this.radReplyRepository.delete({
-      username,
-    });
-
-    await this.radReplyRepository.save({
-      username,
-
-      attribute: 'Mikrotik-Rate-Limit',
-
-      op: ':=',
-
-      value: `${plan.download_speed}k/${plan.upload_speed}k`,
-    });
-
-    if (plan.simultaneous_use) {
-      await this.radReplyRepository.save({
-        username,
-
-        attribute: 'Simultaneous-Use',
-
-        op: ':=',
-
-        value: String(plan.simultaneous_use),
-      });
-    }
-
-    return true;
-  }
-
-  async disableUser(username: string) {
-    await this.radCheckRepository.update(
-      {
-        username,
-        attribute: 'Auth-Type',
-      },
-
-      {
-        op: ':=',
-        value: 'Reject',
-      },
-    );
-
-    return true;
-  }
-
   async deleteUser(username: string) {
     await this.radCheckRepository.delete({
       username,
@@ -193,62 +214,62 @@ export class RadiusService {
     };
   }
 
-  async createHotspotUser(dto: CreateHotspotUserDto) {
-    const count = dto.count ?? 1;
+  // async createHotspotUser(dto: CreateUserDto) {
+  //   const count = dto.count ?? 1;
 
-    const users: HotspotUserResult[] = [];
+  //   const users: HotspotUserResult[] = [];
 
-    for (let i = 0; i < count; i++) {
-      const username =
-        dto.generateUsername || !dto.username
-          ? this.generateVoucherUsername()
-          : dto.username;
+  //   for (let i = 0; i < count; i++) {
+  //     const username =
+  //       dto.generateUsername || !dto.username
+  //         ? this.generateVoucherUsername()
+  //         : dto.username;
 
-      const password = dto.password || this.generateVoucherPassword();
+  //     const password = dto.password || this.generateVoucherPassword();
 
-      const checks = [...dto.checks];
+  //     const checks = [...dto.checks];
 
-      if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
-        checks.push({
-          attribute: 'Cleartext-Password',
-          op: ':=',
-          value: password,
-        });
-      }
+  //     if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
+  //       checks.push({
+  //         attribute: 'Cleartext-Password',
+  //         op: ':=',
+  //         value: password,
+  //       });
+  //     }
 
-      for (const item of checks) {
-        await this.radCheckRepository.save({
-          username,
-          attribute: item.attribute,
-          op: item.op,
-          value: item.value,
-        });
-      }
+  //     for (const item of checks) {
+  //       await this.radCheckRepository.save({
+  //         username,
+  //         attribute: item.attribute,
+  //         op: item.op,
+  //         value: item.value,
+  //       });
+  //     }
 
-      for (const item of dto.replies) {
-        await this.radReplyRepository.save({
-          username,
-          attribute: item.attribute,
-          op: item.op,
-          value: item.value,
-        });
-      }
+  //     for (const item of dto.replies) {
+  //       await this.radReplyRepository.save({
+  //         username,
+  //         attribute: item.attribute,
+  //         op: item.op,
+  //         value: item.value,
+  //       });
+  //     }
 
-      users.push({
-        username,
-        password,
-      });
+  //     users.push({
+  //       username,
+  //       password,
+  //     });
 
-      if (!dto.generateUsername && dto.username) {
-        break;
-      }
-    }
+  //     if (!dto.generateUsername && dto.username) {
+  //       break;
+  //     }
+  //   }
 
-    return {
-      count: users.length,
-      users,
-    };
-  }
+  //   return {
+  //     count: users.length,
+  //     users,
+  //   };
+  // }
 
   async createGroup(dto: CreateGroupDto) {
     for (const item of dto.checks) {
@@ -330,5 +351,283 @@ export class RadiusService {
 
       mikrotik: MikrotikAttributes,
     };
+  }
+
+  public async findAll(filter: FindAllUserDto) {
+    const query = this.radCheckRepository
+      .createQueryBuilder('radcheck')
+      .where('true');
+
+    generateQuerySorts(query, filter, RadCheck, 'radcheck');
+    generateQueryConditions(query, filter, 'radcheck');
+
+    const result = await customPaginate(query, {
+      page: filter.pagination.page,
+      limit: filter.pagination.limit,
+    });
+
+    const usernames = result.items.map((x) => x.username);
+
+    if (!usernames.length) {
+      return {
+        ...result,
+        data: [],
+      };
+    }
+
+    const checks = await this.radCheckRepository.find({
+      where: {
+        username: In(usernames),
+      },
+      order: {
+        username: 'ASC',
+      },
+    });
+
+    const replies = await this.radReplyRepository.find({
+      where: {
+        username: In(usernames),
+      },
+    });
+
+    const users = {};
+
+    for (const username of usernames) {
+      users[username] = {
+        username,
+        checks: [],
+        replies: [],
+      };
+    }
+
+    for (const check of checks) {
+      users[check.username].checks.push({
+        attribute: check.attribute,
+        op: check.op,
+        value: check.value,
+      });
+    }
+
+    for (const reply of replies) {
+      users[reply.username].replies.push({
+        attribute: reply.attribute,
+        op: reply.op,
+        value: reply.value,
+      });
+    }
+
+    const response = {
+      ...result,
+    };
+
+    response.items = usernames.map((username) => users[username]);
+
+    return response;
+  }
+  async findOne(username: string) {
+    const checks = await this.radCheckRepository.find({
+      where: { username },
+    });
+
+    if (!checks.length) {
+      throw new NotFoundException('User not found');
+    }
+
+    const replies = await this.radReplyRepository.find({
+      where: { username },
+    });
+
+    return {
+      username,
+      checks,
+      replies,
+    };
+  }
+
+  async update(username: string, dto: UpdateUserDto) {
+    const exists = await this.radCheckRepository.findOne({
+      where: { username },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('User not found');
+    }
+
+    const newUsername = dto.username ?? username;
+
+    if (newUsername !== username) {
+      await Promise.all([
+        this.radCheckRepository.update({ username }, { username: newUsername }),
+        this.radReplyRepository.update({ username }, { username: newUsername }),
+      ]);
+
+      username = newUsername;
+    }
+
+    if (dto.checks) {
+      await this.radCheckRepository.delete({ username });
+
+      const checks = [...dto.checks];
+
+      if (
+        dto.password &&
+        !checks.some((c) => c.attribute === 'Cleartext-Password')
+      ) {
+        checks.push({
+          attribute: 'Cleartext-Password',
+          op: ':=',
+          value: dto.password,
+        });
+      }
+
+      await this.radCheckRepository.save(
+        checks.map((item) => ({
+          username,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        })),
+      );
+    } else if (dto.password) {
+      // تحديث كلمة المرور فقط
+      await this.radCheckRepository.update(
+        {
+          username,
+          attribute: 'Cleartext-Password',
+        },
+        {
+          value: dto.password,
+        },
+      );
+    }
+
+    // تحديث radreply
+    if (dto.replies) {
+      await this.radReplyRepository.delete({ username });
+
+      await this.radReplyRepository.save(
+        dto.replies.map((item) => ({
+          username,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        })),
+      );
+    }
+
+    const [radcheck, radreply] = await Promise.all([
+      this.radCheckRepository.find({
+        where: { username },
+      }),
+      this.radReplyRepository.find({
+        where: { username },
+      }),
+    ]);
+
+    return {
+      username,
+      radcheck,
+      radreply,
+    };
+  }
+
+  async remove(username: string) {
+    const exists = await this.radCheckRepository.findOne({
+      where: { username },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.radCheckRepository.delete({ username });
+    await this.radReplyRepository.delete({ username });
+
+    return {
+      done: true,
+    };
+  }
+
+  private async usernameExists(username: string): Promise<boolean> {
+    return this.radCheckRepository.exists({
+      where: { username },
+    });
+  }
+
+  public async createUserRadius(dto: CreateNetworkRadiusDto) {
+    const userRadius = this.networkRadiusRepo.create(dto);
+    return await this.networkRadiusRepo.save(userRadius);
+  }
+
+  public async findAllUserNetwork(filter: FindAllUserDto) {
+    const query = this.networkRadiusRepo
+      .createQueryBuilder('network_user')
+      .where('true');
+
+    generateQuerySorts(query, filter, NetworkRadius, 'network_user');
+    generateQueryConditions(query, filter, 'network_user');
+
+    const result = await customPaginate(query, {
+      page: filter.pagination.page,
+      limit: filter.pagination.limit,
+    });
+
+    const usernames = result.items.map((x) => x.username);
+
+    if (!usernames.length) {
+      return {
+        ...result,
+        data: [],
+      };
+    }
+
+    const checks = await this.radCheckRepository.find({
+      where: {
+        username: In(usernames),
+      },
+      order: {
+        username: 'ASC',
+      },
+    });
+
+    const replies = await this.radReplyRepository.find({
+      where: {
+        username: In(usernames),
+      },
+    });
+
+    const users = {};
+
+    for (const username of usernames) {
+      users[username] = {
+        username,
+        checks: [],
+        replies: [],
+      };
+    }
+
+    for (const check of checks) {
+      users[check.username].checks.push({
+        attribute: check.attribute,
+        op: check.op,
+        value: check.value,
+      });
+    }
+
+    for (const reply of replies) {
+      users[reply.username].replies.push({
+        attribute: reply.attribute,
+        op: reply.op,
+        value: reply.value,
+      });
+    }
+
+    const response = {
+      ...result,
+    };
+
+    response.items = usernames.map((username) => users[username]);
+
+    return response;
   }
 }

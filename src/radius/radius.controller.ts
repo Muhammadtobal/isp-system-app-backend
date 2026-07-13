@@ -12,66 +12,43 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { RadiusService } from './radius.service';
 
-import { CreatePppoeUserDto } from './dto/create-pppoe-user.dto';
-import { CreateHotspotUserDto } from './dto/create-hotspot-user.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { UpdatePlanDto } from './dto/update-plan.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { AssignGroupDto } from './dto/assign-group.dto';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { FindAllUserDto } from './dto/find-all-user.dto';
+import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
+import { AuthUser } from 'src/shared/helpers';
 
-@ApiTags('radius')
 @Controller('radius')
 export class RadiusController {
   constructor(private readonly radiusService: RadiusService) {}
 
-  @Post('pppoe')
+  @Post('create-pppoe')
   @UseGuards(JwtAuthSharedGuard)
-  createPppoeUser(@Body() dto: CreatePppoeUserDto) {
-    return this.radiusService.createPppoeUser(dto);
+  async createPppoeUser(@Body() dto: CreateUserDto) {
+    const users = await this.radiusService.createRadiusUsers(dto);
+
+    return users[0];
   }
 
   @Post('hotspot')
   @UseGuards(JwtAuthSharedGuard)
-  createHotspotUser(@Body() dto: CreateHotspotUserDto) {
-    return this.radiusService.createHotspotUser(dto);
+  async createHotspotUser(@Body() dto: CreateUserDto) {
+    const users = await this.radiusService.createRadiusUsers(dto);
+
+    return {
+      count: users.length,
+      users,
+    };
   }
-
-  // @Patch('password')
-
-  // changePassword(@Body() dto: ChangePasswordDto) {
-  //   return this.radiusService.changePassword(dto.username, dto.password);
-  // }
-
-  // @Patch('plan')
-  // @UseGuards(JwtAuthSharedGuard)
-  // updatePlan(@Body() dto: UpdatePlanDto) {
-  //   return this.radiusService.updatePlan(dto.username, dto.plan);
-  // }
-
-  // @Patch('disable/:username')
-  // @UseGuards(JwtAuthSharedGuard)
-  // disableUser(@Param('username') username: string) {
-  //   return this.radiusService.disableUser(username);
-  // }
-
-  // @Delete(':username')
-  // @UseGuards(JwtAuthSharedGuard)
-  // deleteUser(@Param('username') username: string) {
-  //   return this.radiusService.deleteUser(username);
-  // }
 
   @Get('online')
   @UseGuards(JwtAuthSharedGuard)
   getOnlineUsers() {
     return this.radiusService.getOnlineUsers();
   }
-
-  // @Get('usage/:username')
-  // @UseGuards(JwtAuthSharedGuard)
-  // getUserUsage(@Param('username') username: string) {
-  //   return this.radiusService.getUserUsage(username);
-  // }
 
   @Post('group')
   @UseGuards(JwtAuthSharedGuard)
@@ -94,5 +71,35 @@ export class RadiusController {
   @UseGuards(JwtAuthSharedGuard)
   getRadiusAttributes() {
     return this.radiusService.getRadiusAttributes();
+  }
+
+  @Post('find-all')
+  @UseGuards(JwtAuthSharedGuard)
+  findAll(@Body() filter: FindAllUserDto) {
+    return this.radiusService.findAll(filter);
+  }
+
+  @Get('radius/:username')
+  @UseGuards(JwtAuthSharedGuard)
+  findOne(@Param('username') username: string) {
+    return this.radiusService.findOne(username);
+  }
+
+  @Patch('radius/:username')
+  @UseGuards(JwtAuthSharedGuard)
+  update(@Param('username') username: string, @Body() dto: UpdateUserDto) {
+    return this.radiusService.update(username, dto);
+  }
+
+  @Delete('radius/:username')
+  @UseGuards(JwtAuthSharedGuard)
+  remove(@Param('username') username: string) {
+    return this.radiusService.remove(username);
+  }
+
+  @Post('find-all-user-network')
+  @UseGuards(JwtAuthSharedGuard)
+  findAllUserNetwork(@Body() filter: FindAllUserDto) {
+    return this.radiusService.findAllUserNetwork(filter);
   }
 }

@@ -5,46 +5,89 @@ export class RadAcct {
   @PrimaryGeneratedColumn()
   radacctid: number;
 
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   acctsessionid: string;
 
-  @Column({ length: 32 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   acctuniqueid: string;
 
   @Index()
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   username: string;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   realm: string;
 
-  @Column({ length: 15 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   nasipaddress: string;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'datetime',
+    nullable: true,
+  })
   acctstarttime: Date;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'datetime',
+    nullable: true,
+  })
   acctupdatetime: Date;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'datetime',
+    nullable: true,
+  })
   acctstoptime: Date;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'int',
+    nullable: true,
+  })
   acctsessiontime: number;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'bigint',
+    nullable: true,
+  })
   acctinputoctets: number;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'bigint',
+    nullable: true,
+  })
   acctoutputoctets: number;
 
-  @Column({ length: 15 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   framedipaddress: string;
 
-  @Column({ length: 50 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   callingstationid: string;
 
-  @Column({ length: 50 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   calledstationid: string;
 }

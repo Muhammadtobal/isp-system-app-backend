@@ -3,6 +3,7 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Min,
@@ -12,7 +13,7 @@ import { Type } from 'class-transformer';
 
 import { RadiusAttributeDto } from './radius-attribute.dto';
 
-export class CreateHotspotUserDto {
+export class CreateUserDto {
   @ApiProperty({
     example: 'guest001',
     required: false,
@@ -20,6 +21,11 @@ export class CreateHotspotUserDto {
   @IsOptional()
   @IsString()
   username?: string;
+
+  @ApiProperty({ example: 2, required: true })
+  @IsNotEmpty()
+  @IsInt()
+  network_id: number;
 
   @ApiProperty({
     example: '123456',

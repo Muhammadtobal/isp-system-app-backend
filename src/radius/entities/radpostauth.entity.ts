@@ -5,13 +5,22 @@ export class RadPostAuth {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   username: string;
 
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   pass: string;
 
-  @Column({ length: 32 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   reply: string;
 
   @Column({
@@ -21,8 +30,9 @@ export class RadPostAuth {
   authdate: Date;
 
   @Column({
+    type: 'varchar',
+    length: 255,
     nullable: true,
-    length: 64,
   })
   class: string;
 }

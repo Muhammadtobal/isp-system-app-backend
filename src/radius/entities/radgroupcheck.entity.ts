@@ -6,19 +6,28 @@ export class RadGroupCheck {
   id: number;
 
   @Index()
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   groupname: string;
 
-  @Column({ length: 64 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   attribute: string;
 
   @Column({
-    type: 'char',
-    length: 2,
+    type: 'varchar',
+    length: 255,
     default: ':=',
   })
   op: string;
 
-  @Column({ length: 253 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   value: string;
 }

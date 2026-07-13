@@ -5,17 +5,21 @@ export class Nas {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 128 })
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
   nasname: string;
 
   @Column({
-    length: 32,
-    nullable: true,
+    type: 'varchar',
+    length: 255,
   })
   shortname: string;
 
   @Column({
-    length: 30,
+    type: 'varchar',
+    length: 255,
     nullable: true,
     default: 'other',
   })
@@ -27,25 +31,29 @@ export class Nas {
   ports: number;
 
   @Column({
-    length: 60,
+    type: 'varchar',
+    length: 255,
     default: 'secret',
   })
   secret: string;
 
   @Column({
-    length: 64,
+    type: 'varchar',
+    length: 255,
     nullable: true,
   })
   server: string;
 
   @Column({
-    length: 50,
+    type: 'varchar',
+    length: 255,
     nullable: true,
   })
   community: string;
 
   @Column({
-    length: 200,
+    type: 'varchar',
+    length: 255,
     nullable: true,
   })
   description: string;
