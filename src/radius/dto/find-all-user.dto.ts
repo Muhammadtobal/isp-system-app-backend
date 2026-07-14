@@ -11,6 +11,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   ListOfIdsInput,
+  MatchInput,
   PaginationInput,
   SingleIdInput,
   SortInput,
@@ -41,13 +42,13 @@ export class FindAllUserDto {
   @ValidateNested()
   @Type(() => SortInput)
   sort?: SortInput;
-
-  @ApiPropertyOptional({
-    description: 'Search by username',
-    example: 'ahmad',
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsObject()
+  @Type(() => MatchInput)
   username?: string;
 
   @ApiPropertyOptional({
@@ -67,4 +68,13 @@ export class FindAllUserDto {
   @IsObject()
   @IsSingleIdOrList()
   network_id?: SingleIdInput | ListOfIdsInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  service_type?: MatchInput;
 }

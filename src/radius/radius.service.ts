@@ -29,7 +29,13 @@ import {
 } from 'src/shared/helpers';
 import { FindAllUserDto } from './dto/find-all-user.dto';
 import { NetworkRadius } from './entities/network-radius.entity';
-import { CreateNetworkRadiusDto } from './dto/network-radius.dto';
+import {
+  CreateGroupNetworkRadiusDto,
+  CreateNetworkRadiusDto,
+} from './dto/network-radius.dto';
+import { ServiceType } from 'src/shared/enums/service_type.enum';
+import { GroupNetworkRadius } from './entities/group-network-radius';
+import { UpdateGroupDto } from './dto/update-group.dto';
 
 @Injectable()
 export class RadiusService {
@@ -53,52 +59,12 @@ export class RadiusService {
     private readonly userGroupRepo: Repository<RadUserGroup>,
     @InjectRepository(NetworkRadius)
     private readonly networkRadiusRepo: Repository<NetworkRadius>,
+
+    @InjectRepository(GroupNetworkRadius)
+    private readonly groupNetworkRadiusRepo: Repository<GroupNetworkRadius>,
   ) {}
 
-  // async createPppoeUser(dto: CreateUserDto) {
-  //   const username =
-  //     dto.generateUsername || !dto.username
-  //       ? this.generateVoucherUsername()
-  //       : dto.username;
-
-  //   const password = dto.password || this.generateVoucherPassword();
-
-  //   const checks = [...dto.checks];
-
-  //   // إضافة كلمة المرور إذا لم تكن موجودة
-  //   if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
-  //     checks.push({
-  //       attribute: 'Cleartext-Password',
-  //       op: ':=',
-  //       value: password,
-  //     });
-  //   }
-
-  //   for (const item of checks) {
-  //     await this.radCheckRepository.save({
-  //       username,
-  //       attribute: item.attribute,
-  //       op: item.op,
-  //       value: item.value,
-  //     });
-  //   }
-
-  //   for (const item of dto.replies) {
-  //     await this.radReplyRepository.save({
-  //       username,
-  //       attribute: item.attribute,
-  //       op: item.op,
-  //       value: item.value,
-  //     });
-  //   }
-
-  //   return {
-  //     username,
-  //     password,
-  //   };
-  // }
-
-  public async createRadiusUsers(dto: CreateUserDto) {
+  public async createRadiusUsers(dto: CreateUserDto, isPpppoe: boolean) {
     const count = dto.generateUsername || dto.count ? (dto.count ?? 1) : 1;
 
     const users: HotspotUserResult[] = [];
@@ -152,10 +118,13 @@ export class RadiusService {
           value: item.value,
         })),
       );
-
+      let valueService;
+      if (isPpppoe === true) valueService = ServiceType.PPPOE;
+      else valueService = ServiceType.HOTSPOT;
       await this.createUserRadius({
         network_id: dto.network_id,
         username,
+        service_type: valueService,
       });
       users.push({
         username,
@@ -169,19 +138,8 @@ export class RadiusService {
 
     return users;
   }
-  async deleteUser(username: string) {
-    await this.radCheckRepository.delete({
-      username,
-    });
 
-    await this.radReplyRepository.delete({
-      username,
-    });
-
-    return true;
-  }
-
-  async getOnlineUsers() {
+  public async getOnlineUsers() {
     return await this.radAcctRepository.find({
       where: {
         acctstoptime: IsNull(),
@@ -189,118 +147,45 @@ export class RadiusService {
     });
   }
 
-  async getUserUsage(username: string) {
-    const sessions = await this.radAcctRepository.find({
+  public async createGroup(dto: CreateGroupDto) {
+    const groupExist = await this.groupCheckRepo.findOne({
       where: {
-        username,
+        groupname: dto.name,
       },
     });
+    if (groupExist) {
+      throw new HttpException('group already exits ', HttpStatus.BAD_REQUEST);
+    }
+    const checks = await this.groupCheckRepo.save(
+      dto.checks.map((item) => ({
+        groupname: dto.name,
+        attribute: item.attribute,
+        op: item.op,
+        value: item.value,
+      })),
+    );
 
-    let download = 0;
-    let upload = 0;
-
-    sessions.forEach((session) => {
-      download += Number(session.acctinputoctets || 0);
-
-      upload += Number(session.acctoutputoctets || 0);
+    const replies = await this.groupReplyRepo.save(
+      dto.replies.map((item) => ({
+        groupname: dto.name,
+        attribute: item.attribute,
+        op: item.op,
+        value: item.value,
+      })),
+    );
+    await this.createGroupNetworkRadius({
+      network_id: dto.network_id,
+      groupname: dto.name,
     });
-
     return {
-      username,
-
-      download_bytes: download,
-
-      upload_bytes: upload,
+      data: {
+        groupname: dto.name,
+        checks,
+        replies,
+      },
     };
   }
-
-  // async createHotspotUser(dto: CreateUserDto) {
-  //   const count = dto.count ?? 1;
-
-  //   const users: HotspotUserResult[] = [];
-
-  //   for (let i = 0; i < count; i++) {
-  //     const username =
-  //       dto.generateUsername || !dto.username
-  //         ? this.generateVoucherUsername()
-  //         : dto.username;
-
-  //     const password = dto.password || this.generateVoucherPassword();
-
-  //     const checks = [...dto.checks];
-
-  //     if (!checks.some((c) => c.attribute === 'Cleartext-Password')) {
-  //       checks.push({
-  //         attribute: 'Cleartext-Password',
-  //         op: ':=',
-  //         value: password,
-  //       });
-  //     }
-
-  //     for (const item of checks) {
-  //       await this.radCheckRepository.save({
-  //         username,
-  //         attribute: item.attribute,
-  //         op: item.op,
-  //         value: item.value,
-  //       });
-  //     }
-
-  //     for (const item of dto.replies) {
-  //       await this.radReplyRepository.save({
-  //         username,
-  //         attribute: item.attribute,
-  //         op: item.op,
-  //         value: item.value,
-  //       });
-  //     }
-
-  //     users.push({
-  //       username,
-  //       password,
-  //     });
-
-  //     if (!dto.generateUsername && dto.username) {
-  //       break;
-  //     }
-  //   }
-
-  //   return {
-  //     count: users.length,
-  //     users,
-  //   };
-  // }
-
-  async createGroup(dto: CreateGroupDto) {
-    for (const item of dto.checks) {
-      await this.groupCheckRepo.save({
-        groupname: dto.name,
-
-        attribute: item.attribute,
-
-        op: item.op,
-
-        value: item.value,
-      });
-    }
-
-    for (const item of dto.replies) {
-      await this.groupReplyRepo.save({
-        groupname: dto.name,
-
-        attribute: item.attribute,
-
-        op: item.op,
-
-        value: item.value,
-      });
-    }
-
-    return {
-      message: 'Group created successfully',
-    };
-  }
-  async assignGroup(username: string, group: string) {
+  public async assignGroup(username: string, group: string) {
     await this.userGroupRepo.save({
       username,
       groupname: group,
@@ -310,7 +195,7 @@ export class RadiusService {
     return true;
   }
 
-  async removeGroup(username: string) {
+  public async unassignGroup(username: string) {
     await this.userGroupRepo.delete({
       username,
     });
@@ -341,7 +226,7 @@ export class RadiusService {
     return password;
   }
 
-  getRadiusAttributes() {
+  public getRadiusAttributes() {
     return {
       operators: Operators,
 
@@ -424,7 +309,7 @@ export class RadiusService {
 
     return response;
   }
-  async findOne(username: string) {
+  public async findOneUser(username: string) {
     const checks = await this.radCheckRepository.find({
       where: { username },
     });
@@ -444,7 +329,27 @@ export class RadiusService {
     };
   }
 
-  async update(username: string, dto: UpdateUserDto) {
+  public async findOneGroup(groupname: string) {
+    const checks = await this.groupCheckRepo.find({
+      where: { groupname },
+    });
+
+    if (!checks.length) {
+      throw new NotFoundException('groupname not found');
+    }
+
+    const replies = await this.groupReplyRepo.find({
+      where: { groupname },
+    });
+
+    return {
+      groupname,
+      checks,
+      replies,
+    };
+  }
+
+  public async updateUser(username: string, dto: UpdateUserDto) {
     const exists = await this.radCheckRepository.findOne({
       where: { username },
     });
@@ -456,10 +361,35 @@ export class RadiusService {
     const newUsername = dto.username ?? username;
 
     if (newUsername !== username) {
+      // التحقق من أن الاسم الجديد غير مستخدم
+      const usernameExists = await this.radCheckRepository.findOne({
+        where: { username: newUsername },
+      });
+
+      if (usernameExists) {
+        throw new HttpException(
+          'Username already exists',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const networkUser = await this.networkRadiusRepo.findOne({
+        where: { username },
+      });
+
       await Promise.all([
         this.radCheckRepository.update({ username }, { username: newUsername }),
         this.radReplyRepository.update({ username }, { username: newUsername }),
       ]);
+
+      if (networkUser) {
+        await this.networkRadiusRepo.delete({ username });
+
+        await this.networkRadiusRepo.save({
+          ...networkUser,
+          username: newUsername,
+        });
+      }
 
       username = newUsername;
     }
@@ -489,7 +419,6 @@ export class RadiusService {
         })),
       );
     } else if (dto.password) {
-      // تحديث كلمة المرور فقط
       await this.radCheckRepository.update(
         {
           username,
@@ -501,7 +430,6 @@ export class RadiusService {
       );
     }
 
-    // تحديث radreply
     if (dto.replies) {
       await this.radReplyRepository.delete({ username });
 
@@ -531,7 +459,92 @@ export class RadiusService {
     };
   }
 
-  async remove(username: string) {
+  public async updateGroup(groupname: string, dto: UpdateGroupDto) {
+    const exists = await this.groupCheckRepo.findOne({
+      where: { groupname },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('Group not found');
+    }
+
+    const newGroupName = dto.groupname ?? groupname;
+
+    if (newGroupName !== groupname) {
+      const groupExists = await this.groupCheckRepo.findOne({
+        where: { groupname: newGroupName },
+      });
+
+      if (groupExists) {
+        throw new HttpException(
+          `Group  already exists`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const groupNetwork = await this.groupNetworkRadiusRepo.findOne({
+        where: { groupname },
+      });
+
+      await Promise.all([
+        this.groupCheckRepo.update({ groupname }, { groupname: newGroupName }),
+        this.groupReplyRepo.update({ groupname }, { groupname: newGroupName }),
+      ]);
+
+      if (groupNetwork) {
+        await this.groupNetworkRadiusRepo.delete({ groupname });
+
+        await this.groupNetworkRadiusRepo.save({
+          ...groupNetwork,
+          groupname: newGroupName,
+        });
+      }
+
+      groupname = newGroupName;
+    }
+
+    if (dto.checks) {
+      await this.groupCheckRepo.delete({ groupname });
+
+      await this.groupCheckRepo.save(
+        dto.checks.map((item) => ({
+          groupname,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        })),
+      );
+    }
+
+    if (dto.replies) {
+      await this.groupReplyRepo.delete({ groupname });
+
+      await this.groupReplyRepo.save(
+        dto.replies.map((item) => ({
+          groupname,
+          attribute: item.attribute,
+          op: item.op,
+          value: item.value,
+        })),
+      );
+    }
+
+    const [radgroupcheck, radgroupreply] = await Promise.all([
+      this.groupCheckRepo.find({
+        where: { groupname },
+      }),
+      this.groupReplyRepo.find({
+        where: { groupname },
+      }),
+    ]);
+
+    return {
+      groupname,
+      radgroupcheck,
+      radgroupreply,
+    };
+  }
+  public async removeUser(username: string) {
     const exists = await this.radCheckRepository.findOne({
       where: { username },
     });
@@ -539,7 +552,7 @@ export class RadiusService {
     if (!exists) {
       throw new NotFoundException('User not found');
     }
-
+    await this.removeUserRadius(exists.username);
     await this.radCheckRepository.delete({ username });
     await this.radReplyRepository.delete({ username });
 
@@ -557,6 +570,19 @@ export class RadiusService {
   public async createUserRadius(dto: CreateNetworkRadiusDto) {
     const userRadius = this.networkRadiusRepo.create(dto);
     return await this.networkRadiusRepo.save(userRadius);
+  }
+
+  public async createGroupNetworkRadius(dto: CreateGroupNetworkRadiusDto) {
+    const groupNetworkRadius = this.groupNetworkRadiusRepo.create(dto);
+    return await this.groupNetworkRadiusRepo.save(groupNetworkRadius);
+  }
+
+  public async removeUserRadius(username: string) {
+    return await this.networkRadiusRepo.delete({ username });
+  }
+
+  public async removeGroupRadius(groupname: string) {
+    return await this.groupNetworkRadiusRepo.delete({ groupname });
   }
 
   public async findAllUserNetwork(filter: FindAllUserDto) {
@@ -598,9 +624,10 @@ export class RadiusService {
 
     const users = {};
 
-    for (const username of usernames) {
-      users[username] = {
-        username,
+    for (const networkUser of result.items) {
+      users[networkUser.username] = {
+        username: networkUser.username,
+        service_type: networkUser.service_type,
         checks: [],
         replies: [],
       };
@@ -629,5 +656,96 @@ export class RadiusService {
     response.items = usernames.map((username) => users[username]);
 
     return response;
+  }
+
+  public async findAllGroupNetwork(filter: FindAllUserDto) {
+    const query = this.groupNetworkRadiusRepo
+      .createQueryBuilder('group_network_radius')
+      .where('true');
+
+    generateQuerySorts(
+      query,
+      filter,
+      GroupNetworkRadius,
+      'group_network_radius',
+    );
+    generateQueryConditions(query, filter, 'group_network_radius');
+
+    const result = await customPaginate(query, {
+      page: filter.pagination.page,
+      limit: filter.pagination.limit,
+    });
+
+    const groupNames = result.items.map((x) => x.groupname);
+
+    if (!groupNames.length) {
+      return {
+        ...result,
+        items: [],
+      };
+    }
+
+    const checks = await this.groupCheckRepo.find({
+      where: {
+        groupname: In(groupNames),
+      },
+      order: {
+        groupname: 'ASC',
+      },
+    });
+
+    const replies = await this.groupReplyRepo.find({
+      where: {
+        groupname: In(groupNames),
+      },
+    });
+
+    const groups = {};
+
+    for (const groupNetwork of result.items) {
+      groups[groupNetwork.groupname] = {
+        groupname: groupNetwork.groupname,
+        checks: [],
+        replies: [],
+      };
+    }
+
+    for (const check of checks) {
+      groups[check.groupname]?.checks.push({
+        attribute: check.attribute,
+        op: check.op,
+        value: check.value,
+      });
+    }
+
+    for (const reply of replies) {
+      groups[reply.groupname]?.replies.push({
+        attribute: reply.attribute,
+        op: reply.op,
+        value: reply.value,
+      });
+    }
+
+    return {
+      ...result,
+      items: groupNames.map((groupname) => groups[groupname]),
+    };
+  }
+
+  public async removeGroup(groupname: string) {
+    const exists = await this.groupCheckRepo.findOne({
+      where: { groupname },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('User not found');
+    }
+    await this.removeGroupRadius(exists.groupname);
+    await this.groupCheckRepo.delete({ groupname });
+    await this.groupReplyRepo.delete({ groupname });
+
+    return {
+      done: true,
+    };
   }
 }

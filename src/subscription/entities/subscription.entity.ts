@@ -31,7 +31,7 @@ export class Subscription extends BaseEntity {
   @Column('bigint')
   point_id: number;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ type: 'varchar', length: 255 })
   radius_username: string;
 
   @Column({
@@ -45,11 +45,6 @@ export class Subscription extends BaseEntity {
     nullable: true,
   })
   expire_date?: Date;
-
-  @Column({
-    default: true,
-  })
-  auto_renew: boolean;
 
   @Column({ type: 'boolean', default: true })
   status: boolean;

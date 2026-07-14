@@ -13,6 +13,7 @@ import { RadGroupReply } from './entities/radgroupreply.entity';
 import { RadGroupCheck } from './entities/radgroupcheck.entity';
 import { RadiusController } from './radius.controller';
 import { NetworkRadius } from './entities/network-radius.entity';
+import { GroupNetworkRadius } from './entities/group-network-radius';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NetworkRadius } from './entities/network-radius.entity';
       RadGroupReply,
       RadUserGroup,
       NetworkRadius,
+      GroupNetworkRadius,
     ]),
   ],
   controllers: [RadiusController],

@@ -4,6 +4,7 @@ import { Employee } from 'src/employee/entities/employee.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { Point } from 'src/point/entities/point.entity';
+import { GroupNetworkRadius } from 'src/radius/entities/group-network-radius';
 import { NetworkRadius } from 'src/radius/entities/network-radius.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -57,4 +58,10 @@ export class Network extends BaseEntity {
 
   @OneToMany(() => NetworkRadius, (network_radius) => network_radius.network)
   network_radiuses: NetworkRadius[];
+
+  @OneToMany(
+    () => GroupNetworkRadius,
+    (group_network_radius) => group_network_radius.network,
+  )
+  group_network_radiuses: GroupNetworkRadius[];
 }

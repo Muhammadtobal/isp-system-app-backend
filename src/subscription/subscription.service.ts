@@ -48,6 +48,7 @@ export class SubscriptionService {
     const point = await this.pointService.findOne({
       id: createSubscriptionDto.point_id,
     });
+
     if (!point) {
       throw new HttpException(
         ErrorMessages.POINT_NOT_FOUND,
@@ -62,27 +63,25 @@ export class SubscriptionService {
       );
     }
 
+    const plan = await this.planService.findOne({
+      id: createSubscriptionDto.plan_id,
+    });
+
+    if (!plan) {
+      return null;
+    }
+
     const subscription = this.subscriptionRepository.create(
       createSubscriptionDto,
     );
+
     const saved = await this.subscriptionRepository.save(subscription);
 
     await this.pointService.update(point.id, {
       count_subscription: point.count_subscription + 1,
     });
-    const plan = await this.planService.findOne({
-      id: createSubscriptionDto.plan_id,
-    });
-    if (!plan) return null;
 
-    const username = `pppoe${saved.id}`;
-
-    const password = Math.random().toString(36).slice(-8);
-
-    // await this.radiusService.createPppoeUser(username, password, plan);
-    saved.radius_username = username;
-
-    return await this.subscriptionRepository.save(saved);
+    return saved;
   }
 
   public async findAll(filter: FindAllSubscriptionDto) {

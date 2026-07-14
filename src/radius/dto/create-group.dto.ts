@@ -32,4 +32,9 @@ export class CreateGroupDto {
   @ValidateNested({ each: true })
   @Type(() => RadiusAttributeDto)
   replies: RadiusAttributeDto[];
+
+  @ApiProperty({ example: 2, required: true })
+  @IsNotEmpty()
+  @IsInt()
+  network_id: number;
 }

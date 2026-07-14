@@ -14,6 +14,11 @@ export class CreateSubscriptionDto {
   @IsInt()
   plan_id: number;
 
+  @ApiProperty({ example: 'm', required: true })
+  @IsNotEmpty()
+  @IsString()
+  radius_username: string;
+
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsInt()
@@ -39,14 +44,6 @@ export class CreateSubscriptionDto {
   @IsOptional()
   @IsDateString()
   expire_date?: string;
-
-  @ApiProperty({
-    example: true,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  auto_renew?: boolean;
 
   @ApiProperty({
     example: true,

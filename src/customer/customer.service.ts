@@ -59,7 +59,7 @@ export class CustomerService {
       user_id: customerSaved.user_id,
       start_date: createCustomerDto.expire_date,
       expire_date: createCustomerDto.expire_date,
-      auto_renew: createCustomerDto.auto_renew,
+      radius_username: createCustomerDto.radius_username,
     });
 
     return customerSaved;

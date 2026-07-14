@@ -11,20 +11,17 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class NetworkRadius {
+export class GroupNetworkRadius {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  username: string;
+  groupname: string;
 
   @Column('bigint')
   network_id: number;
 
-  @Column({ type: 'enum', enum: ServiceType })
-  service_type: ServiceType;
-
-  @ManyToOne(() => Network, (network) => network.network_radiuses)
+  @ManyToOne(() => Network, (network) => network.group_network_radiuses)
   @JoinColumn({ name: 'network_id' })
   network?: Network;
 }

@@ -20,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FindAllUserDto } from './dto/find-all-user.dto';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 import { AuthUser } from 'src/shared/helpers';
+import { UpdateGroupDto } from './dto/update-group.dto';
 
 @Controller('radius')
 export class RadiusController {
@@ -28,15 +29,15 @@ export class RadiusController {
   @Post('create-pppoe')
   @UseGuards(JwtAuthSharedGuard)
   async createPppoeUser(@Body() dto: CreateUserDto) {
-    const users = await this.radiusService.createRadiusUsers(dto);
+    const users = await this.radiusService.createRadiusUsers(dto, true);
 
     return users[0];
   }
 
-  @Post('hotspot')
+  @Post('create-hotspot')
   @UseGuards(JwtAuthSharedGuard)
   async createHotspotUser(@Body() dto: CreateUserDto) {
-    const users = await this.radiusService.createRadiusUsers(dto);
+    const users = await this.radiusService.createRadiusUsers(dto, false);
 
     return {
       count: users.length,
@@ -44,62 +45,84 @@ export class RadiusController {
     };
   }
 
-  @Get('online')
-  @UseGuards(JwtAuthSharedGuard)
-  getOnlineUsers() {
-    return this.radiusService.getOnlineUsers();
-  }
+  // @Get('get-online-users')
+  // @UseGuards(JwtAuthSharedGuard)
+  // getOnlineUsers() {
+  //   return this.radiusService.getOnlineUsers();
+  // }
 
-  @Post('group')
-  @UseGuards(JwtAuthSharedGuard)
-  createGroup(@Body() dto: CreateGroupDto) {
-    return this.radiusService.createGroup(dto);
-  }
-
-  @Post('group/assign')
-  @UseGuards(JwtAuthSharedGuard)
-  assignGroup(@Body() dto: AssignGroupDto) {
-    return this.radiusService.assignGroup(dto.username, dto.groupname);
-  }
-
-  @Delete('group/:username')
-  @UseGuards(JwtAuthSharedGuard)
-  removeGroup(@Param('username') username: string) {
-    return this.radiusService.removeGroup(username);
-  }
   @Get('attributes')
   @UseGuards(JwtAuthSharedGuard)
   getRadiusAttributes() {
     return this.radiusService.getRadiusAttributes();
   }
 
-  @Post('find-all')
+  @Get('get-one-user/:username')
   @UseGuards(JwtAuthSharedGuard)
-  findAll(@Body() filter: FindAllUserDto) {
-    return this.radiusService.findAll(filter);
+  findOneUser(@Param('username') username: string) {
+    return this.radiusService.findOneUser(username);
   }
 
-  @Get('radius/:username')
+  @Patch('update-user/:username')
   @UseGuards(JwtAuthSharedGuard)
-  findOne(@Param('username') username: string) {
-    return this.radiusService.findOne(username);
+  updateUser(@Param('username') username: string, @Body() dto: UpdateUserDto) {
+    return this.radiusService.updateUser(username, dto);
   }
 
-  @Patch('radius/:username')
-  @UseGuards(JwtAuthSharedGuard)
-  update(@Param('username') username: string, @Body() dto: UpdateUserDto) {
-    return this.radiusService.update(username, dto);
-  }
-
-  @Delete('radius/:username')
-  @UseGuards(JwtAuthSharedGuard)
-  remove(@Param('username') username: string) {
-    return this.radiusService.remove(username);
-  }
-
-  @Post('find-all-user-network')
+  @Post('get-all-user-network')
   @UseGuards(JwtAuthSharedGuard)
   findAllUserNetwork(@Body() filter: FindAllUserDto) {
     return this.radiusService.findAllUserNetwork(filter);
+  }
+
+  @Delete('remove-user/:username')
+  @UseGuards(JwtAuthSharedGuard)
+  removeUser(@Param('username') username: string) {
+    return this.radiusService.removeUser(username);
+  }
+
+  @Post('get-all-group-network')
+  @UseGuards(JwtAuthSharedGuard)
+  findAllGroupNetwork(@Body() filter: FindAllUserDto) {
+    return this.radiusService.findAllGroupNetwork(filter);
+  }
+
+  @Post('create-group')
+  @UseGuards(JwtAuthSharedGuard)
+  createGroup(@Body() dto: CreateGroupDto) {
+    return this.radiusService.createGroup(dto);
+  }
+
+  @Post('assign-group')
+  @UseGuards(JwtAuthSharedGuard)
+  assignGroup(@Body() dto: AssignGroupDto) {
+    return this.radiusService.assignGroup(dto.username, dto.groupname);
+  }
+
+  @Delete('unassign-group/:username')
+  @UseGuards(JwtAuthSharedGuard)
+  unassignGroup(@Param('username') username: string) {
+    return this.radiusService.unassignGroup(username);
+  }
+
+  @Get('get-one-group/:groupname')
+  @UseGuards(JwtAuthSharedGuard)
+  findOneGroup(@Param('groupname') groupname: string) {
+    return this.radiusService.findOneGroup(groupname);
+  }
+
+  @Patch('update-group/:groupname')
+  @UseGuards(JwtAuthSharedGuard)
+  updateGroup(
+    @Param('groupname') groupname: string,
+    @Body() dto: UpdateGroupDto,
+  ) {
+    return this.radiusService.updateGroup(groupname, dto);
+  }
+
+  @Delete('remove-group/:groupname')
+  @UseGuards(JwtAuthSharedGuard)
+  removeGroup(@Param('groupname') groupname: string) {
+    return this.radiusService.removeGroup(groupname);
   }
 }

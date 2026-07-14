@@ -14,6 +14,11 @@ export class CreateCustomerDto {
   @IsString()
   name: string;
 
+  @ApiProperty({ example: 'm', required: true })
+  @IsNotEmpty()
+  @IsString()
+  radius_username: string;
+
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsInt()
@@ -44,14 +49,6 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsDateString()
   expire_date?: string;
-
-  @ApiProperty({
-    example: true,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  auto_renew?: boolean;
 
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
