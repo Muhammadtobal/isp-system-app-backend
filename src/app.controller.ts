@@ -386,4 +386,9 @@ export class AppController {
 
   //   return { done: true };
   // }
+
+  @Get('status')
+  getStatus() {
+    return this.appService.getServerInfo();
+  }
 }
