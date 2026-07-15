@@ -587,11 +587,13 @@ export class RadiusService {
 
   public async findAllUserNetwork(filter: FindAllUserDto) {
     const query = this.networkRadiusRepo
-      .createQueryBuilder('network_user')
+      .createQueryBuilder('network_radius')
+      .leftJoinAndSelect('network_radius.network', 'network')
+
       .where('true');
 
-    generateQuerySorts(query, filter, NetworkRadius, 'network_user');
-    generateQueryConditions(query, filter, 'network_user');
+    generateQuerySorts(query, filter, NetworkRadius, 'network_radius');
+    generateQueryConditions(query, filter, 'network_radius');
 
     const result = await customPaginate(query, {
       page: filter.pagination.page,
@@ -628,6 +630,7 @@ export class RadiusService {
       users[networkUser.username] = {
         username: networkUser.username,
         service_type: networkUser.service_type,
+        network: networkUser.network,
         checks: [],
         replies: [],
       };
@@ -661,6 +664,7 @@ export class RadiusService {
   public async findAllGroupNetwork(filter: FindAllUserDto) {
     const query = this.groupNetworkRadiusRepo
       .createQueryBuilder('group_network_radius')
+      .leftJoinAndSelect('group_network_radius.network', 'network')
       .where('true');
 
     generateQuerySorts(
@@ -707,6 +711,7 @@ export class RadiusService {
         groupname: groupNetwork.groupname,
         checks: [],
         replies: [],
+        network: groupNetwork.network,
       };
     }
 
