@@ -1,6 +1,12 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { RadiusAttributeDto } from './radius-attribute.dto';
 
 export class UpdateGroupDto {
@@ -29,4 +35,9 @@ export class UpdateGroupDto {
   @ValidateNested({ each: true })
   @Type(() => RadiusAttributeDto)
   replies?: RadiusAttributeDto[];
+
+  @ApiProperty({ example: 2, required: false })
+  @IsOptional()
+  @IsInt()
+  network_id?: number;
 }

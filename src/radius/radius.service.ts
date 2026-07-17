@@ -391,15 +391,30 @@ export class RadiusService {
       ]);
 
       if (networkUser) {
-        await this.networkRadiusRepo.delete({ username });
+        await this.networkRadiusRepo.delete({
+          username,
+        });
 
         await this.networkRadiusRepo.save({
           ...networkUser,
           username: newUsername,
+          network_id:
+            dto.network_id !== undefined
+              ? dto.network_id
+              : networkUser.network_id,
         });
       }
 
       username = newUsername;
+    }
+
+    if (dto.network_id !== undefined) {
+      await this.networkRadiusRepo.update(
+        { username },
+        {
+          network_id: dto.network_id,
+        },
+      );
     }
 
     if (dto.checks) {
@@ -500,17 +515,29 @@ export class RadiusService {
       ]);
 
       if (groupNetwork) {
-        await this.groupNetworkRadiusRepo.delete({ groupname });
+        await this.groupNetworkRadiusRepo.delete({
+          groupname,
+        });
 
         await this.groupNetworkRadiusRepo.save({
           ...groupNetwork,
           groupname: newGroupName,
+          network_id:
+            dto.network_id !== undefined
+              ? dto.network_id
+              : groupNetwork.network_id,
         });
       }
-
+      if (dto.network_id !== undefined) {
+        await this.groupNetworkRadiusRepo.update(
+          { groupname },
+          {
+            network_id: dto.network_id,
+          },
+        );
+      }
       groupname = newGroupName;
     }
-
     if (dto.checks) {
       await this.groupCheckRepo.delete({ groupname });
 

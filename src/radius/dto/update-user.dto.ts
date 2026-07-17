@@ -1,8 +1,10 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
@@ -51,4 +53,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   generateUsername?: boolean;
+
+  @ApiProperty({ example: 2, required: false })
+  @IsOptional()
+  @IsInt()
+  network_id?: number;
 }
