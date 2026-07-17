@@ -528,15 +528,17 @@ export class RadiusService {
               : groupNetwork.network_id,
         });
       }
-      if (dto.network_id !== undefined) {
-        await this.groupNetworkRadiusRepo.update(
-          { groupname },
-          {
-            network_id: dto.network_id,
-          },
-        );
-      }
+
       groupname = newGroupName;
+    }
+
+    if (dto.network_id !== undefined) {
+      await this.groupNetworkRadiusRepo.update(
+        { groupname },
+        {
+          network_id: dto.network_id,
+        },
+      );
     }
     if (dto.checks) {
       await this.groupCheckRepo.delete({ groupname });
