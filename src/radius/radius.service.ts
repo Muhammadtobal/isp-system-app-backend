@@ -317,12 +317,16 @@ export class RadiusService {
     if (!checks.length) {
       throw new NotFoundException('User not found');
     }
-
+    const userNetwork = await this.networkRadiusRepo.findOne({
+      where: { username },
+      relations: { network: true },
+    });
     const replies = await this.radReplyRepository.find({
       where: { username },
     });
 
     return {
+      network: userNetwork?.network,
       username,
       checks,
       replies,
@@ -337,12 +341,16 @@ export class RadiusService {
     if (!checks.length) {
       throw new NotFoundException('groupname not found');
     }
-
+    const groupNetworkRadius = await this.groupNetworkRadiusRepo.findOne({
+      where: { groupname },
+      relations: { network: true },
+    });
     const replies = await this.groupReplyRepo.find({
       where: { groupname },
     });
 
     return {
+      network: groupNetworkRadius?.network,
       groupname,
       checks,
       replies,
