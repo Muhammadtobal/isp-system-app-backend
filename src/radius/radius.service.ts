@@ -126,6 +126,7 @@ export class RadiusService {
         username,
         service_type: valueService,
       });
+      if (dto.groupname) await this.assignGroup(username, dto.groupname);
       users.push({
         username,
         password,

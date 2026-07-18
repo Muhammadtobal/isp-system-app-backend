@@ -67,6 +67,14 @@ export class CreateUserDto {
   @IsInt()
   @Min(1)
   count?: number;
+
+  @ApiProperty({
+    example: 'HOME-20M',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  groupname?: string;
 }
 
 export interface HotspotUserResult {
