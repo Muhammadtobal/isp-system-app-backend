@@ -58,4 +58,11 @@ export class UpdateUserDto {
   @IsOptional()
   @IsInt()
   network_id?: number;
+  @ApiProperty({
+    example: 'HOME-20M',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  groupname?: string;
 }

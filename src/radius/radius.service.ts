@@ -391,7 +391,6 @@ export class RadiusService {
     const newUsername = dto.username ?? username;
 
     if (newUsername !== username) {
-      // التحقق من أن الاسم الجديد غير مستخدم
       const usernameExists = await this.radCheckRepository.findOne({
         where: { username: newUsername },
       });
@@ -437,6 +436,22 @@ export class RadiusService {
           network_id: dto.network_id,
         },
       );
+    }
+    const currentGroup = await this.radUserGroupRepository.findOne({
+      where: {
+        username: dto.username,
+      },
+    });
+    if (dto.groupname !== undefined) {
+      if (
+        dto.username &&
+        currentGroup &&
+        currentGroup.groupname !== dto.groupname
+      ) {
+        await this.unassignGroup(dto.username);
+
+        await this.assignGroup(dto.username, dto.groupname);
+      }
     }
 
     if (dto.checks) {
