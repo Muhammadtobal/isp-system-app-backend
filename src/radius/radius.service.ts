@@ -5,7 +5,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, IsNull, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsSelect,
+  FindOptionsWhere,
+  In,
+  IsNull,
+  Repository,
+} from 'typeorm';
 
 import { RadCheck } from './entities/ radcheck.entity';
 import { RadReply } from './entities/radreply.entity';
@@ -36,6 +43,10 @@ import {
 import { ServiceType } from 'src/shared/enums/service_type.enum';
 import { GroupNetworkRadius } from './entities/group-network-radius';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { Nas } from './entities/nas.entity';
+import { CreateNasDto } from './dto/create-nas.dto';
+import { UpdateNasDto } from './dto/update-nas.dto';
+import { FindAllNasDto } from './dto/find-all-nas.dto';
 
 @Injectable()
 export class RadiusService {
@@ -59,6 +70,12 @@ export class RadiusService {
     private readonly userGroupRepo: Repository<RadUserGroup>,
     @InjectRepository(NetworkRadius)
     private readonly networkRadiusRepo: Repository<NetworkRadius>,
+
+    @InjectRepository(Nas)
+    private readonly nasRepository: Repository<Nas>,
+
+    @InjectRepository(RadUserGroup)
+    private readonly radUserGroupRepository: Repository<RadUserGroup>,
 
     @InjectRepository(GroupNetworkRadius)
     private readonly groupNetworkRadiusRepo: Repository<GroupNetworkRadius>,
@@ -322,11 +339,15 @@ export class RadiusService {
       where: { username },
       relations: { network: true },
     });
+    const groupUser = await this.radUserGroupRepository.findOne({
+      where: { username },
+    });
     const replies = await this.radReplyRepository.find({
       where: { username },
     });
 
     return {
+      groupUser: groupUser?.groupname,
       network: userNetwork?.network,
       username,
       checks,
@@ -786,6 +807,90 @@ export class RadiusService {
     await this.removeGroupRadius(exists.groupname);
     await this.groupCheckRepo.delete({ groupname });
     await this.groupReplyRepo.delete({ groupname });
+
+    return {
+      done: true,
+    };
+  }
+
+  public async createNas(createNasDto: CreateNasDto) {
+    const exists = await this.nasRepository.findOne({
+      where: { nasname: createNasDto.nasname },
+    });
+
+    if (exists) {
+      throw new HttpException('NAS already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    const nas = this.nasRepository.create({
+      ...createNasDto,
+      type: createNasDto.type ?? 'other',
+    });
+
+    return await this.nasRepository.save(nas);
+  }
+
+  public async updateNas(id: number, updateNasDto: UpdateNasDto) {
+    if (Object.keys(updateNasDto).length === 0) {
+      return this.findOneNas({ id });
+    }
+    const currentNas = await this.findOneNas({ id });
+
+    if (!currentNas) {
+      throw new HttpException('nas not found', HttpStatus.NOT_FOUND);
+    }
+    if (updateNasDto.nasname && updateNasDto.nasname !== currentNas.nasname) {
+      const nas = await this.findOneNas({
+        nasname: updateNasDto.nasname,
+      });
+
+      if (nas) {
+        throw new HttpException('nas already exist', HttpStatus.BAD_REQUEST);
+      }
+    }
+    await this.nasRepository.update(id, updateNasDto);
+
+    return await this.findOneNas({
+      id,
+    });
+  }
+
+  public findOneNas(
+    nasOptions: FindOptionsWhere<Nas>,
+    options?: {
+      selected?: FindOptionsSelect<Nas>;
+      relations?: FindOptionsRelations<Nas>;
+    },
+  ) {
+    return this.nasRepository.findOne({
+      select: options?.selected,
+      relations: options?.relations,
+      where: nasOptions,
+    });
+  }
+
+  public async findAllNas(filter: FindAllNasDto) {
+    const query = this.nasRepository.createQueryBuilder('nas').where('true');
+
+    generateQuerySorts(query, filter, Nas, 'nas');
+    generateQueryConditions(query, filter, 'nas');
+
+    return await customPaginate(query, {
+      page: filter.pagination.page,
+      limit: filter.pagination.limit,
+    });
+  }
+
+  public async removeNas(id: number) {
+    const exists = await this.nasRepository.findOne({
+      where: { id },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('NAS not found');
+    }
+
+    await this.nasRepository.delete({ id });
 
     return {
       done: true,

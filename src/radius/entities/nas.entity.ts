@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('nas')
 export class Nas {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
   @Column({
@@ -13,27 +13,27 @@ export class Nas {
 
   @Column({
     type: 'varchar',
-    length: 255,
+    length: 100,
+    nullable: true,
   })
-  shortname: string;
+  shortname?: string;
 
   @Column({
     type: 'varchar',
-    length: 255,
-    nullable: true,
+    length: 50,
     default: 'other',
   })
   type: string;
 
   @Column({
+    type: 'int',
     nullable: true,
   })
-  ports: number;
+  ports?: number;
 
   @Column({
     type: 'varchar',
     length: 255,
-    default: 'secret',
   })
   secret: string;
 
@@ -42,19 +42,19 @@ export class Nas {
     length: 255,
     nullable: true,
   })
-  server: string;
+  server?: string;
 
   @Column({
     type: 'varchar',
     length: 255,
     nullable: true,
   })
-  community: string;
+  community?: string;
 
   @Column({
     type: 'varchar',
     length: 255,
     nullable: true,
   })
-  description: string;
+  description?: string;
 }

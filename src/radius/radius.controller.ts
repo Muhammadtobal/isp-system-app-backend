@@ -21,6 +21,9 @@ import { FindAllUserDto } from './dto/find-all-user.dto';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 import { AuthUser } from 'src/shared/helpers';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { CreateNasDto } from './dto/create-nas.dto';
+import { UpdateNasDto } from './dto/update-nas.dto';
+import { FindAllNasDto } from './dto/find-all-nas.dto';
 
 @Controller('radius')
 export class RadiusController {
@@ -124,5 +127,35 @@ export class RadiusController {
   @UseGuards(JwtAuthSharedGuard)
   removeGroup(@Param('groupname') groupname: string) {
     return this.radiusService.removeGroup(groupname);
+  }
+
+  @Post('create-nas')
+  @UseGuards(JwtAuthSharedGuard)
+  createNas(@Body() createNasDto: CreateNasDto) {
+    return this.radiusService.createNas(createNasDto);
+  }
+
+  @Patch('update-nas/:id')
+  @UseGuards(JwtAuthSharedGuard)
+  public update(@Param('id') id: number, @Body() updateNasDto: UpdateNasDto) {
+    return this.radiusService.updateNas(id, updateNasDto);
+  }
+
+  @Get('get-one-nas/:id')
+  @UseGuards(JwtAuthSharedGuard)
+  public findOne(@Param('id') id: number) {
+    return this.radiusService.findOneNas({ id });
+  }
+
+  @Post('get-all-nas')
+  @UseGuards(JwtAuthSharedGuard)
+  public findAllNas(@Body() filter: FindAllNasDto) {
+    return this.radiusService.findAllNas(filter);
+  }
+
+  @Delete('remove-nas/:id')
+  @UseGuards(JwtAuthSharedGuard)
+  removeNas(@Param('id') id: number) {
+    return this.radiusService.removeNas(id);
   }
 }
