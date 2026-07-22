@@ -57,8 +57,6 @@ export class CustomerService {
       point_id: createCustomerDto.point_id,
       customer_id: customerSaved.id,
       user_id: customerSaved.user_id,
-      start_date: createCustomerDto.expire_date,
-      expire_date: createCustomerDto.expire_date,
       radius_username: createCustomerDto.radius_username,
     });
 

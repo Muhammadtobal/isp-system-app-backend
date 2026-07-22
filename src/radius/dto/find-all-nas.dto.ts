@@ -42,12 +42,4 @@ export class FindAllNasDto {
   @ValidateNested()
   @Type(() => SortInput)
   sort?: SortInput;
-  @ApiProperty({
-    example: '{ op : "full or partial" value:"example"}',
-    required: false,
-  })
-  @IsOptional()
-  @IsObject()
-  @Type(() => MatchInput)
-  username?: string;
 }

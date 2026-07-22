@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsInt,
@@ -6,7 +7,23 @@ import {
   IsDateString,
   IsBoolean,
   IsOptional,
+  ValidateNested,
+  IsNumber,
 } from 'class-validator';
+
+class LocationDto {
+  @ApiProperty({
+    example: 31.9539,
+  })
+  @IsNumber()
+  latitude: number;
+
+  @ApiProperty({
+    example: 35.9106,
+  })
+  @IsNumber()
+  longitude: number;
+}
 
 export class CreateSubscriptionDto {
   @ApiProperty({ example: 1 })
@@ -30,22 +47,6 @@ export class CreateSubscriptionDto {
   point_id: number;
 
   @ApiProperty({
-    example: '2026-07-09T00:00:00Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDateString()
-  start_date?: string;
-
-  @ApiProperty({
-    example: '2026-08-09T00:00:00Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDateString()
-  expire_date?: string;
-
-  @ApiProperty({
     example: true,
     required: false,
   })
@@ -60,4 +61,13 @@ export class CreateSubscriptionDto {
   @IsOptional()
   @IsInt()
   user_id?: number;
+
+  @ApiProperty({
+    type: LocationDto,
+    required: false,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocationDto)
+  location?: LocationDto;
 }

@@ -34,22 +34,6 @@ export class CreateCustomerDto {
   @IsString()
   phone: string;
 
-  @ApiProperty({
-    example: '2026-07-09T00:00:00Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDateString()
-  start_date?: string;
-
-  @ApiProperty({
-    example: '2026-08-09T00:00:00Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDateString()
-  expire_date?: string;
-
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsInt()

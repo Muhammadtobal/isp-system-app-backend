@@ -23,7 +23,6 @@ import { ProductModule } from './product/product.module';
 import { SoldModule } from './sold/sold.module';
 import { DomainModule } from './domain/domain.module';
 import { RadiusModule } from './radius/radius.module';
-import { HotspotModule } from './hotspot/hotspot.module';
 
 console.log({
   host: process.env.DB_HOST,
@@ -72,8 +71,6 @@ console.log({
     SoldModule,
     DomainModule,
     RadiusModule,
-
-    HotspotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
