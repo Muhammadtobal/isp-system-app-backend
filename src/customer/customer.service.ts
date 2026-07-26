@@ -67,6 +67,9 @@ export class CustomerService {
   public findAll(filter: FindAllCustomerDto) {
     const query = this.customerRepository
       .createQueryBuilder('customer')
+      .leftJoin('customer.network', 'network')
+      .leftJoin('customer.user', 'user')
+      .select(['customer', 'network.name', 'user.name'])
       .where('true');
 
     generateQuerySorts<Customer>(query, filter, Customer, 'customer');
