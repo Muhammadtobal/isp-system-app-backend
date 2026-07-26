@@ -101,6 +101,53 @@ export class SubscriptionService {
         'point.name',
       ])
       .where('true');
+
+    if (filter.location?.latitude && filter.location?.longitude) {
+      const userLat = filter.location.latitude;
+      const userLon = filter.location.longitude;
+
+      query
+        .addSelect(
+          `
+    (
+      6371 * ACOS(
+        COS(RADIANS(:userLat)) *
+        COS(
+          RADIANS(
+            CAST(
+              JSON_UNQUOTE(JSON_EXTRACT(subscription.location, '$.latitude'))
+              AS DECIMAL(10,6)
+            )
+          )
+        ) *
+        COS(
+          RADIANS(
+            CAST(
+              JSON_UNQUOTE(JSON_EXTRACT(subscription.location, '$.longitude'))
+              AS DECIMAL(10,6)
+            )
+          ) - RADIANS(:userLon)
+        ) +
+        SIN(RADIANS(:userLat)) *
+        SIN(
+          RADIANS(
+            CAST(
+              JSON_UNQUOTE(JSON_EXTRACT(subscription.location, '$.latitude'))
+              AS DECIMAL(10,6)
+            )
+          )
+        )
+      )
+    )
+    `,
+          'distance',
+        )
+        .setParameters({
+          userLat,
+          userLon,
+        })
+        .addOrderBy('distance', 'ASC');
+    }
     generateQuerySorts<Subscription>(
       query,
       filter,
@@ -118,9 +165,13 @@ export class SubscriptionService {
       },
     );
 
-    const onlineUsers = await this.radiusService.getOnlineUsers();
+    const users = await this.radiusService.getOnlineUsers();
 
-    const onlineSet = new Set(onlineUsers.map((user) => user.username));
+    const onlineSet = new Set(
+      users
+        .filter((user) => user.acctstoptime === null)
+        .map((user) => user.username),
+    );
 
     result.items = result.items.map((subscription: any) => ({
       ...subscription,

@@ -58,6 +58,7 @@ export class CustomerService {
       customer_id: customerSaved.id,
       user_id: customerSaved.user_id,
       radius_username: createCustomerDto.radius_username,
+      location: createCustomerDto.location,
     });
 
     return customerSaved;

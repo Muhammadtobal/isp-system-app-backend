@@ -29,34 +29,27 @@ export class Plan extends BaseEntity {
   @Column('bigint', { nullable: true })
   user_id?: number;
 
-  // نوع الخدمة
   @Column({
     type: 'enum',
     enum: ServiceType,
   })
   service_type: ServiceType;
 
-  // سرعة التحميل kbps
   @Column('int')
   download_speed: number;
 
-  // سرعة الرفع kbps
   @Column('int')
   upload_speed: number;
 
-  // حجم البيانات بالميغابايت (NULL = Unlimited)
   @Column('bigint', { nullable: true })
   quota_mb?: number;
 
-  // مدة الجلسة بالثواني (خاصة بالـ Hotspot غالباً)
   @Column('int', { nullable: true })
   session_timeout?: number;
 
-  // مدة الاشتراك بالأيام
   @Column('int', { nullable: true })
   validity_days?: number;
 
-  // عدد الأجهزة المسموح بها
   @Column('int', { default: 1 })
   simultaneous_use: number;
 

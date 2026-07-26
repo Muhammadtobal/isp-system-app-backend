@@ -40,8 +40,7 @@ export interface RequestWithUser extends Request {
   };
 }
 
-export function generateQuerySorts<T>(
-  // @ts-ignore
+export function generateQuerySorts<T extends ObjectLiteral>(
   query: SelectQueryBuilder<T>,
   filter: any,
   entity: Function,
@@ -55,17 +54,20 @@ export function generateQuerySorts<T>(
     if (
       filter.sort.by.split('.')[0] === 'counts' &&
       filter.sort.by.split('.')[1]
-    )
-      query.orderBy(
+    ) {
+      query.addOrderBy(
         `JSON_EXTRACT(${entityName}.counts, '$.${filter.sort.by.split('.')[1]}')`,
         `${filter.sort.type}` as 'ASC' | 'DESC',
       );
-    else
-      query.orderBy(
+    } else {
+      query.addOrderBy(
         `${entityName}.${filter.sort.by}`,
         `${filter.sort.type}` as 'ASC' | 'DESC',
       );
-  } else query.orderBy(`${entityName}.id`, `DESC`);
+    }
+  } else {
+    query.addOrderBy(`${entityName}.id`, `DESC`);
+  }
 }
 export function isValidColumn(entity: Function, columnName: string): boolean {
   const columns = getMetadataArgsStorage()

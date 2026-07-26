@@ -10,6 +10,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   ListOfIdsInput,
+  MatchInput,
   PaginationInput,
   SingleIdInput,
   SortInput,
@@ -55,4 +56,13 @@ export class FindAllExpenseTypeDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  name?: MatchInput;
 }

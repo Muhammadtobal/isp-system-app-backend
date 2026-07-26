@@ -10,11 +10,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   ListOfIdsInput,
+  MatchInput,
+  MaxNumberInput,
+  MinNumberInput,
   PaginationInput,
+  RangeNumberInput,
   SingleIdInput,
+  SingleNumberInput,
   SortInput,
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
+import { IsSingleNumberOrRange } from 'src/shared/decorators/is-single-number-or-range.decorator';
 
 export class FindAllProductDto {
   @ApiProperty({
@@ -55,4 +61,52 @@ export class FindAllProductDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  name?: MatchInput;
+
+  @ApiPropertyOptional({
+    description: 'Price filter (single value or range)',
+    examples: {
+      single: {
+        summary: 'Equal to',
+        value: {
+          value: 50,
+        },
+      },
+      min: {
+        summary: 'Greater than or equal',
+        value: {
+          min: 50,
+        },
+      },
+      max: {
+        summary: 'Less than or equal',
+        value: {
+          max: 100,
+        },
+      },
+      range: {
+        summary: 'Between min and max',
+        value: {
+          min: 50,
+          max: 100,
+        },
+      },
+    },
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleNumberOrRange()
+  price?:
+    | SingleNumberInput
+    | RangeNumberInput
+    | MaxNumberInput
+    | MinNumberInput;
 }

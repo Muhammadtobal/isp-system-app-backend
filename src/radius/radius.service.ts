@@ -47,6 +47,7 @@ import { Nas } from './entities/nas.entity';
 import { CreateNasDto } from './dto/create-nas.dto';
 import { UpdateNasDto } from './dto/update-nas.dto';
 import { FindAllNasDto } from './dto/find-all-nas.dto';
+import { PaginationMetadata } from 'src/shared/pagination-metadata';
 
 @Injectable()
 export class RadiusService {
@@ -158,11 +159,29 @@ export class RadiusService {
   }
 
   public async getOnlineUsers() {
-    return await this.radAcctRepository.find({
-      where: {
-        acctstoptime: IsNull(),
-      },
-    });
+    const limit = 100;
+
+    let page = 1;
+    let allUsers: RadAcct[] = [];
+
+    while (true) {
+      const users = await this.radAcctRepository
+        .createQueryBuilder('radAcct')
+        .where('radAcct.acctstoptime IS NULL')
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getMany();
+
+      allUsers.push(...users);
+
+      if (users.length < limit) {
+        break;
+      }
+
+      page++;
+    }
+
+    return allUsers;
   }
 
   public async createGroup(dto: CreateGroupDto) {

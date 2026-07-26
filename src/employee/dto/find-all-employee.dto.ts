@@ -10,6 +10,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   ListOfIdsInput,
+  MatchInput,
   PaginationInput,
   SingleIdInput,
   SortInput,
@@ -65,4 +66,22 @@ export class FindAllEmployeeDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  email?: MatchInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  full_name?: MatchInput;
 }

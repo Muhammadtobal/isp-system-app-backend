@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -6,7 +7,9 @@ import {
   IsOptional,
   IsBoolean,
   IsDateString,
+  ValidateNested,
 } from 'class-validator';
+import { LocationDto } from 'src/subscription/dto/create-subscription.dto';
 
 export class CreateCustomerDto {
   @ApiProperty({ example: 'Ahmed Ali' })
@@ -48,4 +51,13 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsInt()
   user_id?: number;
+
+  @ApiProperty({
+    type: LocationDto,
+    required: false,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocationDto)
+  location?: LocationDto;
 }

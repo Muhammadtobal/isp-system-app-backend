@@ -2,12 +2,13 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { PaginationInput, SortInput } from 'src/shared/dto';
+import { MatchInput, PaginationInput, SortInput } from 'src/shared/dto';
 
 export class FindAllUserDto {
   @ApiProperty({
@@ -38,4 +39,48 @@ export class FindAllUserDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  name?: MatchInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  description?: MatchInput;
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  email?: MatchInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  phone?: MatchInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  address?: MatchInput;
 }

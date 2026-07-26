@@ -10,11 +10,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   ListOfIdsInput,
+  MatchInput,
   PaginationInput,
   SingleIdInput,
   SortInput,
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
+import { LocationDto } from './create-subscription.dto';
 
 export class FindAllSubscriptionDto {
   @ApiProperty({
@@ -55,4 +57,34 @@ export class FindAllSubscriptionDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Location coordinates',
+    example: {
+      lat: 31.9539,
+      lon: 35.9106,
+    },
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocationDto)
+  location?: LocationDto;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  radius_username?: MatchInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  subscription_code?: MatchInput;
 }

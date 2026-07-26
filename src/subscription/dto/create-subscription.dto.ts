@@ -11,7 +11,7 @@ import {
   IsNumber,
 } from 'class-validator';
 
-class LocationDto {
+export class LocationDto {
   @ApiProperty({
     example: 31.9539,
   })
