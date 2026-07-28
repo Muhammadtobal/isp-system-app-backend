@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -20,10 +22,17 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { Subscription } from './entities/subscription.entity';
+import { AlertService } from 'src/alert/alert.service';
+import { PaymentService } from 'src/payment/payment.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('subscription')
 export class SubscriptionController {
-  constructor(private readonly subscriptionService: SubscriptionService) {}
+  constructor(
+    private readonly subscriptionService: SubscriptionService,
+    private readonly alertService: AlertService,
+    private readonly paymentService: PaymentService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -66,7 +75,22 @@ export class SubscriptionController {
   @Delete('remove/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Subscription.name)
-  public remove(@Param('id') id: number) {
+  public async remove(@Param('id') id: number) {
+    const payment = await this.paymentService.findOne({ subscription_id: id });
+    if (payment) {
+      throw new HttpException(
+        ErrorMessages.SUBSCRIPTION_HAS_PAYMENTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const alert = await this.alertService.findOne({ subscription_id: id });
+    if (alert) {
+      throw new HttpException(
+        ErrorMessages.SUBSCRIPTION_HAS_NOTIFICATIONS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.subscriptionService.remove(id);
     return {
       done: true,

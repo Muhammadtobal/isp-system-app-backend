@@ -6,6 +6,8 @@ import { Subscription } from './entities/subscription.entity';
 import { RadiusModule } from 'src/radius/radius.module';
 import { PointModule } from 'src/point/point.module';
 import { PlanModule } from 'src/plan/plan.module';
+import { PaymentModule } from 'src/payment/payment.module';
+import { AlertModule } from 'src/alert/alert.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { PlanModule } from 'src/plan/plan.module';
     RadiusModule,
     PointModule,
     PlanModule,
+    PaymentModule,
+    AlertModule,
   ],
   exports: [SubscriptionService],
   controllers: [SubscriptionController],

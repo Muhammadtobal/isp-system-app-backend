@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { ProductService } from './product.service';
@@ -23,10 +25,15 @@ import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 
 import { AuthUser } from 'src/shared/helpers';
 import { Product } from './entities/product.entity';
+import { SoldService } from 'src/sold/sold.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly soldService: SoldService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -68,7 +75,14 @@ export class ProductController {
   @Delete('remove/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Product.name)
-  remove(@Param('id') id: number) {
+  public async remove(@Param('id') id: number) {
+    const product = await this.soldService.findOne({ product_id: id });
+    if (product) {
+      throw new HttpException(
+        ErrorMessages.PRODUCT_HAS_SALES,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.productService.remove(id);
     return {
       done: true,

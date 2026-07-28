@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -21,12 +23,14 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { Customer } from './entities/customer.entity';
+import { SubscriptionService } from 'src/subscription/subscription.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('customer')
 export class CustomerController {
   constructor(
     private readonly customerService: CustomerService,
-    private readonly pointService: PointService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   @Post('create')
@@ -70,7 +74,16 @@ export class CustomerController {
   @Delete('remove/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Customer.name)
-  public remove(@Param('id') id: number) {
+  public async remove(@Param('id') id: number) {
+    const subscription = await this.subscriptionService.findOne({
+      customer_id: id,
+    });
+    if (subscription) {
+      throw new HttpException(
+        ErrorMessages.CUSTOMER_HAS_SUBSCRIPTIONS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.customerService.remove(id);
     return {
       done: true,

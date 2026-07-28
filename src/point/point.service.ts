@@ -35,7 +35,52 @@ export class PointService {
     const query = this.pointRepository
       .createQueryBuilder('point')
       .where('true');
+    if (filter.location?.latitude && filter.location?.longitude) {
+      const userLat = filter.location.latitude;
+      const userLon = filter.location.longitude;
 
+      query
+        .addSelect(
+          `
+    (
+      6371 * ACOS(
+        COS(RADIANS(:userLat)) *
+        COS(
+          RADIANS(
+            CAST(
+              JSON_UNQUOTE(JSON_EXTRACT(point.location, '$.latitude'))
+              AS DECIMAL(10,6)
+            )
+          )
+        ) *
+        COS(
+          RADIANS(
+            CAST(
+              JSON_UNQUOTE(JSON_EXTRACT(point.location, '$.longitude'))
+              AS DECIMAL(10,6)
+            )
+          ) - RADIANS(:userLon)
+        ) +
+        SIN(RADIANS(:userLat)) *
+        SIN(
+          RADIANS(
+            CAST(
+              JSON_UNQUOTE(JSON_EXTRACT(point.location, '$.latitude'))
+              AS DECIMAL(10,6)
+            )
+          )
+        )
+      )
+    )
+    `,
+          'distance',
+        )
+        .setParameters({
+          userLat,
+          userLon,
+        })
+        .addOrderBy('distance', 'ASC');
+    }
     generateQuerySorts<Point>(query, filter, Point, 'point');
     generateQueryConditions<Point>(query, filter, 'point');
 

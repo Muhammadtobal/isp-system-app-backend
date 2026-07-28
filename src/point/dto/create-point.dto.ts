@@ -5,8 +5,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { LocationDto } from 'src/subscription/dto/create-subscription.dto';
+import { Type } from 'class-transformer';
 
 export class CreatePointDto {
   @ApiProperty({
@@ -29,11 +32,6 @@ export class CreatePointDto {
   @IsNotEmpty()
   @IsInt()
   max_subscription: number;
-
-  @ApiProperty({ example: 'Dubai - UAE' })
-  @IsNotEmpty()
-  @IsString()
-  location: string;
 
   @ApiPropertyOptional({
     example: 'Some notes',
@@ -59,4 +57,13 @@ export class CreatePointDto {
   @IsOptional()
   @IsInt()
   user_id?: number;
+
+  @ApiProperty({
+    type: LocationDto,
+    required: false,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocationDto)
+  location?: LocationDto;
 }

@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { PointService } from './point.service';
@@ -22,10 +24,15 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { Point } from './entities/point.entity';
+import { SubscriptionService } from 'src/subscription/subscription.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('point')
 export class PointController {
-  constructor(private readonly pointService: PointService) {}
+  constructor(
+    private readonly pointService: PointService,
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -68,7 +75,16 @@ export class PointController {
   @Delete('remove/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Point.name)
-  public remove(@Param('id') id: number) {
+  public async remove(@Param('id') id: number) {
+    const subscription = await this.subscriptionService.findOne({
+      point_id: id,
+    });
+    if (subscription) {
+      throw new HttpException(
+        ErrorMessages.POINT_HAS_SUBSCRIPTIONS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.pointService.remove(id);
     return {
       done: true,

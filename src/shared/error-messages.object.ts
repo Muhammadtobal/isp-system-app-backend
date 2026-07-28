@@ -15,4 +15,19 @@ export const ErrorMessages = {
 
   MAX_SUBSCRIPTION_REACHED:
     'لا يمكن إضافة اشتراك جديد، تم الوصول إلى الحد الأقصى',
+
+  CUSTOMER_HAS_SUBSCRIPTIONS: 'لا يمكن حذف الزبون، لديه اشتراكات مرتبطة به',
+
+  SUBSCRIPTION_HAS_NOTIFICATIONS:
+    'لا يمكن حذف الاشتراك، لديه تنبيهات مرتبطة به',
+
+  SUBSCRIPTION_HAS_PAYMENTS: 'لا يمكن حذف الاشتراك، لديه مدفوعات مرتبطة به',
+
+  EXPENSE_TYPE_HAS_EXPENSES: 'لا يمكن حذف نوع المصروف، لوجود مصاريف مرتبطة به',
+
+  POINT_HAS_SUBSCRIPTIONS: 'لا يمكن حذف العلبة, لوجود مشتركين مرتبطين بها',
+
+  PLAN_HAS_SUBSCRIPTIONS: 'لا يمكن حذف الباقة، لوجود اشتراكات مرتبطة بها',
+
+  PRODUCT_HAS_SALES: 'لا يمكن حذف المنتج، لوجود مبيعات مرتبطة به',
 };

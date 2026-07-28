@@ -33,11 +33,14 @@ export class Point extends BaseEntity {
   @Column({ type: 'int', default: 0 })
   count_subscription: number;
 
-  @Column({ type: 'text' })
-  location: string;
-
   @Column('bigint', { nullable: true })
   user_id?: number;
+
+  @Column('simple-json', { nullable: true })
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
 
   @ManyToOne(() => User, (user) => user.expenses)
   @JoinColumn({ name: 'user_id' })

@@ -16,6 +16,7 @@ import {
   SortInput,
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
+import { LocationDto } from 'src/subscription/dto/create-subscription.dto';
 
 export class FindAllPointDto {
   @ApiProperty({
@@ -84,4 +85,16 @@ export class FindAllPointDto {
   @IsObject()
   @Type(() => MatchInput)
   notes?: MatchInput;
+
+  @ApiPropertyOptional({
+    description: 'Location coordinates',
+    example: {
+      lat: 31.9539,
+      lon: 35.9106,
+    },
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocationDto)
+  location?: LocationDto;
 }

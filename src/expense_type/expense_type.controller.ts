@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { ExpenseTypeService } from './expense_type.service';
@@ -20,10 +22,15 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 import { AuthUser } from 'src/shared/helpers';
+import { ExpenseService } from 'src/expense/expense.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('expense-type')
 export class ExpenseTypeController {
-  constructor(private readonly expenseTypeService: ExpenseTypeService) {}
+  constructor(
+    private readonly expenseTypeService: ExpenseTypeService,
+    private readonly expenseService: ExpenseService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -63,7 +70,14 @@ export class ExpenseTypeController {
 
   @Delete('remove/:id')
   @UseGuards(JwtAuthSharedGuard)
-  remove(@Param('id') id: number) {
+  public async remove(@Param('id') id: number) {
+    const expense = await this.expenseService.findOne({ expense_type_id: id });
+    if (expense) {
+      throw new HttpException(
+        ErrorMessages.EXPENSE_TYPE_HAS_EXPENSES,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.expenseTypeService.remove(id);
     return {
       done: true,

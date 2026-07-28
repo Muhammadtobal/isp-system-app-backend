@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
@@ -20,10 +22,15 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { Plan } from './entities/plan.entity';
+import { SubscriptionService } from 'src/subscription/subscription.service';
+import { ErrorMessages } from 'src/shared/error-messages.object';
 
 @Controller('plan')
 export class PlanController {
-  constructor(private readonly planService: PlanService) {}
+  constructor(
+    private readonly planService: PlanService,
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -63,7 +70,16 @@ export class PlanController {
   @Delete('remove/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.DELETE + Plan.name)
-  public remove(@Param('id') id: number) {
+  public async remove(@Param('id') id: number) {
+    const subscription = await this.subscriptionService.findOne({
+      plan_id: id,
+    });
+    if (subscription) {
+      throw new HttpException(
+        ErrorMessages.PLAN_HAS_SUBSCRIPTIONS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.planService.remove(id);
     return {
       done: true,
