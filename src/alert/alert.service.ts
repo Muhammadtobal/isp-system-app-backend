@@ -23,6 +23,7 @@ import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
+import { ConstantService } from 'src/constant/constant.service';
 
 @Injectable()
 export class AlertService {
@@ -30,9 +31,15 @@ export class AlertService {
     @InjectRepository(Alert)
     private readonly alertRepository: Repository<Alert>,
     private readonly subscriptionService: SubscriptionService,
+    private readonly constantService: ConstantService,
   ) {}
 
   public async create(createAlertDto: CreateAlertDto) {
+    const constant = await this.constantService.findOne({
+      key: 'ALERT_INTERVAL_DAYS',
+    });
+
+    const intervalDays = Number(constant?.value?.days ?? 30);
     const queryRunner =
       this.alertRepository.manager.connection.createQueryRunner();
 
@@ -69,13 +76,12 @@ export class AlertService {
 
         .andWhere(
           `
-    (
-      last_payment.last_payment_date IS NULL
-      OR last_payment.last_payment_date < DATE_SUB(NOW(), INTERVAL 30 DAY)
-    )
-  `,
+(
+  last_payment.last_payment_date IS NULL
+  OR last_payment.last_payment_date < DATE_SUB(NOW(), INTERVAL ${intervalDays} DAY)
+)
+`,
         )
-
         .getRawMany();
 
       if (!lateSubscriptions.length) {

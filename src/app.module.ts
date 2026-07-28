@@ -23,6 +23,7 @@ import { ProductModule } from './product/product.module';
 import { SoldModule } from './sold/sold.module';
 import { DomainModule } from './domain/domain.module';
 import { RadiusModule } from './radius/radius.module';
+import { ConstantModule } from './constant/constant.module';
 
 console.log({
   host: process.env.DB_HOST,
@@ -71,8 +72,10 @@ console.log({
     SoldModule,
     DomainModule,
     RadiusModule,
+    ConstantModule,
   ],
   controllers: [AppController],
+  exports: [AppService],
   providers: [AppService],
 })
 export class AppModule {}

@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Permission } from './permission/entities/permission.entity';
 import { DataSource } from 'typeorm';
 import { PermissionService } from './permission/permission.service';
 import * as si from 'systeminformation';
+import { Constant } from './constant/entities/constant.entity';
+import { ConstantService } from './constant/constant.service';
 
 @Injectable()
 export class AppService {
@@ -18,6 +20,7 @@ export class AppService {
     try {
     } finally {
       await queryRunner.release();
+
       await this.permissionService.syncPermissions();
       await this.setGlobalPermissions();
     }
