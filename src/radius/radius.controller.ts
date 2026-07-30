@@ -17,7 +17,7 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { AssignGroupDto } from './dto/assign-group.dto';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FindAllUserDto } from './dto/find-all-user.dto';
+import { FindAllUserRadiusDto } from './dto/find-all-user.dto';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 import { AuthUser } from 'src/shared/helpers';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -74,7 +74,7 @@ export class RadiusController {
 
   @Post('get-all-user-network')
   @UseGuards(JwtAuthSharedGuard)
-  findAllUserNetwork(@Body() filter: FindAllUserDto) {
+  findAllUserNetwork(@Body() filter: FindAllUserRadiusDto) {
     return this.radiusService.findAllUserNetwork(filter);
   }
 
@@ -86,7 +86,7 @@ export class RadiusController {
 
   @Post('get-all-group-network')
   @UseGuards(JwtAuthSharedGuard)
-  findAllGroupNetwork(@Body() filter: FindAllUserDto) {
+  findAllGroupNetwork(@Body() filter: FindAllUserRadiusDto) {
     return this.radiusService.findAllGroupNetwork(filter);
   }
 

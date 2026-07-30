@@ -34,7 +34,7 @@ import {
   generateQueryConditions,
   generateQuerySorts,
 } from 'src/shared/helpers';
-import { FindAllUserDto } from './dto/find-all-user.dto';
+import { FindAllUserRadiusDto } from './dto/find-all-user.dto';
 import { NetworkRadius } from './entities/network-radius.entity';
 import {
   CreateGroupNetworkRadiusDto,
@@ -275,7 +275,7 @@ export class RadiusService {
     };
   }
 
-  public async findAll(filter: FindAllUserDto) {
+  public async findAll(filter: FindAllUserRadiusDto) {
     const query = this.radCheckRepository
       .createQueryBuilder('radcheck')
       .where('true');
@@ -678,7 +678,7 @@ export class RadiusService {
     return await this.groupNetworkRadiusRepo.delete({ groupname });
   }
 
-  public async findAllUserNetwork(filter: FindAllUserDto) {
+  public async findAllUserNetwork(filter: FindAllUserRadiusDto) {
     const query = this.networkRadiusRepo
       .createQueryBuilder('network_radius')
       .leftJoinAndSelect('network_radius.network', 'network')
@@ -754,7 +754,7 @@ export class RadiusService {
     return response;
   }
 
-  public async findAllGroupNetwork(filter: FindAllUserDto) {
+  public async findAllGroupNetwork(filter: FindAllUserRadiusDto) {
     const query = this.groupNetworkRadiusRepo
       .createQueryBuilder('group_network_radius')
       .leftJoinAndSelect('group_network_radius.network', 'network')

@@ -18,7 +18,7 @@ import {
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
 
-export class FindAllUserDto {
+export class FindAllUserRadiusDto {
   @ApiProperty({
     description: 'Pagination object',
     example: {
