@@ -34,9 +34,6 @@ export class Subscription extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   radius_username: string;
 
-  @Column({ type: 'boolean', default: true })
-  status: boolean;
-
   @Column('simple-json', { nullable: true })
   location?: {
     latitude: number;

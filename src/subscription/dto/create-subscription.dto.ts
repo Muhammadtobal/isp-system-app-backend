@@ -47,14 +47,6 @@ export class CreateSubscriptionDto {
   point_id: number;
 
   @ApiProperty({
-    example: true,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  status?: boolean;
-
-  @ApiProperty({
     example: 1,
     required: false,
   })
