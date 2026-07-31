@@ -6,15 +6,24 @@ import {
   IsOptional,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  getSchemaPath,
+} from '@nestjs/swagger';
 
 import {
   ListOfIdsInput,
+  MaxNumberInput,
+  MinNumberInput,
   PaginationInput,
+  RangeNumberInput,
   SingleIdInput,
+  SingleNumberInput,
   SortInput,
 } from 'src/shared/dto';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
+import { IsSingleNumberOrRange } from 'src/shared/decorators/is-single-number-or-range.decorator';
 
 export class FindAllPaymentDto {
   @ApiProperty({
@@ -55,4 +64,40 @@ export class FindAllPaymentDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Filter by price (single number or range or min/max)',
+    oneOf: [
+      { $ref: getSchemaPath(SingleNumberInput) },
+      { $ref: getSchemaPath(RangeNumberInput) },
+      { $ref: getSchemaPath(MinNumberInput) },
+      { $ref: getSchemaPath(MaxNumberInput) },
+    ],
+    example: {
+      single: {
+        summary: 'Single price',
+        value: { value: 100 },
+      },
+      range: {
+        summary: 'Range',
+        value: { min: 100, max: 500 },
+      },
+      min: {
+        summary: 'Min only',
+        value: { min: 100 },
+      },
+      max: {
+        summary: 'Max only',
+        value: { max: 500 },
+      },
+    },
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleNumberOrRange()
+  amount?:
+    | SingleNumberInput
+    | RangeNumberInput
+    | MaxNumberInput
+    | MinNumberInput;
 }
