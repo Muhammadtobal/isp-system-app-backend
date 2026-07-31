@@ -51,6 +51,15 @@ export class FindAllUserRadiusDto {
   @Type(() => MatchInput)
   username?: string;
 
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  groupname?: string;
+
   @ApiPropertyOptional({
     description: 'Active status',
     example: true,
