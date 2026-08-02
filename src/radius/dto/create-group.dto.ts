@@ -15,7 +15,7 @@ export class CreateGroupDto {
     example: 'HOME-20M',
   })
   @IsString()
-  name: string;
+  groupname: string;
 
   @ApiProperty({
     type: [RadiusAttributeDto],

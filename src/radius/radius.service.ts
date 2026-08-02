@@ -187,7 +187,7 @@ export class RadiusService {
   public async createGroup(dto: CreateGroupDto) {
     const groupExist = await this.groupCheckRepo.findOne({
       where: {
-        groupname: dto.name,
+        groupname: dto.groupname,
       },
     });
     if (groupExist) {
@@ -195,7 +195,7 @@ export class RadiusService {
     }
     const checks = await this.groupCheckRepo.save(
       dto.checks.map((item) => ({
-        groupname: dto.name,
+        groupname: dto.groupname,
         attribute: item.attribute,
         op: item.op,
         value: item.value,
@@ -204,7 +204,7 @@ export class RadiusService {
 
     const replies = await this.groupReplyRepo.save(
       dto.replies.map((item) => ({
-        groupname: dto.name,
+        groupname: dto.groupname,
         attribute: item.attribute,
         op: item.op,
         value: item.value,
@@ -212,11 +212,11 @@ export class RadiusService {
     );
     await this.createGroupNetworkRadius({
       network_id: dto.network_id,
-      groupname: dto.name,
+      groupname: dto.groupname,
     });
     return {
       data: {
-        groupname: dto.name,
+        groupname: dto.groupname,
         checks,
         replies,
       },
