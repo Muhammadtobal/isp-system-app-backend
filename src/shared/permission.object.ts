@@ -83,6 +83,51 @@ const PermissionsStore = {
   UPDATE_CONSTANT: 'updateConstant',
   DELETE_CONSTANT: 'deleteConstant',
   CREATE_CONSTANT: 'createConstant',
+
+  GET_NAS_NETWORK_RADIUS: 'getNasNetworkRadius',
+  UPDATE_NAS_NETWORK_RADIUS: 'updateNasNetworkRadius',
+  DELETE_NAS_NETWORK_RADIUS: 'deleteNasNetworkRadius',
+  CREATE_NAS_NETWORK_RADIUS: 'createNasNetworkRadius',
+
+  GET_RAD_CHECK: 'getRadCheck',
+  UPDATE_RAD_CHECK: 'updateRadCheck',
+  DELETE_RAD_CHECK: 'deleteRadCheck',
+  CREATE_RAD_CHECK: 'createRadCheck',
+
+  GET_GROUP_NETWORK_RADIUS: 'getGroupNetworkRadius',
+  UPDATE_GROUP_NETWORK_RADIUS: 'updateGroupNetworkRadius',
+  DELETE_GROUP_NETWORK_RADIUS: 'deleteGroupNetworkRadius',
+  CREATE_GROUP_NETWORK_RADIUS: 'createGroupNetworkRadius',
+
+  GET_RAD_ACCT: 'getRadAcct',
+  UPDATE_RAD_ACCT: 'updateRadAcct',
+  DELETE_RAD_ACCT: 'deleteRadAcct',
+  CREATE_RAD_ACCT: 'createRadAcct',
+
+  GET_RAD_GROUP_CHECK: 'getRadGroupCheck',
+  UPDATE_RAD_GROUP_CHECK: 'updateRadGroupCheck',
+  DELETE_RAD_GROUP_CHECK: 'deleteRadGroupCheck',
+  CREATE_RAD_GROUP_CHECK: 'createRadGroupCheck',
+
+  GET_RAD_GROUP_REPLY: 'getRadGroupReply',
+  UPDATE_RAD_GROUP_REPLY: 'updateRadGroupReply',
+  DELETE_RAD_GROUP_REPLY: 'deleteRadGroupReply',
+  CREATE_RAD_GROUP_REPLY: 'createRadGroupReply',
+
+  GET_RAD_POST_AUTH: 'getRadPostAuth',
+  UPDATE_RAD_POST_AUTH: 'updateRadPostAuth',
+  DELETE_RAD_POST_AUTH: 'deleteRadPostAuth',
+  CREATE_RAD_POST_AUTH: 'createRadPostAuth',
+
+  GET_RAD_REPLY: 'getRadReply',
+  UPDATE_RAD_REPLY: 'updateRadReply',
+  DELETE_RAD_REPLY: 'deleteRadReply',
+  CREATE_RAD_REPLY: 'createRadReply',
+
+  GET_RAD_USER_GROUP: 'getRadUserGroup',
+  UPDATE_RAD_USER_GROUP: 'updateRadUserGroup',
+  DELETE_RAD_USER_GROUP: 'deleteRadUserGroup',
+  CREATE_RAD_USER_GROUP: 'createRadUserGroup',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;
