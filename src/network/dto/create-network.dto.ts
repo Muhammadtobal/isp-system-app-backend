@@ -21,15 +21,6 @@ export class CreateNetworkDto {
   @IsInt()
   user_id: number;
 
-  @ApiProperty({
-    type: LocationDto,
-    required: false,
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => LocationDto)
-  location?: LocationDto;
-
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

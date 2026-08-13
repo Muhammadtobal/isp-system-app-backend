@@ -25,12 +25,6 @@ export class Network extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column('simple-json', { nullable: true })
-  location?: {
-    latitude: number;
-    longitude: number;
-  };
-
   @Column('bigint')
   user_id: number;
 
