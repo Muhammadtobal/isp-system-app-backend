@@ -48,6 +48,7 @@ export class PaymentService {
     const query = this.paymentRepository
       .createQueryBuilder('payment')
 
+      .leftJoin('payment.network', 'network')
       .leftJoin('payment.subscription', 'subscription')
       .leftJoin('subscription.plan', 'plan')
       .leftJoin('subscription.customer', 'customer')
@@ -55,11 +56,10 @@ export class PaymentService {
 
       .select([
         'payment',
-
+        'network',
         'subscription.id',
 
         'plan.name',
-        'plan.speed',
         'plan.price',
 
         'customer.name',

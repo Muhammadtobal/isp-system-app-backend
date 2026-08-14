@@ -24,6 +24,11 @@ export class CreatePaymentDto {
   @IsBoolean()
   active?: boolean;
 
+  @ApiProperty({ example: 1, required: true })
+  @IsNotEmpty()
+  @IsInt()
+  network_id: number;
+
   @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsInt()

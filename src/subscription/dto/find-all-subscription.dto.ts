@@ -53,6 +53,16 @@ export class FindAllSubscriptionDto {
   @IsSingleIdOrList()
   user_id?: SingleIdInput | ListOfIdsInput;
 
+  @ApiProperty({
+    description: 'user id (single or list)',
+    example: { id: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  network_id?: SingleIdInput | ListOfIdsInput;
+
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

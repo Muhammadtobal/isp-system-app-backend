@@ -2,11 +2,13 @@ import { Customer } from 'src/customer/entities/customer.entity';
 import { EmployeeNetwork } from 'src/employee-network/entities/employee-network.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { Point } from 'src/point/entities/point.entity';
 import { GroupNetworkRadius } from 'src/radius/entities/group-network-radius';
 import { NetworkRadius } from 'src/radius/entities/network-radius.entity';
 import { BaseEntity } from 'src/shared/base.entity';
+import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -49,6 +51,12 @@ export class Network extends BaseEntity {
     (employee_network) => employee_network.network,
   )
   employee_networks: EmployeeNetwork[];
+
+  @OneToMany(() => Payment, (payment) => payment.network)
+  payments: Payment[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.network)
+  subscriptions: Subscription[];
 
   @OneToMany(() => NetworkRadius, (network_radius) => network_radius.network)
   network_radiuses: NetworkRadius[];

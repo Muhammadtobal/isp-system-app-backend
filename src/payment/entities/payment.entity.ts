@@ -27,9 +27,16 @@ export class Payment extends BaseEntity {
   @Column('bigint', { nullable: true })
   user_id?: number;
 
-  @ManyToOne(() => User, (user) => user.expenses)
+  @Column('bigint')
+  network_id: number;
+
+  @ManyToOne(() => User, (user) => user.payments)
   @JoinColumn({ name: 'user_id' })
   user?: User;
+
+  @ManyToOne(() => Network, (user) => user.payments)
+  @JoinColumn({ name: 'network_id' })
+  network?: Network;
 
   @ManyToOne(() => Subscription, (subscription) => subscription.payments, {})
   @JoinColumn({ name: 'subscription_id' })

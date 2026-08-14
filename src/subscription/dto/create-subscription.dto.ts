@@ -46,6 +46,11 @@ export class CreateSubscriptionDto {
   @IsInt()
   point_id: number;
 
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  network_id: number;
+
   @ApiProperty({
     example: true,
     required: false,

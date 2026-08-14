@@ -25,6 +25,7 @@ import { Operation } from 'src/shared/enums/operation..enum';
 import { Customer } from './entities/customer.entity';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { FindStatisticsDto } from 'src/point/dto/statistics.dto';
 
 @Controller('customer')
 export class CustomerController {
@@ -93,7 +94,10 @@ export class CustomerController {
   @Get('customers-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Customer.name)
-  public async customersStatistics(@CurrentUser() req: AuthUser) {
+  public async customersStatistics(
+    @CurrentUser() req: AuthUser,
+    @Body() filter: FindStatisticsDto,
+  ) {
     const user = req;
     let user_id;
 
@@ -111,6 +115,7 @@ export class CustomerController {
 
     while (!lastPage) {
       const result = await this.customerService.findAll({
+        ...filter,
         pagination: { page, limit },
         user_id: { value: Number(user_id) },
       });

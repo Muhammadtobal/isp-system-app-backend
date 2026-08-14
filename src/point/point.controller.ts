@@ -26,6 +26,7 @@ import { Operation } from 'src/shared/enums/operation..enum';
 import { Point } from './entities/point.entity';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { FindStatisticsDto } from './dto/statistics.dto';
 
 @Controller('point')
 export class PointController {
@@ -94,7 +95,10 @@ export class PointController {
   @Get('points-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Point.name)
-  async pointsStatistics(@CurrentUser() req: AuthUser) {
+  async pointsStatistics(
+    @CurrentUser() req: AuthUser,
+    @Body() filter: FindStatisticsDto,
+  ) {
     const user = req;
     let user_id;
     if (user.role !== 'admin') {
@@ -110,6 +114,7 @@ export class PointController {
 
     while (!lastPage) {
       const result = await this.pointService.findAll({
+        ...filter,
         pagination: { page, limit },
         user_id: { value: Number(user_id) },
       });

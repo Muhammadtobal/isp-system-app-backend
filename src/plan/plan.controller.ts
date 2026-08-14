@@ -24,6 +24,7 @@ import { Operation } from 'src/shared/enums/operation..enum';
 import { Plan } from './entities/plan.entity';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { FindStatisticsDto } from 'src/point/dto/statistics.dto';
 
 @Controller('plan')
 export class PlanController {
@@ -89,7 +90,10 @@ export class PlanController {
   @Get('plans-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Plan.name)
-  public async plansStatistics(@CurrentUser() req: AuthUser) {
+  public async plansStatistics(
+    @CurrentUser() req: AuthUser,
+    @Body() filter: FindStatisticsDto,
+  ) {
     const user = req;
 
     let user_id;
@@ -107,6 +111,7 @@ export class PlanController {
 
     while (!lastPage) {
       const result = await this.planService.findAll({
+        ...filter,
         pagination: { page, limit },
         user_id: { value: Number(user_id) },
       });

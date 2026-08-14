@@ -43,6 +43,9 @@ export class Subscription extends BaseEntity {
   @Column('bigint', { nullable: true })
   user_id?: number;
 
+  @Column('bigint')
+  network_id: number;
+
   @Column({ unique: true })
   subscription_code: string;
 
@@ -53,6 +56,10 @@ export class Subscription extends BaseEntity {
   @ManyToOne(() => Plan, (plan) => plan.subscriptions)
   @JoinColumn({ name: 'plan_id' })
   plan?: Plan;
+
+  @ManyToOne(() => Network, (network) => network.subscriptions)
+  @JoinColumn({ name: 'network_id' })
+  network?: Network;
 
   @ManyToOne(() => Customer, (customer) => customer.subscriptions, {})
   @JoinColumn({ name: 'customer_id' })

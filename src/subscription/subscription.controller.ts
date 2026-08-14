@@ -25,6 +25,7 @@ import { Subscription } from './entities/subscription.entity';
 import { AlertService } from 'src/alert/alert.service';
 import { PaymentService } from 'src/payment/payment.service';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { FindStatisticsDto } from 'src/point/dto/statistics.dto';
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -100,7 +101,10 @@ export class SubscriptionController {
   @Get('subscriptions-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Subscription.name)
-  async subscriptionsStatistics(@CurrentUser() req: AuthUser) {
+  async subscriptionsStatistics(
+    @CurrentUser() req: AuthUser,
+    @Body() filter: FindStatisticsDto,
+  ) {
     const user = req;
     let user_id;
 
@@ -118,6 +122,7 @@ export class SubscriptionController {
 
     while (!lastPage) {
       const result = await this.subscriptionService.findAll({
+        ...filter,
         pagination: { page, limit },
         user_id: { value: Number(user_id) },
       });

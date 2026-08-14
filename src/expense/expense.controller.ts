@@ -24,6 +24,7 @@ import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 import { FindTotalExpenseDto } from './dto/find-total-expense.dto';
+import { FindStatisticsDto } from 'src/point/dto/statistics.dto';
 
 @Controller('expense')
 export class ExpenseController {
@@ -123,7 +124,10 @@ export class ExpenseController {
   @Get('expenses-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Expense.name)
-  async expensesStatistics(@CurrentUser() req: AuthUser) {
+  async expensesStatistics(
+    @CurrentUser() req: AuthUser,
+    @Body() filter: FindStatisticsDto,
+  ) {
     const user = req;
     let user_id;
 
@@ -141,6 +145,7 @@ export class ExpenseController {
 
     while (!lastPage) {
       const result = await this.expenseService.findAll({
+        ...filter,
         pagination: { page, limit },
         user_id: { value: user_id },
       });

@@ -88,11 +88,12 @@ export class SubscriptionService {
     const query = this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoin('subscription.plan', 'plan')
+      .leftJoin('subscription.network', 'network')
       .leftJoin('subscription.point', 'point')
       .leftJoin('subscription.customer', 'customer')
       .select([
         'subscription',
-
+        'network',
         'plan.name',
         'plan.price',
 
