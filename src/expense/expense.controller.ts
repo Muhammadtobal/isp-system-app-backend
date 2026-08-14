@@ -121,7 +121,7 @@ export class ExpenseController {
     };
   }
 
-  @Get('expenses-statistics')
+  @Post('expenses-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Expense.name)
   async expensesStatistics(

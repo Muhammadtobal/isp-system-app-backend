@@ -87,7 +87,7 @@ export class PlanController {
     };
   }
 
-  @Get('plans-statistics')
+  @Post('plans-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Plan.name)
   public async plansStatistics(

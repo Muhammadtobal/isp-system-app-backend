@@ -91,7 +91,7 @@ export class CustomerController {
     };
   }
 
-  @Get('customers-statistics')
+  @Post('customers-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Customer.name)
   public async customersStatistics(

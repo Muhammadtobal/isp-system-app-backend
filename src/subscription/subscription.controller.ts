@@ -98,7 +98,7 @@ export class SubscriptionController {
     };
   }
 
-  @Get('subscriptions-statistics')
+  @Post('subscriptions-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Subscription.name)
   async subscriptionsStatistics(

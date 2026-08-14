@@ -92,7 +92,7 @@ export class PointController {
     };
   }
 
-  @Get('points-statistics')
+  @Post('points-statistics')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Point.name)
   async pointsStatistics(
