@@ -49,7 +49,7 @@ export class FindAllProductDto {
 
   @ApiProperty({
     description: 'user id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()

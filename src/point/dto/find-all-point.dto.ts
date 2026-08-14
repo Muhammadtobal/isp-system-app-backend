@@ -45,7 +45,7 @@ export class FindAllPointDto {
 
   @ApiProperty({
     description: 'Network id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()
@@ -55,7 +55,7 @@ export class FindAllPointDto {
 
   @ApiProperty({
     description: 'Network id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()

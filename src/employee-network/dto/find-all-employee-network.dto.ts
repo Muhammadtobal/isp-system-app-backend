@@ -42,7 +42,7 @@ export class FindAllEmployeeNetworkDto {
 
   @ApiProperty({
     description: 'Network id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()
@@ -52,7 +52,7 @@ export class FindAllEmployeeNetworkDto {
 
   @ApiProperty({
     description: 'Network id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()
@@ -62,7 +62,7 @@ export class FindAllEmployeeNetworkDto {
 
   @ApiProperty({
     description: 'user id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()

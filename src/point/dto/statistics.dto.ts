@@ -21,7 +21,7 @@ import { LocationDto } from 'src/subscription/dto/create-subscription.dto';
 export class FindStatisticsDto {
   @ApiProperty({
     description: 'Network id (single or list)',
-    example: { id: 1 },
+    example: { value: 1 },
     required: false,
   })
   @IsOptional()
