@@ -18,7 +18,7 @@ import { Alert } from 'src/alert/entities/alert.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Sold } from 'src/sold/entities/sold.entity';
-
+import { RadiusService } from 'src/radius/radius.service';
 import { Role } from 'src/shared/enums/role.enum';
 import { ServiceType } from 'src/shared/enums/service_type.enum';
 
@@ -29,7 +29,7 @@ async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule);
 
   const dataSource = app.get(DataSource);
-
+  const radiusService = app.get(RadiusService);
   const userRepository = dataSource.getRepository(User);
   const networkRepository = dataSource.getRepository(Network);
   const employeeRepository = dataSource.getRepository(Employee);
@@ -424,6 +424,10 @@ async function seed() {
     // 9. SUBSCRIPTIONS
     // =========================================================
 
+    // =========================================================
+    // 9. SUBSCRIPTIONS
+    // =========================================================
+
     console.log('\n📋 إنشاء الاشتراكات...');
 
     const subscriptions: Subscription[] = [];
@@ -447,6 +451,45 @@ async function seed() {
       });
 
       if (!subscription) {
+        // ==========================================
+        // إنشاء مستخدم PPPoE في RADIUS
+        // ==========================================
+
+        const radiusUsers = await radiusService.createRadiusUsers(
+          {
+            generateUsername: true,
+            count: 1,
+
+            network_id: network.id,
+
+            checks: [],
+
+            replies: [
+              {
+                attribute: 'Framed-Protocol',
+                op: ':=',
+                value: 'PPP',
+              },
+              {
+                attribute: 'Service-Type',
+                op: ':=',
+                value: 'Framed-User',
+              },
+            ],
+          },
+          true,
+        );
+
+        const radiusUser = radiusUsers[0];
+
+        if (!radiusUser) {
+          throw new Error(`Failed to create PPPoE user for subscription ${i}`);
+        }
+
+        // ==========================================
+        // إنشاء Subscription
+        // ==========================================
+
         subscription = subscriptionRepository.create({
           customer_id: customer.id,
 
@@ -456,7 +499,7 @@ async function seed() {
 
           network_id: network.id,
 
-          radius_username: `مستخدم_تجريبي_${i}`,
+          radius_username: radiusUser.username,
 
           user_id: owner.id,
 
@@ -469,6 +512,10 @@ async function seed() {
         });
 
         subscription = await subscriptionRepository.save(subscription);
+
+        console.log(
+          `   ↳ PPPoE: ${radiusUser.username} → Subscription ${subscription.id}`,
+        );
       }
 
       subscriptions.push(subscription);
