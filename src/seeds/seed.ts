@@ -95,32 +95,39 @@ async function seed() {
     // =========================================================
     // 2. NETWORKS
     // =========================================================
+    // =========================================================
+    // 2. NETWORKS
+    // =========================================================
 
     console.log('\n🌐 إنشاء الشبكات...');
 
     const networks: Network[] = [];
 
-    for (let i = 1; i <= COUNT; i++) {
-      const owner = users[(i - 1) % users.length];
+    const NETWORKS_PER_USER = 3;
 
-      let network = await networkRepository.findOne({
-        where: {
-          name: `شبكة تجريبية ${i}`,
-          user_id: owner.id,
-        },
-      });
+    for (const user of users) {
+      for (let i = 1; i <= NETWORKS_PER_USER; i++) {
+        const networkNumber = networks.length + 1;
 
-      if (!network) {
-        network = networkRepository.create({
-          name: `شبكة تجريبية ${i}`,
-          user_id: owner.id,
-          active: true,
+        let network = await networkRepository.findOne({
+          where: {
+            name: `شبكة تجريبية ${i}`,
+            user_id: user.id,
+          },
         });
 
-        network = await networkRepository.save(network);
-      }
+        if (!network) {
+          network = networkRepository.create({
+            name: `شبكة تجريبية ${i}`,
+            user_id: user.id,
+            active: true,
+          });
 
-      networks.push(network);
+          network = await networkRepository.save(network);
+        }
+
+        networks.push(network);
+      }
     }
 
     console.log(`✅ Networks: ${networks.length}`);
@@ -171,7 +178,7 @@ async function seed() {
 
     for (let i = 1; i <= COUNT; i++) {
       const employee = employees[i - 1];
-      const network = networks[i - 1];
+      const network = networks[(i - 1) % networks.length];
       const owner = users[(i - 1) % users.length];
 
       if (!employee) {
@@ -179,7 +186,9 @@ async function seed() {
       }
 
       if (!network) {
-        throw new Error(`Network ${i} is undefined`);
+        throw new Error(
+          `Network ${((i - 1) % networks.length) + 1} is undefined`,
+        );
       }
 
       if (!owner) {
