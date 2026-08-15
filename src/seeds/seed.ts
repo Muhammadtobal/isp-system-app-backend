@@ -57,7 +57,7 @@ async function seed() {
     // 1. USERS
     // =========================================================
 
-    console.log('\n👤 Creating Users...');
+    console.log('\n👤 إنشاء المستخدمين...');
 
     const users: User[] = [];
 
@@ -74,12 +74,12 @@ async function seed() {
 
       if (!user) {
         user = userRepository.create({
-          name: `Demo User ${i}`,
-          description: `Demo user number ${i}`,
+          name: `مستخدم تجريبي ${i}`,
+          description: `رقم المستخدم التجريبي ${i}`,
           email,
           password: passwordHash,
           phone: `+966500000${String(i).padStart(3, '0')}`,
-          address: `Riyadh, Saudi Arabia - Street ${i}`,
+          address: `الرياض، المملكة العربية السعودية - الشارع ${i}`,
           role: i === 1 ? Role.ADMIN : Role.USER,
           active: true,
         });
@@ -90,13 +90,13 @@ async function seed() {
       users.push(user);
     }
 
-    console.log(`✅ Users: ${users.length}`);
+    console.log(`✅ المستخدمون: ${users.length}`);
 
     // =========================================================
     // 2. NETWORKS
     // =========================================================
 
-    console.log('\n🌐 Creating Networks...');
+    console.log('\n🌐 إنشاء الشبكات...');
 
     const networks: Network[] = [];
 
@@ -105,14 +105,14 @@ async function seed() {
 
       let network = await networkRepository.findOne({
         where: {
-          name: `Demo Network ${i}`,
+          name: `شبكة تجريبية ${i}`,
           user_id: owner.id,
         },
       });
 
       if (!network) {
         network = networkRepository.create({
-          name: `Demo Network ${i}`,
+          name: `شبكة تجريبية ${i}`,
           user_id: owner.id,
           active: true,
         });
@@ -129,7 +129,7 @@ async function seed() {
     // 3. EMPLOYEES
     // =========================================================
 
-    console.log('\n👨‍💼 Creating Employees...');
+    console.log('\n👨‍💼 إنشاء الموظفين...');
 
     const employees: Employee[] = [];
 
@@ -147,7 +147,7 @@ async function seed() {
       if (!employee) {
         employee = employeeRepository.create({
           email,
-          full_name: `Demo Employee ${i}`,
+          full_name: `موظف تجريبي ${i}`,
           password: passwordHash,
           user_id: owner.id,
           active: true,
@@ -159,13 +159,13 @@ async function seed() {
       employees.push(employee);
     }
 
-    console.log(`✅ Employees: ${employees.length}`);
+    console.log(`✅ الموظفون: ${employees.length}`);
 
     // =========================================================
     // 4. EMPLOYEE NETWORK
     // =========================================================
 
-    console.log('\n🔗 Creating Employee Networks...');
+    console.log('\n🔗 إنشاء شبكات الموظفين...');
 
     const employeeNetworks: EmployeeNetwork[] = [];
 
@@ -212,31 +212,31 @@ async function seed() {
     // 5. EXPENSE TYPES
     // =========================================================
 
-    console.log('\n💰 Creating Expense Types...');
+    console.log('\n💰 إنشاء أنواع المصاريف...');
 
     const expenseTypes: ExpenseType[] = [];
 
     const expenseNames = [
-      'Internet',
-      'Maintenance',
-      'Electricity',
-      'Rent',
-      'Transportation',
-      'Equipment',
-      'Software',
-      'Server',
-      'Marketing',
-      'Office',
-      'Fuel',
-      'Installation',
-      'Repair',
-      'Security',
-      'Support',
-      'Cleaning',
-      'Telephone',
-      'Hosting',
-      'Hardware',
-      'Other',
+      'الإنترنت',
+      'الصيانة',
+      'الكهرباء',
+      'الإيجار',
+      'المواصلات',
+      'المعدات',
+      'البرمجيات',
+      'الخادم',
+      'التسويق',
+      'المكتب',
+      'الوقود',
+      'التركيب',
+      'الإصلاح',
+      'الأمان',
+      'الدعم',
+      'التنظيف',
+      'الهاتف',
+      'الاستضافة',
+      'الأجهزة',
+      'أخرى',
     ];
 
     for (let i = 1; i <= COUNT; i++) {
@@ -270,7 +270,7 @@ async function seed() {
     // 6. CUSTOMERS
     // =========================================================
 
-    console.log('\n👥 Creating Customers...');
+    console.log('\n👥 إنشاء العملاء...');
 
     const customers: Customer[] = [];
 
@@ -288,7 +288,7 @@ async function seed() {
 
       if (!customer) {
         customer = customerRepository.create({
-          name: `Customer ${i}`,
+          name: `عميل ${i}`,
           phone,
           network_id: network.id,
           user_id: owner.id,
@@ -307,15 +307,29 @@ async function seed() {
     // 7. PLANS
     // =========================================================
 
-    console.log('\n📡 Creating Plans...');
+    console.log('\n📡 إنشاء الباقات...');
 
     const plans: Plan[] = [];
+
+    const serviceTypes = [
+      ServiceType.PPPOE,
+      ServiceType.HOTSPOT,
+      ServiceType.GROUP,
+    ];
 
     for (let i = 1; i <= COUNT; i++) {
       const owner = users[(i - 1) % users.length];
       const network = networks[(i - 1) % networks.length];
 
-      const name = `Internet Plan ${i}`;
+      const serviceType = serviceTypes[(i - 1) % serviceTypes.length];
+
+      const serviceTypeNames = {
+        [ServiceType.PPPOE]: 'بروتوكول PPPoE',
+        [ServiceType.HOTSPOT]: 'نقطة اتصال',
+        [ServiceType.GROUP]: 'مجموعة',
+      };
+
+      const name = `باقة ${serviceTypeNames[serviceType]} ${i}`;
 
       let plan = await planRepository.findOne({
         where: {
@@ -331,18 +345,10 @@ async function seed() {
           network_id: network.id,
           user_id: owner.id,
 
-          service_type: ServiceType.PPPOE,
+          service_type: serviceType,
 
           download_speed: 20 + i * 5,
           upload_speed: 5 + i,
-
-          quota_mb: 50000 + i * 10000,
-
-          session_timeout: 0,
-
-          validity_days: 30,
-
-          simultaneous_use: i % 3 === 0 ? 3 : i % 2 === 0 ? 2 : 1,
 
           active: true,
         });
@@ -353,13 +359,12 @@ async function seed() {
       plans.push(plan);
     }
 
-    console.log(`✅ Plans: ${plans.length}`);
-
+    console.log(`✅ الباقات: ${plans.length}`);
     // =========================================================
     // 8. POINTS
     // =========================================================
 
-    console.log('\n📍 Creating Points...');
+    console.log('\n📍 إنشاء النقاط...');
 
     const points: Point[] = [];
 
@@ -367,7 +372,7 @@ async function seed() {
       const owner = users[(i - 1) % users.length];
       const network = networks[(i - 1) % networks.length];
 
-      const name = `Network Point ${i}`;
+      const name = `العلبة ${i}`;
 
       let point = await pointRepository.findOne({
         where: {
@@ -388,7 +393,7 @@ async function seed() {
 
           count_subscription: 0,
 
-          notes: `Demo point number ${i}`,
+          notes: `رقم العلبة التجريبية ${i}`,
 
           location: {
             latitude: 24.7136 + i * 0.01,
@@ -410,7 +415,7 @@ async function seed() {
     // 9. SUBSCRIPTIONS
     // =========================================================
 
-    console.log('\n📋 Creating Subscriptions...');
+    console.log('\n📋 إنشاء الاشتراكات...');
 
     const subscriptions: Subscription[] = [];
 
@@ -442,7 +447,7 @@ async function seed() {
 
           network_id: network.id,
 
-          radius_username: `demo_user_${i}`,
+          radius_username: `مستخدم_تجريبي_${i}`,
 
           user_id: owner.id,
 
@@ -466,7 +471,7 @@ async function seed() {
     // 10. PAYMENTS
     // =========================================================
 
-    console.log('\n💳 Creating Payments...');
+    console.log('\n💳 إنشاء الدفعات...');
 
     const payments: Payment[] = [];
 
@@ -508,7 +513,7 @@ async function seed() {
     // 11. ALERTS
     // =========================================================
 
-    console.log('\n🚨 Creating Alerts...');
+    console.log('\n🚨 إنشاء التنبيهات...');
 
     const alerts: Alert[] = [];
 
@@ -544,7 +549,7 @@ async function seed() {
     // 12. EXPENSES
     // =========================================================
 
-    console.log('\n💸 Creating Expenses...');
+    console.log('\n💸 إنشاء المصاريف...');
 
     const expenses: Expense[] = [];
 
@@ -577,7 +582,7 @@ async function seed() {
 
           user_id: owner.id,
 
-          notes: `Demo expense number ${i}`,
+          notes: `رقم المصروف التجريبي ${i}`,
 
           active: true,
         });
@@ -594,31 +599,31 @@ async function seed() {
     // 13. PRODUCTS
     // =========================================================
 
-    console.log('\n📦 Creating Products...');
+    console.log('\n📦 إنشاء المنتجات...');
 
     const products: Product[] = [];
 
     const productNames = [
-      'TP-Link Router',
-      'MikroTik Router',
-      'Ubiquiti Access Point',
-      'Network Switch',
-      'Ethernet Cable',
-      'Fiber Cable',
-      'Power Adapter',
-      'Network Rack',
-      'ONT Device',
-      'ONU Device',
-      'WiFi Antenna',
-      'Fiber Connector',
-      'SFP Module',
-      'Patch Panel',
-      'UPS',
-      'Network Cabinet',
-      'Wireless Router',
-      'Modem',
-      'Access Point',
-      'Network Card',
+      'جهاز توجيه تي بي لينك',
+      'جهاز توجيه ميكروتيك',
+      'نقطة وصول يوبيكويتي',
+      'مبدّل شبكة',
+      'كابل إيثرنت',
+      'كابل ألياف ضوئية',
+      'محوّل طاقة',
+      'رف شبكات',
+      'جهاز ONT',
+      'جهاز ONU',
+      'هوائي واي فاي',
+      'موصل ألياف ضوئية',
+      'وحدة SFP',
+      'لوحة توزيع الشبكة',
+      'مزود طاقة غير منقطع',
+      'خزانة شبكات',
+      'جهاز توجيه لاسلكي',
+      'مودم',
+      'نقطة وصول',
+      'بطاقة شبكة',
     ];
 
     for (let i = 1; i <= COUNT; i++) {
@@ -656,7 +661,7 @@ async function seed() {
     // 14. SOLD
     // =========================================================
 
-    console.log('\n🛒 Creating Sales...');
+    console.log('\n🛒 إنشاء المبيعات...');
 
     const sales: Sold[] = [];
 
@@ -687,7 +692,7 @@ async function seed() {
 
           value,
 
-          unit: 'piece',
+          unit: 'قطعة',
 
           active: true,
         });
@@ -704,7 +709,7 @@ async function seed() {
     // UPDATE POINT SUBSCRIPTION COUNTS
     // =========================================================
 
-    console.log('\n🔄 Updating Point subscription counts...');
+    console.log('\n🔄 تحديث أعداد الاشتراكات للنقاط...');
 
     for (const point of points) {
       const count = await subscriptionRepository.count({
@@ -723,12 +728,12 @@ async function seed() {
     // =========================================================
 
     console.log('\n======================================');
-    console.log('🌱 DATABASE SEED COMPLETED');
+    console.log('🌱 اكتملت تهيئة قاعدة البيانات');
     console.log('======================================');
 
-    console.log(`👤 Users:              ${users.length}`);
+    console.log(`👤 المستخدمون:              ${users.length}`);
     console.log(`🌐 Networks:           ${networks.length}`);
-    console.log(`👨‍💼 Employees:         ${employees.length}`);
+    console.log(`👨‍💼 الموظفون:         ${employees.length}`);
     console.log(`🔗 Employee Networks:  ${employeeNetworks.length}`);
     console.log(`💰 Expense Types:      ${expenseTypes.length}`);
     console.log(`👥 Customers:          ${customers.length}`);
@@ -743,23 +748,23 @@ async function seed() {
 
     console.log('======================================');
 
-    console.log('\n🔐 Login credentials:');
+    console.log('\n🔐 بيانات تسجيل الدخول:');
 
-    console.log('\nAdmin:');
+    console.log('\nالمدير:');
     console.log('Email: user1@example.com');
     console.log('Password: Password@123456');
 
-    console.log('\nUsers:');
+    console.log('\nالمستخدمون:');
     console.log('Email: user2@example.com ... user3@example.com');
     console.log('Password: Password@123456');
 
-    console.log('\nEmployees:');
+    console.log('\nالموظفون:');
     console.log('Email: employee1@example.com ... employee20@example.com');
     console.log('Password: Password@123456');
 
     console.log('\n======================================');
   } catch (error) {
-    console.error('\n❌ Seed failed');
+    console.error('\n❌ فشلت تهيئة البيانات');
     console.error(error);
 
     process.exit(1);

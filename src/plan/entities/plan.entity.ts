@@ -41,18 +41,6 @@ export class Plan extends BaseEntity {
   @Column('int')
   upload_speed: number;
 
-  @Column('bigint', { nullable: true })
-  quota_mb?: number;
-
-  @Column('int', { nullable: true })
-  session_timeout?: number;
-
-  @Column('int', { nullable: true })
-  validity_days?: number;
-
-  @Column('int', { default: 1 })
-  simultaneous_use: number;
-
   @ManyToOne(() => User, (user) => user.expenses)
   @JoinColumn({ name: 'user_id' })
   user?: User;
