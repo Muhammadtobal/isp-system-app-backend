@@ -17,6 +17,7 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
+import { FindAllEmployeeNetworkDto } from './dto/find-all-employee-network.dto';
 
 @Injectable()
 export class EmployeeNetworkService {
@@ -33,10 +34,19 @@ export class EmployeeNetworkService {
     return this.employeeNetworkRepository.save(employeeNetwork);
   }
 
-  public findAll(filter: any) {
+  public findAll(filter: FindAllEmployeeNetworkDto) {
     const query = this.employeeNetworkRepository
       .createQueryBuilder('employee_network')
       .leftJoinAndSelect('employee_network.network', 'network')
+
+      .leftJoinAndSelect('employee_network.employee', 'employee')
+      .leftJoinAndSelect(
+        'employee.employee_permissions',
+        'employee_permissions',
+      )
+      .leftJoinAndSelect('employee_permissions.permission', 'permission')
+      .leftJoinAndSelect('employee.expenses', 'expenses')
+      .leftJoinAndSelect('expenses.expense_type', 'expense_type')
       .where('true');
 
     generateQuerySorts<EmployeeNetwork>(

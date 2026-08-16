@@ -326,50 +326,58 @@ async function seed() {
       ServiceType.GROUP,
     ];
 
-    for (let i = 1; i <= COUNT; i++) {
-      const owner = users[(i - 1) % users.length];
-      const network = networks[(i - 1) % networks.length];
+    const serviceTypeNames = {
+      [ServiceType.PPPOE]: 'بروتوكول PPPoE',
+      [ServiceType.HOTSPOT]: 'نقطة اتصال',
+      [ServiceType.GROUP]: 'مجموعة',
+    };
 
-      const serviceType = serviceTypes[(i - 1) % serviceTypes.length];
+    for (const network of networks) {
+      const owner = users.find((user) => user.id === network.user_id);
 
-      const serviceTypeNames = {
-        [ServiceType.PPPOE]: 'بروتوكول PPPoE',
-        [ServiceType.HOTSPOT]: 'نقطة اتصال',
-        [ServiceType.GROUP]: 'مجموعة',
-      };
-
-      const name = `باقة ${serviceTypeNames[serviceType]} ${i}`;
-
-      let plan = await planRepository.findOne({
-        where: {
-          name,
-          network_id: network.id,
-        },
-      });
-
-      if (!plan) {
-        plan = planRepository.create({
-          name,
-          price: 50 + i * 10,
-          network_id: network.id,
-          user_id: owner.id,
-
-          service_type: serviceType,
-
-          download_speed: 20 + i * 5,
-          upload_speed: 5 + i,
-
-          active: true,
-        });
-
-        plan = await planRepository.save(plan);
+      if (!owner) {
+        throw new Error(`Owner for network ${network.id} is undefined`);
       }
 
-      plans.push(plan);
+      for (let j = 0; j < serviceTypes.length; j++) {
+        const serviceType = serviceTypes[j];
+
+        const name = `باقة ${serviceTypeNames[serviceType]} - ${network.name}`;
+
+        let plan = await planRepository.findOne({
+          where: {
+            name,
+            network_id: network.id,
+          },
+        });
+
+        if (!plan) {
+          plan = planRepository.create({
+            name,
+
+            price: 50 + (j + 1) * 25,
+
+            network_id: network.id,
+
+            user_id: owner.id,
+
+            service_type: serviceType,
+
+            download_speed: 20 + (j + 1) * 10,
+
+            upload_speed: 5 + (j + 1) * 5,
+
+            active: true,
+          });
+
+          plan = await planRepository.save(plan);
+        }
+
+        plans.push(plan);
+      }
     }
 
-    console.log(`✅ الباقات: ${plans.length}`);
-    // =========================================================
+    console.log(`✅ الباقات: ${plans.length}`); // =========================================================
     // 8. POINTS
     // =========================================================
 
