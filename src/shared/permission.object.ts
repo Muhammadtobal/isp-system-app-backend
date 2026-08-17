@@ -1,4 +1,4 @@
-const PermissionsStore = {
+const PermissionISP = {
   GET_EMPLOYEE: 'getEmployee',
   UPDATE_EMPLOYEE: 'updateEmployee',
   DELETE_EMPLOYEE: 'deleteEmployee',
@@ -130,7 +130,150 @@ const PermissionsStore = {
   CREATE_RAD_USER_GROUP: 'createRadUserGroup',
 } as const;
 
-type PermissionKey = keyof typeof PermissionsStore;
-type PermissionValue = (typeof PermissionsStore)[PermissionKey];
+/**
+ * Type of the Permission keys
+ */
+type PermissionKey = keyof typeof PermissionISP;
 
-export { PermissionsStore, PermissionKey, PermissionValue };
+/**
+ * Type of the Permission values
+ */
+type PermissionValue = (typeof PermissionISP)[PermissionKey];
+
+/**
+ * Permission metadata
+ */
+type PermissionMetadata = {
+  description: string;
+  translation: string;
+  visual_for_user: boolean;
+};
+
+/**
+ * Resources that should be visible to the user.
+ *
+ * RADIUS/internal permissions are hidden from the user.
+ */
+const hiddenResources = new Set([
+  'NAS_NETWORK_RADIUS',
+  'RAD_CHECK',
+  'GROUP_NETWORK_RADIUS',
+  'RAD_ACCT',
+  'RAD_GROUP_CHECK',
+  'RAD_GROUP_REPLY',
+  'RAD_POST_AUTH',
+  'RAD_REPLY',
+  'RAD_USER_GROUP',
+]);
+
+/**
+ * Human readable resource names.
+ */
+const resourceTranslations: Record<string, string> = {
+  EMPLOYEE: 'الموظفين',
+  EMPLOYEE_PERMISSION: 'صلاحيات الموظفين',
+  PERMISSION: 'الصلاحيات',
+  EXPENSE: 'المصاريف',
+  EXPENSE_TYPE: 'أنواع المصاريف',
+  POINT: 'النقاط',
+  PLAN: 'الخطط',
+  NETWORK: 'الشبكات',
+  PAYMENT: 'الدفعات',
+  CUSTOMER: 'العملاء',
+  SUBSCRIPTION: 'الاشتراكات',
+  USER: 'المستخدمين',
+  PRODUCT: 'المنتجات',
+  SOLD: 'المبيعات',
+  ALERT: 'التنبيهات',
+  DOMAIN: 'النطاقات',
+  CONSTANT: 'الثوابت',
+
+  NAS_NETWORK_RADIUS: 'إعدادات NAS Network Radius',
+  RAD_CHECK: 'سجلات RADIUS Check',
+  GROUP_NETWORK_RADIUS: 'مجموعات Network Radius',
+  RAD_ACCT: 'سجلات RADIUS Accounting',
+  RAD_GROUP_CHECK: 'سجلات RADIUS Group Check',
+  RAD_GROUP_REPLY: 'سجلات RADIUS Group Reply',
+  RAD_POST_AUTH: 'سجلات RADIUS Post Auth',
+  RAD_REPLY: 'سجلات RADIUS Reply',
+  RAD_USER_GROUP: 'مجموعات مستخدمي RADIUS',
+};
+
+/**
+ * English resource names.
+ */
+const resourceDescriptions: Record<string, string> = {
+  EMPLOYEE: 'employees',
+  EMPLOYEE_PERMISSION: 'employee permissions',
+  PERMISSION: 'permissions',
+  EXPENSE: 'expenses',
+  EXPENSE_TYPE: 'expense types',
+  POINT: 'points',
+  PLAN: 'plans',
+  NETWORK: 'networks',
+  PAYMENT: 'payments',
+  CUSTOMER: 'customers',
+  SUBSCRIPTION: 'subscriptions',
+  USER: 'users',
+  PRODUCT: 'products',
+  SOLD: 'sales',
+  ALERT: 'alerts',
+  DOMAIN: 'domains',
+  CONSTANT: 'constants',
+
+  NAS_NETWORK_RADIUS: 'NAS network radius',
+  RAD_CHECK: 'RADIUS check records',
+  GROUP_NETWORK_RADIUS: 'group network radius',
+  RAD_ACCT: 'RADIUS accounting records',
+  RAD_GROUP_CHECK: 'RADIUS group check records',
+  RAD_GROUP_REPLY: 'RADIUS group reply records',
+  RAD_POST_AUTH: 'RADIUS post-authentication records',
+  RAD_REPLY: 'RADIUS reply records',
+  RAD_USER_GROUP: 'RADIUS user groups',
+};
+
+/**
+ * Action translations.
+ */
+const actionTranslations: Record<string, string> = {
+  GET: 'عرض',
+  UPDATE: 'تعديل',
+  DELETE: 'حذف',
+  CREATE: 'إنشاء',
+};
+
+/**
+ * Action descriptions.
+ */
+const actionDescriptions: Record<string, string> = {
+  GET: 'View',
+  UPDATE: 'Update',
+  DELETE: 'Delete',
+  CREATE: 'Create',
+};
+
+/**
+ * Generate metadata automatically for every permission.
+ */
+const PermissionMetadata = Object.fromEntries(
+  Object.keys(PermissionISP).map((key) => {
+    const [action, ...resourceParts] = key.split('_');
+
+    const resource = resourceParts.join('_');
+
+    const resourceDescription = resourceDescriptions[resource] ?? resource;
+
+    const resourceTranslation = resourceTranslations[resource] ?? resource;
+
+    return [
+      key,
+      {
+        description: `${actionDescriptions[action]} ${resourceDescription}`,
+        translation: `${actionTranslations[action]} ${resourceTranslation}`,
+        visual_for_user: !hiddenResources.has(resource),
+      },
+    ];
+  }),
+) as Record<PermissionKey, PermissionMetadata>;
+
+export { PermissionISP, PermissionMetadata, PermissionKey, PermissionValue };

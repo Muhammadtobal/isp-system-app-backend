@@ -17,7 +17,11 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
-import { PermissionsStore } from 'src/shared/permission.object';
+import {
+  PermissionISP,
+  PermissionKey,
+  PermissionMetadata,
+} from 'src/shared/permission.object';
 
 @Injectable()
 export class PermissionService {
@@ -68,21 +72,50 @@ export class PermissionService {
   public remove(id: number) {
     this.permissionRepository.delete(id);
   }
-
   public async syncPermissions() {
-    const existingPermissions = await this.permissionRepository.find({
-      select: ['name'],
-    });
+    const existingPermissions = await this.permissionRepository.find();
 
-    const existingKeys = new Set(existingPermissions.map((perm) => perm.name));
+    const existingMap = new Map(
+      existingPermissions.map((permission) => [permission.name, permission]),
+    );
 
-    const newPermissions = Object.entries(PermissionsStore)
-      .filter(([, value]) => !existingKeys.has(value as string))
-      .map(([, value]) => ({ name: value }));
+    const newPermissions: Partial<Permission>[] = [];
+    const permissionsToUpdate: Permission[] = [];
+
+    for (const key of Object.keys(PermissionISP) as PermissionKey[]) {
+      const name = PermissionISP[key];
+      const metadata = PermissionMetadata[key];
+
+      const existingPermission = existingMap.get(name);
+
+      if (!existingPermission) {
+        newPermissions.push({
+          name,
+          description: metadata.description,
+          translation: metadata.translation,
+          visual_for_user: metadata.visual_for_user,
+        });
+
+        continue;
+      }
+
+      existingPermission.description = metadata.description;
+      existingPermission.translation = metadata.translation;
+      existingPermission.visual_for_user = metadata.visual_for_user;
+
+      permissionsToUpdate.push(existingPermission);
+    }
 
     if (newPermissions.length > 0) {
-      await this.permissionRepository.insert(newPermissions as Permission[]);
-      console.log(`Added ${newPermissions.length} new permissions.`);
-    } else console.log('All permissions are already synced.');
+      await this.permissionRepository.insert(newPermissions);
+    }
+
+    if (permissionsToUpdate.length > 0) {
+      await this.permissionRepository.save(permissionsToUpdate);
+    }
+
+    console.log(
+      `Permissions synced. Added: ${newPermissions.length}, Updated: ${permissionsToUpdate.length}`,
+    );
   }
 }
