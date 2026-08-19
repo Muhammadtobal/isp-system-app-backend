@@ -93,7 +93,7 @@ export class PermissionService {
           name,
           description: metadata.description,
           translation: metadata.translation,
-          visual_for_user: metadata.visual_for_user,
+          visual_for_user: true,
         });
 
         continue;

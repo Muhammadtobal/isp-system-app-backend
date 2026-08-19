@@ -58,7 +58,7 @@ export class PaymentService {
         'payment',
         'network',
         'subscription.id',
-
+        'subscription.subscription_code',
         'plan.name',
         'plan.price',
 

@@ -33,6 +33,7 @@ import { GroupNetworkRadius } from './entities/group-network-radius';
 import { RadGroupCheck } from './entities/radgroupcheck.entity';
 import { RadUserGroup } from './entities/radusergroup.entity';
 import { Nas } from './entities/nas.entity';
+import { PermissionISP } from 'src/shared/permission.object';
 
 @Controller('radius')
 export class RadiusController {
@@ -41,6 +42,8 @@ export class RadiusController {
   @Post('create-pppoe')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(
+    PermissionISP.CREATE_PPPOE_USER,
+
     Operation.CREATE + RadCheck.name,
     Operation.CREATE + RadReply.name,
   )
@@ -52,6 +55,8 @@ export class RadiusController {
 
   @Post('create-hotspot')
   @Permissions(
+    PermissionISP.CREATE_HOTSPOT_USER,
+
     Operation.CREATE + RadCheck.name,
     Operation.CREATE + RadReply.name,
   )

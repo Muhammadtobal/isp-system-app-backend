@@ -128,6 +128,9 @@ const PermissionISP = {
   UPDATE_RAD_USER_GROUP: 'updateRadUserGroup',
   DELETE_RAD_USER_GROUP: 'deleteRadUserGroup',
   CREATE_RAD_USER_GROUP: 'createRadUserGroup',
+
+  CREATE_PPPOE_USER: 'createPppoeUser',
+  CREATE_HOTSPOT_USER: 'createHotspotUser',
 } as const;
 
 /**
@@ -197,6 +200,9 @@ const resourceTranslations: Record<string, string> = {
   RAD_POST_AUTH: 'سجلات RADIUS Post Auth',
   RAD_REPLY: 'سجلات RADIUS Reply',
   RAD_USER_GROUP: 'مجموعات مستخدمي RADIUS',
+
+  PPPOE_USER: 'مستخدمين PPPoE',
+  HOTSPOT_USER: 'مستخدمين Hotspot',
 };
 
 /**
@@ -230,6 +236,9 @@ const resourceDescriptions: Record<string, string> = {
   RAD_POST_AUTH: 'RADIUS post-authentication records',
   RAD_REPLY: 'RADIUS reply records',
   RAD_USER_GROUP: 'RADIUS user groups',
+
+  PPPOE_USER: 'PPPoE users',
+  HOTSPOT_USER: 'Hotspot users',
 };
 
 /**
