@@ -388,7 +388,7 @@ export class AppController {
   // }
 
   @Get('status')
-  @UseGuards(JwtAuthUserGuard)
+  @UseGuards(JwtAuthSharedGuard)
   getStatus() {
     return this.appService.getServerInfo();
   }
