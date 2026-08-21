@@ -56,6 +56,15 @@ export class FindAllPermissionDto {
   @IsOptional()
   @IsObject()
   @Type(() => MatchInput)
+  key?: MatchInput;
+
+  @ApiProperty({
+    example: '{ op : "full or partial" value:"example"}',
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
   description?: MatchInput;
 
   @ApiProperty({

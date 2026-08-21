@@ -91,6 +91,9 @@ export class PermissionService {
       if (!existingPermission) {
         newPermissions.push({
           name,
+
+          key: metadata.key,
+
           description: metadata.description,
           translation: metadata.translation,
           visual_for_user: true,
@@ -98,6 +101,9 @@ export class PermissionService {
 
         continue;
       }
+
+      // ✅ تحديث الـ key أيضًا
+      existingPermission.key = metadata.key;
 
       existingPermission.description = metadata.description;
       existingPermission.translation = metadata.translation;

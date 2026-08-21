@@ -10,6 +10,9 @@ export class Permission extends BaseEntity {
   @Column('varchar', { length: 255 })
   name: string;
 
+  @Column('varchar', { length: 255 })
+  key: string;
+
   @Column('text', { nullable: true })
   description?: string;
 

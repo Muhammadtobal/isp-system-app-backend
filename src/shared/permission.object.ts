@@ -149,6 +149,7 @@ type PermissionValue = (typeof PermissionISP)[PermissionKey];
  * Permission metadata
  */
 type PermissionMetadata = {
+  key: string;
   description: string;
   translation: string;
   visual_for_user: boolean;
@@ -263,8 +264,8 @@ const actionDescriptions: Record<string, string> = {
  * Generate metadata automatically for every permission.
  */
 const PermissionMetadata = Object.fromEntries(
-  Object.keys(PermissionISP).map((key) => {
-    const [action, ...resourceParts] = key.split('_');
+  Object.keys(PermissionISP).map((permissionKey) => {
+    const [action, ...resourceParts] = permissionKey.split('_');
 
     const resource = resourceParts.join('_');
 
@@ -273,14 +274,18 @@ const PermissionMetadata = Object.fromEntries(
     const resourceTranslation = resourceTranslations[resource] ?? resource;
 
     return [
-      key,
+      permissionKey,
       {
+        // نفس الـ key لجميع العمليات الخاصة بنفس resource
+        key: resource.toLowerCase(),
+
         description: `${actionDescriptions[action]} ${resourceDescription}`,
+
         translation: `${actionTranslations[action]} ${resourceTranslation}`,
+
         visual_for_user: !hiddenResources.has(resource),
       },
     ];
   }),
 ) as Record<PermissionKey, PermissionMetadata>;
-
 export { PermissionISP, PermissionMetadata, PermissionKey, PermissionValue };
