@@ -34,6 +34,7 @@ import { RadGroupCheck } from './entities/radgroupcheck.entity';
 import { RadUserGroup } from './entities/radusergroup.entity';
 import { Nas } from './entities/nas.entity';
 import { PermissionISP } from 'src/shared/permission.object';
+import { RadGroupReply } from './entities/radgroupreply.entity';
 
 @Controller('radius')
 export class RadiusController {
@@ -123,7 +124,7 @@ export class RadiusController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(
     Operation.CREATE + RadGroupCheck.name,
-    Operation.CREATE + RadGroupCheck.name,
+    Operation.CREATE + RadGroupReply.name,
   )
   createGroup(@Body() dto: CreateGroupDto) {
     return this.radiusService.createGroup(dto);
@@ -147,7 +148,7 @@ export class RadiusController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(
     Operation.GET + RadGroupCheck.name,
-    Operation.GET + RadGroupCheck.name,
+    Operation.GET + RadGroupReply.name,
   )
   findOneGroup(@Param('groupname') groupname: string) {
     return this.radiusService.findOneGroup(groupname);
@@ -157,7 +158,7 @@ export class RadiusController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(
     Operation.UPDATE + RadGroupCheck.name,
-    Operation.UPDATE + RadGroupCheck.name,
+    Operation.UPDATE + RadGroupReply.name,
   )
   updateGroup(
     @Param('groupname') groupname: string,
@@ -170,7 +171,7 @@ export class RadiusController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(
     Operation.DELETE + RadGroupCheck.name,
-    Operation.DELETE + RadGroupCheck.name,
+    Operation.DELETE + RadGroupReply.name,
   )
   removeGroup(@Param('groupname') groupname: string) {
     return this.radiusService.removeGroup(groupname);
@@ -186,14 +187,17 @@ export class RadiusController {
   @Patch('update-nas/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.UPDATE + Nas.name)
-  public update(@Param('id') id: number, @Body() updateNasDto: UpdateNasDto) {
+  public updateNas(
+    @Param('id') id: number,
+    @Body() updateNasDto: UpdateNasDto,
+  ) {
     return this.radiusService.updateNas(id, updateNasDto);
   }
 
   @Get('get-one-nas/:id')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Nas.name)
-  public findOne(@Param('id') id: number) {
+  public findOneNas(@Param('id') id: number) {
     return this.radiusService.findOneNas({ id });
   }
 
