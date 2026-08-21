@@ -101,7 +101,7 @@ export class PermissionService {
 
       existingPermission.description = metadata.description;
       existingPermission.translation = metadata.translation;
-      existingPermission.visual_for_user = metadata.visual_for_user;
+      existingPermission.visual_for_user = true;
 
       permissionsToUpdate.push(existingPermission);
     }

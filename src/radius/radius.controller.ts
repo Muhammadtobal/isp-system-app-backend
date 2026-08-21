@@ -42,8 +42,6 @@ export class RadiusController {
   @Post('create-pppoe')
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(
-    PermissionISP.CREATE_PPPOE_USER,
-
     Operation.CREATE + RadCheck.name,
     Operation.CREATE + RadReply.name,
   )
@@ -55,8 +53,6 @@ export class RadiusController {
 
   @Post('create-hotspot')
   @Permissions(
-    PermissionISP.CREATE_HOTSPOT_USER,
-
     Operation.CREATE + RadCheck.name,
     Operation.CREATE + RadReply.name,
   )
