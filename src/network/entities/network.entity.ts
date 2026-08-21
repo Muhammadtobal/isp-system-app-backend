@@ -9,6 +9,7 @@ import { GroupNetworkRadius } from 'src/radius/entities/group-network-radius';
 import { NetworkRadius } from 'src/radius/entities/network-radius.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { Template } from 'src/template/entities/template.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -60,6 +61,9 @@ export class Network extends BaseEntity {
 
   @OneToMany(() => NetworkRadius, (network_radius) => network_radius.network)
   network_radiuses: NetworkRadius[];
+
+  @OneToMany(() => Template, (template) => template.network)
+  templates: Template[];
 
   @OneToMany(
     () => GroupNetworkRadius,

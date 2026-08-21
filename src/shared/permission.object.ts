@@ -128,6 +128,11 @@ const PermissionISP = {
   UPDATE_RAD_USER_GROUP: 'updateRadUserGroup',
   DELETE_RAD_USER_GROUP: 'deleteRadUserGroup',
   CREATE_RAD_USER_GROUP: 'createRadUserGroup',
+
+  GET_TEMPLATE: 'getTemplate',
+  UPDATE_TEMPLATE: 'updateTemplate',
+  DELETE_TEMPLATE: 'deleteTemplate',
+  CREATE_TEMPLATE: 'createTemplate',
 } as const;
 
 /**
@@ -197,6 +202,7 @@ const resourceTranslations: Record<string, string> = {
   RAD_POST_AUTH: 'سجلات RADIUS Post Auth',
   RAD_REPLY: 'سجلات RADIUS Reply',
   RAD_USER_GROUP: 'مجموعات مستخدمي RADIUS',
+  TEMPLATE: 'قوالب',
 };
 
 /**
@@ -230,6 +236,7 @@ const resourceDescriptions: Record<string, string> = {
   RAD_POST_AUTH: 'RADIUS post-authentication records',
   RAD_REPLY: 'RADIUS reply records',
   RAD_USER_GROUP: 'RADIUS user groups',
+  TEMPLATE: 'templates',
 };
 
 /**

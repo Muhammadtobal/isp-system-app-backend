@@ -24,6 +24,7 @@ import { SoldModule } from './sold/sold.module';
 import { DomainModule } from './domain/domain.module';
 import { RadiusModule } from './radius/radius.module';
 import { ConstantModule } from './constant/constant.module';
+import { TemplateModule } from './template/template.module';
 
 console.log({
   host: process.env.DB_HOST,
@@ -73,6 +74,7 @@ console.log({
     DomainModule,
     RadiusModule,
     ConstantModule,
+    TemplateModule,
   ],
   controllers: [AppController],
   exports: [AppService],
