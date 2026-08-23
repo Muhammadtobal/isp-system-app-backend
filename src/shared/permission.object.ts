@@ -84,10 +84,18 @@ const PermissionISP = {
   DELETE_CONSTANT: 'deleteConstant',
   CREATE_CONSTANT: 'createConstant',
 
-  GET_NAS_NETWORK_RADIUS: 'getNasNetworkRadius',
-  UPDATE_NAS_NETWORK_RADIUS: 'updateNasNetworkRadius',
-  DELETE_NAS_NETWORK_RADIUS: 'deleteNasNetworkRadius',
-  CREATE_NAS_NETWORK_RADIUS: 'createNasNetworkRadius',
+  GET_NETWORK_RADIUS: 'getNetworkRadius',
+  UPDATE_NETWORK_RADIUS: 'updateNetworkRadius',
+  DELETE_NETWORK_RADIUS: 'deleteNetworkRadius',
+  CREATE_NETWORK_RADIUS: 'createNetworkRadius',
+
+  GET_NAS: 'getNas',
+
+  UPDATE_NAS: 'updateNas',
+
+  DELETE_NAS: 'deleteNas',
+
+  CREATE_NAS: 'createNas',
 
   GET_RAD_CHECK: 'getRadCheck',
   UPDATE_RAD_CHECK: 'updateRadCheck',
@@ -171,7 +179,8 @@ type PermissionMetadata = {
  * RADIUS/internal permissions are hidden from the user.
  */
 const hiddenResources = new Set([
-  'NAS_NETWORK_RADIUS',
+  'NAS',
+  'NETWORK_RADIUS',
   'RAD_CHECK',
   'GROUP_NETWORK_RADIUS',
   'RAD_ACCT',
@@ -204,7 +213,9 @@ const resourceTranslations: Record<string, string> = {
   DOMAIN: 'النطاقات',
   CONSTANT: 'الثوابت',
 
-  NAS_NETWORK_RADIUS: 'إعدادات NAS Network Radius',
+  NAS: 'اعدادات nas',
+
+  NETWORK_RADIUS: 'إعدادات Network Radius',
   RAD_CHECK: 'سجلات RADIUS Check',
   GROUP_NETWORK_RADIUS: 'مجموعات Network Radius',
   RAD_ACCT: 'سجلات RADIUS Accounting',
@@ -240,8 +251,8 @@ const resourceDescriptions: Record<string, string> = {
   ALERT: 'alerts',
   DOMAIN: 'domains',
   CONSTANT: 'constants',
-
-  NAS_NETWORK_RADIUS: 'NAS network radius',
+  NAS: 'nas',
+  NETWORK_RADIUS: ' network radius',
   RAD_CHECK: 'RADIUS check records',
   GROUP_NETWORK_RADIUS: 'group network radius',
   RAD_ACCT: 'RADIUS accounting records',

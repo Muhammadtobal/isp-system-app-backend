@@ -22,7 +22,7 @@ export class Expense extends BaseEntity {
   value: number;
 
   @Column({ type: 'double precision', nullable: true })
-  expense_value_converted?: number;
+  value_converted?: number;
 
   @Column('bigint')
   expense_type_id: number;

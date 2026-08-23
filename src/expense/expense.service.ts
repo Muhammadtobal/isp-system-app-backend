@@ -60,7 +60,7 @@ export class ExpenseService {
           ELSE expense.value * exchange_rate.rate
         END
       `,
-          'expense_value_converted',
+          'value_converted',
         )
         .setParameter('toCurrencyId', filter.to_currency_id);
     }
@@ -72,7 +72,7 @@ export class ExpenseService {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
       rawMappings: {
-        expense_value_converted: 'expense_value_converted',
+        value_converted: 'value_converted',
       },
     });
   }
