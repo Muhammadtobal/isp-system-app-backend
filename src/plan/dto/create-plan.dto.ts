@@ -48,6 +48,11 @@ export class CreatePlanDto {
   @IsInt()
   network_id: number;
 
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  currency_id: number;
+
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

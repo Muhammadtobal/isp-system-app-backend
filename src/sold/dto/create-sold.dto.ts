@@ -20,6 +20,11 @@ export class CreateSoldDto {
   @IsInt()
   product_id: number;
 
+  @ApiProperty({ example: 5 })
+  @IsNotEmpty()
+  @IsInt()
+  currency_id: number;
+
   @ApiProperty({ example: 2, required: false })
   @IsOptional()
   @IsInt()

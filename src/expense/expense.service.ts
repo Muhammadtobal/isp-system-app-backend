@@ -19,6 +19,8 @@ import {
   AuthUser,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
+import { ExchangeRate } from 'src/currency/entities/exchange_rate.entity';
+import { CurrencyService } from 'src/currency/currency.service';
 
 @Injectable()
 export class ExpenseService {
@@ -31,14 +33,37 @@ export class ExpenseService {
     const expense = this.expenseRepository.create(createExpenseDto);
     return this.expenseRepository.save(expense);
   }
-
   public findAll(filter: FindAllExpenseDto) {
     const query = this.expenseRepository
       .createQueryBuilder('expense')
       .leftJoinAndSelect('expense.expense_type', 'expense_type')
       .leftJoinAndSelect('expense.employee', 'employee')
+      .leftJoinAndSelect('expense.currency', 'currency')
       .leftJoinAndSelect('expense.network', 'network')
       .where('true');
+
+    if (filter.to_currency_id) {
+      query
+        .leftJoin(
+          ExchangeRate,
+          'exchange_rate',
+          `
+        exchange_rate.currency_id = expense.currency_id
+        AND exchange_rate.to_currency_id = :toCurrencyId
+      `,
+        )
+        .addSelect(
+          `
+        CASE
+          WHEN expense.currency_id = :toCurrencyId
+            THEN expense.value
+          ELSE expense.value * exchange_rate.rate
+        END
+      `,
+          'expense_value_converted',
+        )
+        .setParameter('toCurrencyId', filter.to_currency_id);
+    }
 
     generateQuerySorts<Expense>(query, filter, Expense, 'expense');
     generateQueryConditions<Expense>(query, filter, 'expense');
@@ -46,9 +71,11 @@ export class ExpenseService {
     return customPaginate<Expense, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
+      rawMappings: {
+        expense_value_converted: 'expense_value_converted',
+      },
     });
   }
-
   public findOne(
     expenseOptions: FindOptionsWhere<Expense>,
     options?: {

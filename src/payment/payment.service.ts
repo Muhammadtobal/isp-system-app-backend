@@ -20,6 +20,7 @@ import {
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { SubscriptionService } from 'src/subscription/subscription.service';
+import { ExchangeRate } from 'src/currency/entities/exchange_rate.entity';
 
 @Injectable()
 export class PaymentService {
@@ -49,13 +50,18 @@ export class PaymentService {
       .createQueryBuilder('payment')
 
       .leftJoin('payment.network', 'network')
+      .leftJoin('payment.currency', 'currency2')
+
       .leftJoin('payment.subscription', 'subscription')
       .leftJoin('subscription.plan', 'plan')
+      .leftJoin('plan.currency', 'currency')
+
       .leftJoin('subscription.customer', 'customer')
       .leftJoin('subscription.point', 'point')
 
       .select([
         'payment',
+        'currency',
         'network',
         'subscription.id',
         'subscription.subscription_code',
@@ -68,6 +74,29 @@ export class PaymentService {
       ])
       .where('true');
 
+    if (filter.to_currency_id) {
+      query
+        .leftJoin(
+          ExchangeRate,
+          'exchange_rate',
+          `
+        exchange_rate.currency_id = payment.currency_id
+        AND exchange_rate.to_currency_id = :toCurrencyId
+      `,
+        )
+        .addSelect(
+          `
+        CASE
+          WHEN payment.currency_id = :toCurrencyId
+            THEN payment.amount
+          ELSE payment.amount * exchange_rate.rate
+        END
+      `,
+          'value_converted',
+        )
+        .setParameter('toCurrencyId', filter.to_currency_id);
+    }
+
     generateQuerySorts<Payment>(query, filter, Payment, 'payment');
 
     generateQueryConditions<Payment>(query, filter, 'payment');
@@ -75,6 +104,9 @@ export class PaymentService {
     return customPaginate<Payment, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
+      rawMappings: {
+        value_converted: 'value_converted',
+      },
     });
   }
 

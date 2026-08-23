@@ -287,23 +287,66 @@ export async function customPaginate<
   options: {
     limit: number;
     page: number;
+    rawMappings?: Record<string, string>;
   },
 ): Promise<{ items: T[]; meta: PaginationMetadata }> {
-  const { limit, page } = options;
+  const { limit, page, rawMappings } = options;
   const offset = (page - 1) * limit;
 
-  let data: T[] = await query.clone().take(limit).skip(offset).getMany();
+  const paginatedQuery = query.clone().take(limit).skip(offset);
+
+  let data: T[];
+
+  if (rawMappings && Object.keys(rawMappings).length > 0) {
+    const result = await paginatedQuery.getRawAndEntities();
+
+    data = result.entities;
+
+    const mainAlias = query.expressionMap.mainAlias?.name;
+
+    if (!mainAlias) {
+      throw new Error('Main alias not found in query builder');
+    }
+
+    const rawById = new Map<string, any>();
+
+    for (const rawItem of result.raw) {
+      const id = rawItem[`${mainAlias}_id`];
+
+      if (id !== undefined && id !== null) {
+        rawById.set(String(id), rawItem);
+      }
+    }
+
+    for (const item of data) {
+      const rawItem = rawById.get(String((item as any).id));
+
+      if (!rawItem) continue;
+
+      for (const [property, rawAlias] of Object.entries(rawMappings)) {
+        (item as any)[property] = rawItem[rawAlias];
+      }
+    }
+  } else {
+    data = await paginatedQuery.getMany();
+  }
 
   const mainAlias = query.expressionMap.mainAlias?.name;
-  if (!mainAlias) throw new Error('Main alias not found in query builder');
+
+  if (!mainAlias) {
+    throw new Error('Main alias not found in query builder');
+  }
 
   const countQuery = query.clone();
+
   countQuery.expressionMap.skip = undefined;
   countQuery.expressionMap.take = undefined;
   countQuery.expressionMap.orderBys = {};
+
   const rawCount = await countQuery
     .select(`COUNT(DISTINCT ${mainAlias}.id)`, 'cnt')
     .getRawOne<{ cnt: string }>();
+
   const totalItems = Number(rawCount?.cnt ?? 0);
 
   const metaData: IPaginationMeta = {

@@ -133,6 +133,16 @@ const PermissionISP = {
   UPDATE_TEMPLATE: 'updateTemplate',
   DELETE_TEMPLATE: 'deleteTemplate',
   CREATE_TEMPLATE: 'createTemplate',
+
+  GET_CURRENCY: 'getCurrency',
+  UPDATE_CURRENCY: 'updateCurrency',
+  DELETE_CURRENCY: 'deleteCurrency',
+  CREATE_CURRENCY: 'createCurrency',
+
+  GET_EXCHANGE_RATE: 'getExchangeRate',
+  UPDATE_EXCHANGE_RATE: 'updateExchangeRate',
+  DELETE_EXCHANGE_RATE: 'deleteExchangeRate',
+  CREATE_EXCHANGE_RATE: 'createExchangeRate',
 } as const;
 
 /**
@@ -204,6 +214,9 @@ const resourceTranslations: Record<string, string> = {
   RAD_REPLY: 'سجلات RADIUS Reply',
   RAD_USER_GROUP: 'مجموعات مستخدمي RADIUS',
   TEMPLATE: 'قوالب',
+
+  CURRENCY: 'العملات',
+  EXCHANGE_RATE: 'أسعار الصرف',
 };
 
 /**
@@ -238,6 +251,9 @@ const resourceDescriptions: Record<string, string> = {
   RAD_REPLY: 'RADIUS reply records',
   RAD_USER_GROUP: 'RADIUS user groups',
   TEMPLATE: 'templates',
+
+  CURRENCY: 'currencies',
+  EXCHANGE_RATE: 'exchange rates',
 };
 
 /**

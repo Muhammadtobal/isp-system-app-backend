@@ -19,6 +19,7 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
+import { ExchangeRate } from 'src/currency/entities/exchange_rate.entity';
 
 @Injectable()
 export class ProductService {
@@ -35,7 +36,31 @@ export class ProductService {
   public findAll(filter: FindAllProductDto) {
     const query = this.productRepository
       .createQueryBuilder('product')
+      .leftJoinAndSelect('product.currency', 'currency')
       .where('true');
+
+    if (filter.to_currency_id) {
+      query
+        .leftJoin(
+          ExchangeRate,
+          'exchange_rate',
+          `
+                    exchange_rate.currency_id = product.currency_id
+                    AND exchange_rate.to_currency_id = :toCurrencyId
+                  `,
+        )
+        .addSelect(
+          `
+                    CASE
+                      WHEN product.currency_id = :toCurrencyId
+                        THEN product.price
+                      ELSE product.price * exchange_rate.rate
+                    END
+                  `,
+          'value_converted',
+        )
+        .setParameter('toCurrencyId', filter.to_currency_id);
+    }
 
     generateQuerySorts<Product>(query, filter, Product, 'product');
 
@@ -44,6 +69,7 @@ export class ProductService {
     return customPaginate<Product, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
+      rawMappings: { value_converted: 'value_converted' },
     });
   }
 

@@ -30,6 +30,13 @@ export class CreateExpenseDto {
   @IsNumber()
   network_id: number;
 
+  @ApiProperty({
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  currency_id: number;
+
   @ApiPropertyOptional({
     example: 1,
   })

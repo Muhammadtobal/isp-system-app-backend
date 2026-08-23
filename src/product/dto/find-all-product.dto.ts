@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNotEmpty,
+  IsNumber,
   IsObject,
   IsOptional,
   ValidateNested,
@@ -56,6 +57,23 @@ export class FindAllProductDto {
   @IsObject()
   @IsSingleIdOrList()
   user_id?: SingleIdInput | ListOfIdsInput;
+
+  @ApiProperty({
+    description: 'currency id (single or list)',
+    example: { value: 1 },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  currency_id?: SingleIdInput | ListOfIdsInput;
+
+  @ApiPropertyOptional({
+    example: 1,
+  })
+  @IsOptional()
+  @IsNumber()
+  to_currency_id?: number;
 
   @ApiProperty({ example: true, required: false })
   @IsOptional()

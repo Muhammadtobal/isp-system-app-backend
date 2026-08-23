@@ -29,6 +29,11 @@ export class CreatePaymentDto {
   @IsInt()
   network_id: number;
 
+  @ApiProperty({ example: 1, required: true })
+  @IsNotEmpty()
+  @IsInt()
+  currency_id: number;
+
   @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsInt()

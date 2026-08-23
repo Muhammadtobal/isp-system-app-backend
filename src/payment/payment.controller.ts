@@ -21,10 +21,14 @@ import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation..enum';
 import { Payment } from './entities/payment.entity';
 import { FindTotalPaymentDto } from './dto/find-total-payment.dto';
+import { CurrencyService } from 'src/currency/currency.service';
 
 @Controller('payment')
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    private readonly paymentService: PaymentService,
+    private readonly currencyService: CurrencyService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -120,8 +124,19 @@ export class PaymentController {
       }
     }
 
+    let converted: number = 0;
+    if (filter.currency_id && filter.to_currency_id) {
+      const exchange_rate = await this.currencyService.findOneExchangeRate({
+        currency_id: filter.currency_id,
+        to_currency_id: filter.to_currency_id,
+      });
+
+      if (exchange_rate) converted = exchange_rate?.rate;
+    }
     return {
-      totalPayments,
+      totalPayments: converted
+        ? Number(totalPayments * converted)
+        : Number(totalPayments),
     };
   }
 }

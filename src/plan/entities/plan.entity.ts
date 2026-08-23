@@ -11,6 +11,7 @@ import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ServiceType } from 'src/shared/enums/service_type.enum';
+import { Currency } from 'src/currency/entities/currency.entity';
 
 @Entity()
 export class Plan extends BaseEntity {
@@ -40,6 +41,16 @@ export class Plan extends BaseEntity {
 
   @Column('int')
   upload_speed: number;
+
+  @Column('bigint')
+  currency_id: number;
+
+  @Column({ type: 'double precision', nullable: true })
+  value_converted?: number;
+
+  @ManyToOne(() => Currency, (currency) => currency.plans)
+  @JoinColumn({ name: 'currency_id' })
+  currency?: Currency;
 
   @ManyToOne(() => User, (user) => user.expenses)
   @JoinColumn({ name: 'user_id' })

@@ -1,3 +1,4 @@
+import { Currency } from 'src/currency/entities/currency.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { ExpenseType } from 'src/expense_type/entities/expense_type.entity';
 import { Network } from 'src/network/entities/network.entity';
@@ -20,6 +21,9 @@ export class Expense extends BaseEntity {
   @Column({ type: 'double precision' })
   value: number;
 
+  @Column({ type: 'double precision', nullable: true })
+  expense_value_converted?: number;
+
   @Column('bigint')
   expense_type_id: number;
 
@@ -34,6 +38,13 @@ export class Expense extends BaseEntity {
 
   @Column('bigint', { nullable: true })
   user_id?: number;
+
+  @Column('bigint')
+  currency_id: number;
+
+  @ManyToOne(() => Currency, (currency) => currency.expenses)
+  @JoinColumn({ name: 'currency_id' })
+  currency?: Currency;
 
   @ManyToOne(() => User, (user) => user.expenses)
   @JoinColumn({ name: 'user_id' })

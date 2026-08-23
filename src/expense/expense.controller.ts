@@ -25,10 +25,15 @@ import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 import { FindTotalExpenseDto } from './dto/find-total-expense.dto';
 import { FindStatisticsDto } from 'src/point/dto/statistics.dto';
+import { CurrencyService } from 'src/currency/currency.service';
+import { number } from 'zod';
 
 @Controller('expense')
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(
+    private readonly expenseService: ExpenseService,
+    private readonly currencyService: CurrencyService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -115,9 +120,19 @@ export class ExpenseController {
         page++;
       }
     }
+    let converted: number = 0;
+    if (filter.currency_id && filter.to_currency_id) {
+      const exchange_rate = await this.currencyService.findOneExchangeRate({
+        currency_id: filter.currency_id,
+        to_currency_id: filter.to_currency_id,
+      });
 
+      if (exchange_rate) converted = exchange_rate?.rate;
+    }
     return {
-      totalExpenses,
+      totalExpenses: converted
+        ? Number(totalExpenses * converted)
+        : Number(totalExpenses),
     };
   }
 

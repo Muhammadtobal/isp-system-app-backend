@@ -22,6 +22,7 @@ import {
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
 import { ProductService } from 'src/product/product.service';
 import { Product } from 'src/product/entities/product.entity';
+import { ExchangeRate } from 'src/currency/entities/exchange_rate.entity';
 
 @Injectable()
 export class SoldService {
@@ -47,7 +48,32 @@ export class SoldService {
     const query = this.soldRepository
       .createQueryBuilder('sold')
       .leftJoinAndSelect('sold.product', 'product')
+      .leftJoinAndSelect('sold.currency', 'currency')
+
       .where('true');
+
+    if (filter.to_currency_id) {
+      query
+        .leftJoin(
+          ExchangeRate,
+          'exchange_rate',
+          `
+                          exchange_rate.currency_id = sold.currency_id
+                          AND exchange_rate.to_currency_id = :toCurrencyId
+                        `,
+        )
+        .addSelect(
+          `
+                          CASE
+                            WHEN sold.currency_id = :toCurrencyId
+                              THEN sold.value
+                            ELSE sold.value * exchange_rate.rate
+                          END
+                        `,
+          'value_converted',
+        )
+        .setParameter('toCurrencyId', filter.to_currency_id);
+    }
 
     generateQuerySorts<Sold>(query, filter, Sold, 'sold');
     generateQueryConditions<Sold>(query, filter, 'sold');
@@ -55,6 +81,7 @@ export class SoldService {
     return customPaginate<Sold, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
+      rawMappings: { value_converted: 'value_converted' },
     });
   }
 

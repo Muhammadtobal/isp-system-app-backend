@@ -11,6 +11,7 @@ import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { Currency } from 'src/currency/entities/currency.entity';
 
 @Entity()
 export class Sold extends BaseEntity {
@@ -31,6 +32,16 @@ export class Sold extends BaseEntity {
 
   @Column('bigint', { nullable: true })
   user_id?: number;
+
+  @Column('bigint')
+  currency_id: number;
+
+  @Column({ type: 'double precision', nullable: true })
+  value_converted?: number;
+
+  @ManyToOne(() => Currency, (currency) => currency.sales)
+  @JoinColumn({ name: 'currency_id' })
+  currency?: Currency;
 
   @ManyToOne(() => User, (user) => user.sales)
   @JoinColumn({ name: 'user_id' })

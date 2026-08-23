@@ -4,10 +4,12 @@ import { PaymentController } from './payment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from './entities/payment.entity';
 import { SubscriptionModule } from 'src/subscription/subscription.module';
+import { CurrencyModule } from 'src/currency/currency.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Payment]),
+    CurrencyModule,
     forwardRef(() => SubscriptionModule),
   ],
   exports: [PaymentService],

@@ -18,6 +18,7 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/pagination-metadata';
+import { ExchangeRate } from 'src/currency/entities/exchange_rate.entity';
 
 @Injectable()
 export class PlanService {
@@ -32,8 +33,32 @@ export class PlanService {
   }
 
   public findAll(filter: FindAllPlanDto) {
-    const query = this.planRepository.createQueryBuilder('plan').where('true');
-
+    const query = this.planRepository
+      .createQueryBuilder('plan')
+      .leftJoinAndSelect('plan.currency', 'currency')
+      .where('true');
+    if (filter.to_currency_id) {
+      query
+        .leftJoin(
+          ExchangeRate,
+          'exchange_rate',
+          `
+              exchange_rate.currency_id = plan.currency_id
+              AND exchange_rate.to_currency_id = :toCurrencyId
+            `,
+        )
+        .addSelect(
+          `
+              CASE
+                WHEN plan.currency_id = :toCurrencyId
+                  THEN plan.price
+                ELSE plan.price * exchange_rate.rate
+              END
+            `,
+          'value_converted',
+        )
+        .setParameter('toCurrencyId', filter.to_currency_id);
+    }
     generateQuerySorts<Plan>(query, filter, Plan, 'plan');
 
     generateQueryConditions<Plan>(query, filter, 'plan');
@@ -41,6 +66,9 @@ export class PlanService {
     return customPaginate<Plan, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
+      rawMappings: {
+        value_converted: 'value_converted',
+      },
     });
   }
 

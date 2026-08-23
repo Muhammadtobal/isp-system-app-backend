@@ -25,6 +25,7 @@ import { DomainModule } from './domain/domain.module';
 import { RadiusModule } from './radius/radius.module';
 import { ConstantModule } from './constant/constant.module';
 import { TemplateModule } from './template/template.module';
+import { CurrencyModule } from './currency/currency.module';
 
 console.log({
   host: process.env.DB_HOST,
@@ -75,6 +76,7 @@ console.log({
     RadiusModule,
     ConstantModule,
     TemplateModule,
+    CurrencyModule,
   ],
   controllers: [AppController],
   exports: [AppService],
