@@ -52,7 +52,7 @@ export class SoldController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Sold.name)
   findOne(@Param('id') id: number) {
-    return this.soldService.findOne({ id });
+    return this.soldService.findOne({ id }, { relations: { currency: true } });
   }
 
   @Patch('update/:id')

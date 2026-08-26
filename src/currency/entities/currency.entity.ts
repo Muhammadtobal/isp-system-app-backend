@@ -5,6 +5,8 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 
 import { Expense } from 'src/expense/entities/expense.entity';
@@ -16,7 +18,7 @@ import { Sold } from 'src/sold/entities/sold.entity';
 import { Plan } from 'src/plan/entities/plan.entity';
 
 @Entity()
-export class Currency extends BaseEntity {
+export class Currency {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
@@ -25,6 +27,12 @@ export class Currency extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255 })
   code: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 
   @OneToMany(() => ExchangeRate, (exchange_rate) => exchange_rate.to_currency)
   exchangeRatesTo: ExchangeRate[];

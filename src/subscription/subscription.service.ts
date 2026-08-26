@@ -31,6 +31,7 @@ import { RadiusService } from 'src/radius/radius.service';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { PointService } from 'src/point/point.service';
 import { PlanService } from 'src/plan/plan.service';
+import { RadAcct } from 'src/radius/entities/radacct.entity';
 
 @Injectable()
 export class SubscriptionService {
@@ -165,20 +166,53 @@ export class SubscriptionService {
         page: filter.pagination.page,
       },
     );
+    const radiusSessions = await this.radiusService.getAllSessions();
 
-    const users = await this.radiusService.getOnlineUsers();
+    const radiusMap = new Map<string, RadAcct>();
 
-    const onlineSet = new Set(
-      users
-        .filter((user) => user.acctstoptime === null)
-        .map((user) => user.username),
-    );
+    for (const session of radiusSessions) {
+      const username = session.username?.trim();
 
-    result.items = result.items.map((subscription: any) => ({
-      ...subscription,
-      is_online: onlineSet.has(subscription.radius_username),
-    }));
+      if (!username) {
+        continue;
+      }
 
+      // إذا لم يوجد المستخدم أضفه
+      if (!radiusMap.has(username)) {
+        radiusMap.set(username, session);
+        continue;
+      }
+
+      // نحتفظ بأحدث Session
+      const existing = radiusMap.get(username);
+
+      if (
+        session.acctstarttime &&
+        existing?.acctstarttime &&
+        session.acctstarttime > existing.acctstarttime
+      ) {
+        radiusMap.set(username, session);
+      }
+    }
+    // =========================
+    // Merge Subscription + RADIUS
+    // =========================
+
+    result.items = result.items.map((subscription: any) => {
+      const username = subscription.radius_username?.trim();
+
+      const radiusSession = username ? radiusMap.get(username) : undefined;
+
+      const isOnline = radiusSession?.acctstoptime == null;
+
+      return {
+        ...subscription,
+
+        is_online: isOnline,
+
+        radius_session: radiusSession ?? null,
+      };
+    });
     return result;
   }
 

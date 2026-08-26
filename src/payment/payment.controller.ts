@@ -57,7 +57,7 @@ export class PaymentController {
   public findOne(@Param('id') id: number) {
     return this.paymentService.findOne(
       { id },
-      { relations: { subscription: true } },
+      { relations: { subscription: true, currency: true } },
     );
   }
 

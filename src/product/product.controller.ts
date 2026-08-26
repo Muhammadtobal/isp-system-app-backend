@@ -62,7 +62,10 @@ export class ProductController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Product.name)
   findOne(@Param('id') id: number) {
-    return this.productService.findOne({ id });
+    return this.productService.findOne(
+      { id },
+      { relations: { currency: true } },
+    );
   }
 
   @Patch('update/:id')

@@ -58,7 +58,7 @@ export class PlanController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Plan.name)
   public findOne(@Param('id') id: number) {
-    return this.planService.findOne({ id });
+    return this.planService.findOne({ id }, { relations: { currency: true } });
   }
 
   @Patch('update/:id')

@@ -61,7 +61,10 @@ export class ExpenseController {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Expense.name)
   findOne(@Param('id') id: number) {
-    return this.expenseService.findOne({ id });
+    return this.expenseService.findOne(
+      { id },
+      { relations: { currency: true } },
+    );
   }
 
   @Patch('update/:id')

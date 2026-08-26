@@ -5,13 +5,15 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 import { Currency } from 'src/currency/entities/currency.entity';
 import { BaseEntity } from 'src/shared/base.entity';
 
 @Entity()
-export class ExchangeRate extends BaseEntity {
+export class ExchangeRate {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
@@ -23,6 +25,12 @@ export class ExchangeRate extends BaseEntity {
 
   @Column('double precision', { default: 1 })
   rate: number;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
 
   @ManyToOne(() => Currency, (currency) => currency.exchangeRatesFrom, {
     nullable: false,
