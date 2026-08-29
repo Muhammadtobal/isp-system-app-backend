@@ -166,68 +166,46 @@ export class SubscriptionService {
         page: filter.pagination.page,
       },
     );
-    const radiusSessions = await this.radiusService.getAllSessions();
 
-    const radiusMap = new Map<string, RadAcct>();
+    const onlineUsers = await this.radiusService.getOnlineUsers();
 
-    for (const session of radiusSessions) {
-      const username = session.username?.trim();
-
-      if (!username) {
-        continue;
-      }
-
-      // إذا لم يوجد المستخدم أضفه
-      if (!radiusMap.has(username)) {
-        radiusMap.set(username, session);
-        continue;
-      }
-
-      // نحتفظ بأحدث Session
-      const existing = radiusMap.get(username);
-
-      if (
-        session.acctstarttime &&
-        existing?.acctstarttime &&
-        session.acctstarttime > existing.acctstarttime
-      ) {
-        radiusMap.set(username, session);
-      }
-    }
-    // =========================
-    // Merge Subscription + RADIUS
-    // =========================
+    const onlineMap = new Map(onlineUsers.map((user) => [user.username, user]));
 
     result.items = result.items.map((subscription: any) => {
-      const username = subscription.radius_username?.trim();
-
-      const radiusSession = username ? radiusMap.get(username) : undefined;
-
-      const isOnline = radiusSession?.acctstoptime == null;
+      const radiusSession = onlineMap.get(subscription.radius_username);
 
       return {
         ...subscription,
-
-        is_online: isOnline,
-
-        radius_session: radiusSession ?? null,
+        is_online: !!radiusSession,
       };
     });
+
     return result;
   }
 
-  public findOne(
+  public async findOne(
     subscriptionOptions: FindOptionsWhere<Subscription>,
     options?: {
       selected?: FindOptionsSelect<Subscription>;
       relations?: FindOptionsRelations<Subscription>;
     },
   ) {
-    return this.subscriptionRepository.findOne({
+    const subscription = await this.subscriptionRepository.findOne({
       select: options?.selected,
       relations: options?.relations,
       where: subscriptionOptions,
     });
+
+    if (!subscription) return null;
+
+    const redAcct = await this.radiusService.getSessionsByUsername(
+      subscription.radius_username,
+    );
+
+    return {
+      ...subscription,
+      redAcct: redAcct,
+    };
   }
 
   public async update(

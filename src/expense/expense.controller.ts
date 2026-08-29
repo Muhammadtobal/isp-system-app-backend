@@ -98,7 +98,22 @@ export class ExpenseController {
       user_id = user.userId;
     }
 
-    let totalExpenses = 0;
+    const currency = await this.currencyService.findAll({
+      pagination: {
+        limit: 1000,
+        page: 1,
+      },
+    });
+
+    const totalExpensesByCurrency = {};
+
+    for (const curr of currency.items) {
+      totalExpensesByCurrency[curr.id] = {
+        currency_id: curr.id,
+        currency: curr.code,
+        totalExpenses: 0,
+      };
+    }
 
     const limit = 200;
     let page = 1;
@@ -108,13 +123,25 @@ export class ExpenseController {
       const result = await this.expenseService.findAll({
         ...filter,
         pagination: { page, limit },
-        user_id: { value: Number(user_id) },
+        user_id: user_id ? { value: Number(user_id) } : undefined,
       });
 
       if (!result.items.length) break;
 
       for (const exp of result.items) {
-        totalExpenses += exp.value;
+        if (!exp.currency_id) continue;
+
+        if (!totalExpensesByCurrency[exp.currency_id]) {
+          totalExpensesByCurrency[exp.currency_id] = {
+            currency_id: exp.currency_id,
+            currency: null,
+            totalExpenses: 0,
+          };
+        }
+
+        totalExpensesByCurrency[exp.currency_id].totalExpenses += Number(
+          exp.value,
+        );
       }
 
       if (result.items.length < limit) {
@@ -123,19 +150,9 @@ export class ExpenseController {
         page++;
       }
     }
-    let converted: number = 0;
-    if (filter.currency_id && filter.to_currency_id) {
-      const exchange_rate = await this.currencyService.findOneExchangeRate({
-        currency_id: filter.currency_id,
-        to_currency_id: filter.to_currency_id,
-      });
 
-      if (exchange_rate) converted = exchange_rate?.rate;
-    }
     return {
-      totalExpenses: converted
-        ? Number(totalExpenses * converted)
-        : Number(totalExpenses),
+      totalExpenses: Object.values(totalExpensesByCurrency),
     };
   }
 

@@ -28,9 +28,6 @@ export class Payment extends BaseEntity {
   @Column('bigint', { nullable: true })
   user_id?: number;
 
-  @Column({ type: 'double precision', nullable: true })
-  value_converted?: number;
-
   @Column('bigint')
   network_id: number;
 

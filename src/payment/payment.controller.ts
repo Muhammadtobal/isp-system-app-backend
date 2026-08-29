@@ -95,8 +95,23 @@ export class PaymentController {
       user_id = user.userId;
     }
 
-    let totalPayments = 0;
-    let subscriptionsCount = 0;
+    const currency = await this.currencyService.findAll({
+      pagination: {
+        limit: 1000,
+        page: 1,
+      },
+    });
+
+    const totalPaymentsByCurrency = {};
+
+    for (const curr of currency.items) {
+      totalPaymentsByCurrency[curr.id] = {
+        currency_id: curr.id,
+        currency: curr.code,
+        totalPayments: 0,
+      };
+    }
+
     const limit = 200;
     let page = 1;
     let lastPage = false;
@@ -105,16 +120,25 @@ export class PaymentController {
       const result = await this.paymentService.findAll({
         ...filter,
         pagination: { page, limit },
-        user_id: { value: Number(user_id) },
+        user_id: user_id ? { value: Number(user_id) } : undefined,
       });
+
       if (!result.items.length) break;
 
       for (const pay of result.items) {
-        totalPayments += pay.amount;
+        if (!pay.currency_id) continue;
 
-        if (pay.subscription_id) {
-          subscriptionsCount++;
+        if (!totalPaymentsByCurrency[pay.currency_id]) {
+          totalPaymentsByCurrency[pay.currency_id] = {
+            currency_id: pay.currency_id,
+            currency: null,
+            totalPayments: 0,
+          };
         }
+
+        totalPaymentsByCurrency[pay.currency_id].totalPayments += Number(
+          pay.amount,
+        );
       }
 
       if (result.items.length < limit) {
@@ -124,19 +148,8 @@ export class PaymentController {
       }
     }
 
-    let converted: number = 0;
-    if (filter.currency_id && filter.to_currency_id) {
-      const exchange_rate = await this.currencyService.findOneExchangeRate({
-        currency_id: filter.currency_id,
-        to_currency_id: filter.to_currency_id,
-      });
-
-      if (exchange_rate) converted = exchange_rate?.rate;
-    }
     return {
-      totalPayments: converted
-        ? Number(totalPayments * converted)
-        : Number(totalPayments),
+      totalPayments: Object.values(totalPaymentsByCurrency),
     };
   }
 }

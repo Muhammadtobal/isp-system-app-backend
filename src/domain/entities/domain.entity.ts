@@ -22,6 +22,12 @@ export class Domain extends BaseEntity {
   @Column('bigint')
   user_id: number;
 
+  @Column({ type: 'timestamp' })
+  subscription_start_date: Date;
+
+  @Column({ type: 'timestamp' })
+  subscription_end_date: Date;
+
   @ManyToOne(() => User, (user) => user.domains)
   @JoinColumn({ name: 'user_id' })
   user?: User;

@@ -5,6 +5,7 @@ import {
   IsInt,
   IsOptional,
   IsBoolean,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateDomainDto {
@@ -22,4 +23,20 @@ export class CreateDomainDto {
   @IsOptional()
   @IsInt()
   user_id?: number;
+
+  @ApiProperty({
+    example: '2026-08-29T00:00:00.000Z',
+    description: 'Subscription start date',
+  })
+  @IsNotEmpty()
+  @IsDateString()
+  subscription_start_date: string;
+
+  @ApiPropertyOptional({
+    example: '2027-08-29T00:00:00.000Z',
+    description: 'Subscription end date',
+  })
+  @IsOptional()
+  @IsDateString()
+  subscription_end_date?: string;
 }

@@ -21,9 +21,6 @@ export class Expense extends BaseEntity {
   @Column({ type: 'double precision' })
   value: number;
 
-  @Column({ type: 'double precision', nullable: true })
-  value_converted?: number;
-
   @Column('bigint')
   expense_type_id: number;
 

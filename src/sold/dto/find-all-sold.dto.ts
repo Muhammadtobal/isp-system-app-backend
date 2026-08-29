@@ -57,13 +57,6 @@ export class FindAllSoldDto {
   @IsSingleIdOrList()
   user_id?: SingleIdInput | ListOfIdsInput;
 
-  @ApiPropertyOptional({
-    example: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  to_currency_id?: number;
-
   @ApiProperty({
     description: 'currency id (single or list)',
     example: { value: 1 },

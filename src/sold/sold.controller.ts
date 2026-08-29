@@ -23,10 +23,15 @@ import { CurrentUser } from 'src/shared/decorators/req.guard.decorate';
 
 import { AuthUser } from 'src/shared/helpers';
 import { Sold } from './entities/sold.entity';
+import { FindTotalSoldDto } from './dto/find-total-sold.dto';
+import { CurrencyService } from 'src/currency/currency.service';
 
 @Controller('sold')
 export class SoldController {
-  constructor(private readonly soldService: SoldService) {}
+  constructor(
+    private readonly soldService: SoldService,
+    private readonly currencyService: CurrencyService,
+  ) {}
 
   @Post('create')
   @UseGuards(JwtAuthSharedGuard)
@@ -126,6 +131,77 @@ export class SoldController {
       totalSold,
       activeSold,
       inactiveSold,
+    };
+  }
+
+  @Post('sold-total')
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + 'Sold')
+  public async soldTotal(
+    @Body() filter: FindTotalSoldDto,
+    @CurrentUser() req: AuthUser,
+  ) {
+    const user = req;
+    console.log('user', user);
+
+    let user_id;
+    if (user.role !== 'admin') {
+      user_id = user.userId;
+    }
+
+    const currency = await this.currencyService.findAll({
+      pagination: {
+        limit: 1000,
+        page: 1,
+      },
+    });
+
+    const totalSoldByCurrency = {};
+
+    for (const curr of currency.items) {
+      totalSoldByCurrency[curr.id] = {
+        currency_id: curr.id,
+        currency: curr.code,
+        totalSold: 0,
+      };
+    }
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.soldService.findAll({
+        ...filter,
+        pagination: { page, limit },
+        user_id: user_id ? { value: Number(user_id) } : undefined,
+      });
+
+      if (!result.items.length) break;
+
+      for (const sold of result.items) {
+        if (!sold.currency_id) continue;
+
+        if (!totalSoldByCurrency[sold.currency_id]) {
+          totalSoldByCurrency[sold.currency_id] = {
+            currency_id: sold.currency_id,
+            currency: null,
+            totalSold: 0,
+          };
+        }
+
+        totalSoldByCurrency[sold.currency_id].totalSold += Number(sold.value);
+      }
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      totalSold: Object.values(totalSoldByCurrency),
     };
   }
 }

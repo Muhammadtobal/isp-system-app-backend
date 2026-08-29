@@ -74,29 +74,6 @@ export class PaymentService {
       ])
       .where('true');
 
-    if (filter.to_currency_id) {
-      query
-        .leftJoin(
-          ExchangeRate,
-          'exchange_rate',
-          `
-        exchange_rate.currency_id = payment.currency_id
-        AND exchange_rate.to_currency_id = :toCurrencyId
-      `,
-        )
-        .addSelect(
-          `
-        CASE
-          WHEN payment.currency_id = :toCurrencyId
-            THEN payment.amount
-          ELSE payment.amount * exchange_rate.rate
-        END
-      `,
-          'value_converted',
-        )
-        .setParameter('toCurrencyId', filter.to_currency_id);
-    }
-
     generateQuerySorts<Payment>(query, filter, Payment, 'payment');
 
     generateQueryConditions<Payment>(query, filter, 'payment');
@@ -104,9 +81,6 @@ export class PaymentService {
     return customPaginate<Payment, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
-      rawMappings: {
-        value_converted: 'value_converted',
-      },
     });
   }
 

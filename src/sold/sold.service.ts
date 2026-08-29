@@ -52,36 +52,12 @@ export class SoldService {
 
       .where('true');
 
-    if (filter.to_currency_id) {
-      query
-        .leftJoin(
-          ExchangeRate,
-          'exchange_rate',
-          `
-                          exchange_rate.currency_id = sold.currency_id
-                          AND exchange_rate.to_currency_id = :toCurrencyId
-                        `,
-        )
-        .addSelect(
-          `
-                          CASE
-                            WHEN sold.currency_id = :toCurrencyId
-                              THEN sold.value
-                            ELSE sold.value * exchange_rate.rate
-                          END
-                        `,
-          'value_converted',
-        )
-        .setParameter('toCurrencyId', filter.to_currency_id);
-    }
-
     generateQuerySorts<Sold>(query, filter, Sold, 'sold');
     generateQueryConditions<Sold>(query, filter, 'sold');
 
     return customPaginate<Sold, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
-      rawMappings: { value_converted: 'value_converted' },
     });
   }
 

@@ -42,38 +42,12 @@ export class ExpenseService {
       .leftJoinAndSelect('expense.network', 'network')
       .where('true');
 
-    if (filter.to_currency_id) {
-      query
-        .leftJoin(
-          ExchangeRate,
-          'exchange_rate',
-          `
-        exchange_rate.currency_id = expense.currency_id
-        AND exchange_rate.to_currency_id = :toCurrencyId
-      `,
-        )
-        .addSelect(
-          `
-        CASE
-          WHEN expense.currency_id = :toCurrencyId
-            THEN expense.value
-          ELSE expense.value * exchange_rate.rate
-        END
-      `,
-          'value_converted',
-        )
-        .setParameter('toCurrencyId', filter.to_currency_id);
-    }
-
     generateQuerySorts<Expense>(query, filter, Expense, 'expense');
     generateQueryConditions<Expense>(query, filter, 'expense');
 
     return customPaginate<Expense, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
-      rawMappings: {
-        value_converted: 'value_converted',
-      },
     });
   }
   public findOne(

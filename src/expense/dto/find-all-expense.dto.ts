@@ -63,13 +63,6 @@ export class FindAllExpenseDto {
   @IsSingleIdOrList()
   user_id?: SingleIdInput | ListOfIdsInput;
 
-  @ApiPropertyOptional({
-    example: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  to_currency_id?: number;
-
   @ApiProperty({ example: true, required: false })
   @IsOptional()
   @IsBoolean()

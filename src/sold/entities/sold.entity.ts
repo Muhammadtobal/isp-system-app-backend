@@ -36,9 +36,6 @@ export class Sold extends BaseEntity {
   @Column('bigint')
   currency_id: number;
 
-  @Column({ type: 'double precision', nullable: true })
-  value_converted?: number;
-
   @ManyToOne(() => Currency, (currency) => currency.sales)
   @JoinColumn({ name: 'currency_id' })
   currency?: Currency;

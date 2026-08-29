@@ -67,18 +67,4 @@ export class FindTotalExpenseDto {
   @IsObject()
   @IsSingleIdOrList()
   network_id?: SingleIdInput | ListOfIdsInput;
-
-  @ApiPropertyOptional({
-    example: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  currency_id?: number;
-
-  @ApiPropertyOptional({
-    example: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  to_currency_id?: number;
 }

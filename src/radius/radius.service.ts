@@ -158,32 +158,40 @@ export class RadiusService {
     return users;
   }
 
-  public async getAllSessions(): Promise<RadAcct[]> {
+  public async getOnlineUsers(): Promise<RadAcct[]> {
     const limit = 200;
     let page = 1;
 
-    const allSessions: RadAcct[] = [];
+    const allUsers: RadAcct[] = [];
 
     while (true) {
       const skip = (page - 1) * limit;
 
-      const sessions = await this.radAcctRepository
+      const users = await this.radAcctRepository
         .createQueryBuilder('radAcct')
+        .where('radAcct.acctstoptime IS NULL')
         .orderBy('radAcct.acctstarttime', 'DESC')
         .skip(skip)
         .take(limit)
         .getMany();
 
-      allSessions.push(...sessions);
+      allUsers.push(...users);
 
-      if (sessions.length < limit) {
+      if (users.length < limit) {
         break;
       }
 
       page++;
     }
 
-    return allSessions;
+    return allUsers;
+  }
+  public async getSessionsByUsername(username: string): Promise<RadAcct[]> {
+    return await this.radAcctRepository
+      .createQueryBuilder('radAcct')
+      .where('radAcct.username = :username', { username })
+      .orderBy('radAcct.acctstarttime', 'DESC')
+      .getMany();
   }
   public async createGroup(dto: CreateGroupDto) {
     const groupExist = await this.groupCheckRepo.findOne({
