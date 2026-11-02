@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -213,5 +214,21 @@ export class RadiusController {
   @Permissions(Operation.DELETE + Nas.name)
   removeNas(@Param('id') id: number) {
     return this.radiusService.removeNas(id);
+  }
+
+  @Patch('disconnect-user/:username')
+  // @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + RadCheck.name)
+  disconnectUser(@Param('username') username: string) {
+    return this.radiusService.disconnectUser(username);
+  }
+
+  @Delete('unblock/:username')
+  async unblockUser(@Param('username') username: string) {
+    if (!username?.trim()) {
+      throw new BadRequestException('Username is required');
+    }
+
+    return this.radiusService.unblockUser(username.trim());
   }
 }

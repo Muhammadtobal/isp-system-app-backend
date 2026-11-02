@@ -20,7 +20,7 @@ export class Nas {
 
   @Column({
     type: 'varchar',
-    length: 50,
+    length: 255,
     default: 'other',
   })
   type: string;

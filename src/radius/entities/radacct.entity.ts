@@ -11,13 +11,13 @@ export class RadAcct {
   @Index()
   @Column({
     type: 'varchar',
-    length: 64,
+    length: 255,
   })
   acctsessionid: string;
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
     unique: true,
   })
   acctuniqueid: string;
@@ -25,13 +25,13 @@ export class RadAcct {
   @Index()
   @Column({
     type: 'varchar',
-    length: 64,
+    length: 255,
   })
   username: string;
 
   @Column({
     type: 'varchar',
-    length: 64,
+    length: 255,
     nullable: true,
   })
   realm: string | null;
@@ -39,20 +39,20 @@ export class RadAcct {
   @Index()
   @Column({
     type: 'varchar',
-    length: 15,
+    length: 255,
   })
   nasipaddress: string;
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
     nullable: true,
   })
   nasportid: string | null;
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
     nullable: true,
   })
   nasporttype: string | null;
@@ -94,21 +94,21 @@ export class RadAcct {
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
     nullable: true,
   })
   acctauthentic: string | null;
 
   @Column({
     type: 'varchar',
-    length: 128,
+    length: 255,
     nullable: true,
   })
   connectinfo_start: string | null;
 
   @Column({
     type: 'varchar',
-    length: 128,
+    length: 255,
     nullable: true,
   })
   connectinfo_stop: string | null;
@@ -127,32 +127,32 @@ export class RadAcct {
 
   @Column({
     type: 'varchar',
-    length: 50,
+    length: 255,
   })
   calledstationid: string;
 
   @Column({
     type: 'varchar',
-    length: 50,
+    length: 255,
   })
   callingstationid: string;
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
   })
   acctterminatecause: string;
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
     nullable: true,
   })
   servicetype: string | null;
 
   @Column({
     type: 'varchar',
-    length: 32,
+    length: 255,
     nullable: true,
   })
   framedprotocol: string | null;
@@ -160,42 +160,42 @@ export class RadAcct {
   @Index()
   @Column({
     type: 'varchar',
-    length: 15,
+    length: 255,
   })
   framedipaddress: string;
 
   @Index()
   @Column({
     type: 'varchar',
-    length: 45,
+    length: 255,
   })
   framedipv6address: string;
 
   @Index()
   @Column({
     type: 'varchar',
-    length: 45,
+    length: 255,
   })
   framedipv6prefix: string;
 
   @Index()
   @Column({
     type: 'varchar',
-    length: 44,
+    length: 255,
   })
   framedinterfaceid: string;
 
   @Index()
   @Column({
     type: 'varchar',
-    length: 45,
+    length: 255,
   })
   delegatedipv6prefix: string;
 
   @Index()
   @Column({
     type: 'varchar',
-    length: 64,
+    length: 255,
     nullable: true,
   })
   class: string | null;

@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
 
 @Entity('radcheck')
+@Index('IDX_radcheck_username', ['username'])
 export class RadCheck {
   @PrimaryGeneratedColumn()
   id: number;

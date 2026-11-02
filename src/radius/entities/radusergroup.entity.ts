@@ -5,14 +5,14 @@ export class RadUserGroup {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index()
+  @Index('IDX_radusergroup_username')
   @Column({
     type: 'varchar',
     length: 255,
   })
   username: string;
 
-  @Index()
+  @Index('IDX_radusergroup_groupname')
   @Column({
     type: 'varchar',
     length: 255,

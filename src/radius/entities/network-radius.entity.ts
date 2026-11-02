@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 
 @Entity()
+@Index('UQ_network_radius_username', ['username'], { unique: true })
 export class NetworkRadius {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
